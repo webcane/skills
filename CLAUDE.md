@@ -68,3 +68,5 @@ Create `skills/<new-skill-name>/SKILL.md` with the required frontmatter, then ru
 ## After Any Change
 
 Update `CLAUDE.md` (if structure/workflow changed) and add an entry to `CHANGELOG.md` under `## [Unreleased]`.
+
+When releasing a new skill version, move the `## [Unreleased]` entries into a new versioned section (e.g. `## [1.1.0] - YYYY-MM-DD`) before tagging and publishing.
