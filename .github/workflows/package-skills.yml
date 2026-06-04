@@ -1,0 +1,32 @@
+name: Package Skills
+on:
+  push:
+    branches: [main]
+    paths: ['skills/**']
+  release:
+    types: [published]
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Create dist directory
+        run: mkdir -p dist
+      - name: Package skills
+        run: |
+          for skill_dir in skills/*/; do
+            skill_name=$(basename "$skill_dir")
+            tar -czf "dist/${skill_name}.skill" -C "skills" "$skill_name"
+          done
+      - name: Upload as artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: skills
+          path: dist/
+      - name: Upload to release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*.skill
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
