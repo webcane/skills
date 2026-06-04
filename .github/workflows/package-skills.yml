@@ -10,15 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Create dist directory
-        run: mkdir -p dist
       - name: Package skills
         run: |
+          mkdir -p dist
           for skill_dir in skills/*/; do
-            skill_name=$(basename "$skill_dir")
-            tar -czf "dist/${skill_name}.skill" -C "skills" "$skill_name"
+            name=$(basename "$skill_dir")
+            tar -czf "dist/${name}.skill" -C skills "$name"
           done
-      - name: Upload as artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: skills
