@@ -64,3 +64,7 @@ CI (`.github/workflows/package-skills.yml`) automatically packages all skills on
 ## Adding a New Skill
 
 Create `skills/<new-skill-name>/SKILL.md` with the required frontmatter, then run the package script. The CI will pick it up automatically on push.
+
+## After Any Change
+
+Update `CLAUDE.md` (if structure/workflow changed) and add an entry to `CHANGELOG.md` under `## [Unreleased]`.
