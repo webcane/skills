@@ -8,17 +8,6 @@ color: cyan
 
 A structured approach to creating authentic LinkedIn articles that resonate with professional audiences by sharing genuine experiences and practical lessons. Combines personal narrative with accessible, engaging writing and optional research verification.
 
-## When to Use This Skill
-
-Use this skill when:
-- Writing LinkedIn articles or posts that share a professional insight or lesson
-- You want to document a challenge, solution, or discovery you've experienced
-- Creating thought leadership content that feels authentic and human
-- Need help planning and structuring an article before writing
-- Want to ensure your LinkedIn content avoids corporate jargon and clichés
-
----
-
 ## Three-Mode Operation
 
 This skill operates in three sequential modes. You can skip Research/Verify if your article is purely personal narrative.
@@ -114,23 +103,8 @@ Draft the article section by section, following the outline and style guidelines
 
 **Words Per Section:** See length recommendations below for targets.
 
-### Sentence Rhythm Examples
-
-**Example 1 (Flat - Boring):**
-"I had a problem with my project management approach. It was not working well. I decided to try a different method. The new method was better. I learned important lessons from this experience."
-
-**Example 2 (Varied - Engaging):**
+**Rhythm example:**
 "My project management approach was failing. So I tried something radically different. What surprised me was how much the team responded to one small change: asking for their input before finalizing timelines. Suddenly, projects moved faster. They weren't resisting the plan anymore—they were executing it."
-
-**Why Example 2 Works:**
-- Short opening creates tension ("My project management approach was failing.")
-- Medium sentence provides action ("So I tried something radically different.")
-- Long sentence with specific detail anchors the insight
-- Short sentence for impact ("Suddenly, projects moved faster.")
-- Longer closing sentence explains the lesson
-
-**Example 3 (Real LinkedIn Style):**
-"I spent months perfecting my pitch. Rehearsed it dozens of times. Then I threw it away. What actually worked wasn't the perfect delivery—it was showing up without a script and actually listening. The conversation happened. Real connection happened. That's what changed everything."
 
 ---
 
@@ -187,30 +161,6 @@ Before you write, work through these questions:
 - What specifically happened that taught you this lesson?
 - What did you try first?
 - What surprised you about the process?
-
----
-
-## Writing the Article
-
-### Opening (2-3 sentences)
-Set a specific scene or observation. Make it vivid and concrete. The reader should immediately recognize the situation.
-
-**Example opening:**
-"I spent three months building the perfect product roadmap. Charts, timelines, customer research, everything aligned. Then I showed it to the team, and none of them built it the way I planned."
-
-### Building the Argument (3-4 paragraphs)
-- Paragraph 1: Establish the problem clearly
-- Paragraph 2: Explain why the obvious approach didn't work
-- Paragraph 3: Describe what you actually did differently
-- Paragraph 4 (optional): Include a setback or adjustment you made along the way
-
-Use transitions that show logical flow: "What I didn't expect...", "The shift came when...", "This taught me..."
-
-### The Insight (1-2 paragraphs)
-Extract the lesson from your experience. Make it specific enough to be actionable but broad enough that others can adapt it.
-
-### Closing (1 paragraph + question)
-Wrap up your thought. End with a genuine question that invites readers into the comments. Show you want their perspective, not just their approval.
 
 ---
 
@@ -294,42 +244,10 @@ After the draft is complete, you enter the **collaborative review phase**. This 
 
 ### How the Review Loop Works
 
-1. **Article is presented in full** with clear section breaks
-2. **You review the entire draft** and identify which specific parts need improvement
-3. **You can request rephrasing of:** 
-   - Specific sentences or paragraphs
-   - Entire sections (e.g., "Rephrase the opening")
-   - Specific issues (e.g., "This sentence sounds too corporate, make it more conversational")
-   - Tone adjustments (e.g., "Make this section more confident")
-4. **I rephrase only the requested parts** while keeping everything else unchanged
-5. **The loop continues** — I repeatedly ask "Which parts would you like me to improve?" until you respond with:
-   - "Done"
-   - "Complete"
-   - "It's ok"
-   - "Looks good"
-   - Or any similar confirmation
-
-### Example Review Exchange
-
-**You:** "The opening paragraph feels too formal. Can you make it more conversational?"
-
-**I:** [Rephrase opening only]
-
-**You:** "Better. Now can you tighten up the second section? It's a bit wordy."
-
-**I:** [Rephrase that section only]
-
-**You:** "Perfect. Anything else I should tweak?"
-
-**I:** "A few suggestions if you want: The transition to the third section could be smoother, and the closing question could be more specific. But it reads well. What would you like to refine?"
-
-**You:** "Let's improve that transition."
-
-**I:** [Rephrase transition only]
-
-**You:** "Done!"
-
-**I:** "Great! Your article is ready. Here's the final version ready to publish..."
+1. Present the full article with clear section breaks
+2. Rephrase only the specific parts the user requests — sentences, paragraphs, sections, or tone adjustments
+3. After each revision, ask "Which parts would you like me to improve?"
+4. Continue until the user signals completion ("Done", "Looks good", or similar)
 
 ### Review Loop Guidelines
 
@@ -354,56 +272,6 @@ After the draft is complete, you enter the **collaborative review phase**. This 
 
 **The Invisible Author**: Content so polished it sounds like a company published it, not a person
 → Let your voice and personality come through. Imperfection is proof of authenticity.
-
----
-
-## How to Use This Skill
-
-### The Complete Workflow
-
-**Step 1: OUTLINE MODE**
-1. Answer the planning questions in the Planning Phase section
-2. Sketch out your 6-part structure with 2-3 bullet points per section
-3. I'll create a detailed outline with word count targets and story beats
-4. Review and adjust the outline until it feels right
-
-**Step 2: RESEARCH/VERIFY MODE (Optional)**
-1. Decide: Does your article include data, statistics, or claims that need verification?
-2. If YES: I'll research and verify facts, find credible sources, integrate into your narrative
-3. If NO: Skip this mode and go straight to writing
-
-**Step 3: WRITE MODE**
-1. I'll draft the article section by section
-2. Following the outline, style guidelines, and word count targets
-3. Deliver the complete first draft
-4. Move to the Review & Revision Loop
-
-**Step 4: REVIEW & REVISION LOOP**
-1. You review the complete draft
-2. Tell me which parts need improvement
-3. I rephrase only those specific parts
-4. Repeat step 2-3 until you say you're done
-5. Final article is ready to publish
-
-### Typical User Prompts
-
-**Starting an outline:**
-- "Help me outline a LinkedIn article about [topic]"
-- "Plan an article for my audience of [who]"
-
-**Adding research:**
-- "Can you verify the stats in this article?"
-- "Research the latest trends in [topic] and integrate them"
-
-**Writing the article:**
-- "Write the article based on this outline"
-- "Draft the full article now"
-
-**Revising:**
-- "Make the opening more conversational"
-- "Tighten up the second section"
-- "This feels too promotional—fix the tone"
-- "Done!"
 
 ---
 
