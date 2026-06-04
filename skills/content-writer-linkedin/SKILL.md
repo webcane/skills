@@ -1,5 +1,5 @@
 ---
-name: content-writer
+name: content-writer-linkedin
 description: Create authentic, engaging LinkedIn articles that share genuine professional insights and experiences. Use this skill whenever the user wants to write LinkedIn posts or articles—especially when they want to share lessons learned, solve professional challenges, or contribute thought leadership. The skill guides you through planning and writing coherent, human-sounding content that follows the Minto Pyramid Principle, avoids buzzwords and clichés, and reads like genuine personal narrative rather than marketing copy. Operates in three modes—Outline for structure, optional Research/Verify for data-driven articles, and Write for drafting—followed by a collaborative Review loop where users can request specific rephrasing until satisfied.
 color: cyan
 ---
