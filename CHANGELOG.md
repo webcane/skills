@@ -4,6 +4,7 @@
 
 ### Changed
 - Trimmed `content-writer-linkedin` SKILL.md by ~31% — removed duplicate workflow section, condensed sentence rhythm examples, collapsed review loop dialogue to bullet points, dropped "When to Use" and "Typical User Prompts" sections
+- CI workflow now automatically promotes `[Unreleased]` to a versioned section in CHANGELOG.md when a release is published
 
 ## [1.0.0] - 2026-06-04
 

@@ -8,6 +8,8 @@ on:
 jobs:
   package:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v3
       - name: Package skills
@@ -29,3 +31,17 @@ jobs:
           files: dist/*.skill
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update CHANGELOG on release
+        if: github.event_name == 'release'
+        run: |
+          VERSION="${{ github.event.release.tag_name }}"
+          VERSION="${VERSION#v}"
+          DATE="$(date -u +%Y-%m-%d)"
+          git fetch origin main
+          git checkout main
+          sed -i "s/## \[Unreleased\]/## [${VERSION}] - ${DATE}/" CHANGELOG.md
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git diff --cached --quiet || git commit -m "chore: update CHANGELOG for v${VERSION}"
+          git push origin main
