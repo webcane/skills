@@ -1,14 +1,14 @@
 #!/bin/bash
 # Download and install a .skill file from GitHub
 # Usage: ./scripts/install-skill.sh <skill-name> [version]
-# Env:   INSTALL_DIR (default: .), GITHUB_REPO (default: yourusername/skills)
+# Env:   INSTALL_DIR (default: .), GITHUB_REPO (default: webcane/skills)
 
 set -e
 
 SKILL_NAME="${1:-}"
 VERSION="${2:-latest}"
 INSTALL_DIR="${INSTALL_DIR:-.}"
-GITHUB_REPO="${GITHUB_REPO:-yourusername/skills}"
+GITHUB_REPO="${GITHUB_REPO:-webcane/skills}"
 BRANCH="${BRANCH:-main}"
 
 [ -z "$SKILL_NAME" ] && echo "Usage: $0 <skill-name> [version]" && exit 1
