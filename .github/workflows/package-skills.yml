@@ -12,7 +12,7 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Package all skills
         run: |
           mkdir -p dist
@@ -21,7 +21,7 @@ jobs:
             tar -czf "dist/${name}.skill" -C skills "$name"
           done
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: skills
           path: dist/
@@ -34,7 +34,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: main
       - name: Parse skill + version from tag
@@ -53,7 +53,7 @@ jobs:
       - name: Package the released skill
         run: bash scripts/package-skill.sh "${{ steps.parse.outputs.skill }}" "${{ steps.parse.outputs.version }}"
       - name: Upload to release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: |
             dist/${{ steps.parse.outputs.skill }}.skill
