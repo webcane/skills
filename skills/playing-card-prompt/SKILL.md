@@ -29,35 +29,13 @@ The user may invoke the skill in three modes. Detect which one from their messag
 
 ## Startup: loading saved settings
 
-Before asking any wizard questions, load persistent settings. See `references/CONFIG.md`
-for the full schema, lookup order, and field reference.
-
-Manage `config.json` with the bundled CLI rather than hand-editing it — it validates
-every value against the on-disk decks/patterns:
-
-```bash
-python3 scripts/manage_config.py show              # effective config + saved config.json
-python3 scripts/manage_config.py set deck german   # validate + persist one field
-python3 scripts/manage_config.py options [key]     # list allowed values
-python3 scripts/manage_config.py validate          # check config.json against the schema
-python3 scripts/manage_config.py reset --yes       # delete config.json (restore defaults)
-```
-
-Keys: `deck`, `lettering`, `style`, `aspect_ratio`, `index.size`, `index.count`,
-`index.layout`. Use `get`/`set`/`unset` for single fields.
-
-**Lookup order** (first found wins per field):
-1. `config.json` in the skill directory
-2. `$AGENT_SKILLS_SETTINGS` → global `settings.json` (read the
-   `"playing-card-prompt"` namespace if present, else top-level keys)
-3. Built-in defaults
-
-**Persistent fields** (saved in config — rarely change between cards):
-`deck`, `lettering`, `style`, `aspect_ratio`, `index.*`
-
-**Per-card fields** (always asked — never saved):
-`rank`, `suit`, `character_name`, `character_features`, `extra_attributes`,
-`reference_transfers`, `exclusions`
+Before asking any wizard questions, load persistent settings (`deck`, `lettering`,
+`style`, `aspect_ratio`, `index.*`) via `python3 scripts/manage_config.py show`.
+Everything else — schema, lookup order, field reference, and the full CLI — is in
+`references/CONFIG.md`; read it whenever you need to inspect, change, or validate
+`config.json`. Per-card fields (`rank`, `suit`, `character_name`,
+`character_features`, `extra_attributes`, `reference_transfers`, `exclusions`) are
+always asked fresh and never saved.
 
 ---
 
