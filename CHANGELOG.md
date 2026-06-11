@@ -10,6 +10,7 @@ and each skill is versioned and released independently.
 - Switched to **per-skill versioning**: each skill carries its version in `SKILL.md` frontmatter (`metadata.version`), keeps its own `CHANGELOG.md`, and is released under a namespaced tag `<skill>/v<version>`
 - `package-skill.sh` now reads the version from `SKILL.md` frontmatter when no version argument is passed
 - CI (`package-skills.yml`) parses the release tag, packages and uploads only the tagged skill, and promotes that skill's `[Unreleased]` CHANGELOG section to a versioned one
+- Synced `README.md`, `QUICK_START.md`, and `CLAUDE.md` to the per-skill release workflow
 
 ## Versioning
 
