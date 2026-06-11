@@ -41,7 +41,7 @@ always asked fresh and never saved.
 
 ## Mode: Config (`--init` / `--config`)
 
-Walk the user through **only the persistent settings** (Steps 1, 2, 5, 9 and
+Walk the user through **only the persistent settings** (Steps 1, 2, 5, 8 and
 optionally index). Show current values if `config.json` already exists so the user
 can accept or change each one. At the end, persist each value with
 `python3 scripts/manage_config.py set <key> <value>` (it validates and writes
@@ -147,11 +147,14 @@ _Skipped if loaded from config._ Always ask this on first run; never skip it. Li
 `*.md` files in `assets/pattern/` (ignore names starting with `_`) as options:
 **Austrian (default) · French · English**, and note they can request another style.
 Load the chosen `assets/pattern/<style>.md` and take its `[STYLE_BLOCK]`. For a style
-not on disk, improvise a block following `assets/pattern/_adding-a-pattern.md`.
+not on disk, improvise a block following `assets/pattern/_adding-a-pattern.md`, then
+save that improvised block (e.g. note it in the conversation) so later cards in the
+same deck reuse the identical wording — every card should carry the SAME `[STYLE_BLOCK]`
+text verbatim so the whole deck looks like one consistent set.
 
 ---
 
-**If the rank is A or a number 2–10, jump to Step 9 (Aspect ratio). Steps 5b–7 are court-only.**
+**If the rank is A or a number 2–10, jump to Step 8 (Aspect ratio). Steps 5b–7 are court-only.**
 
 ---
 
@@ -200,7 +203,7 @@ the prompt during assembly. If nothing, no extra exclusions are added.
 
 ---
 
-### Step 9 — Card type / aspect ratio · _persistent_
+### Step 8 — Card type / aspect ratio · _persistent_
 
 _Skipped if loaded from config._ Ask the card type (see the aspect-ratio table in
 `references/REFERENCE.md`):
@@ -225,14 +228,47 @@ Fill `[ASPECT_RATIO]` with the ratio only.
    `[RESOLVED_ATTRIBUTES]` and `[NEGATIVE_LIST]` by following the merge rules in
    `references/REFERENCE.md` (resolve conflicts down to one final, deduplicated,
    contradiction-free state — do not list "traditional" and "override" side by side).
-4. Splice the chosen `[STYLE_BLOCK]` where `[STYLE_BLOCK]` appears.
+4. Splice the chosen `[STYLE_BLOCK]` where `[STYLE_BLOCK]` appears, **copied verbatim and
+   in full** (every line, in order, trailing comma kept) — never summarize, reorder, or
+   drop lines from it. When generating multiple cards for the same deck, reuse the exact
+   same `[STYLE_BLOCK]` text on every card so the set stays visually consistent.
 5. **Drop any line whose placeholder is empty** — never output a literal `[PLACEHOLDER]`.
 6. Keep phrasing as short, comma-separated visual phrases (general → specific: card
    type/style, then layout, then the portrait, then technical finish, then negatives
    last) — avoid full sentences, section headers, or restating the same detail twice.
-7. Consistency check: RANK_LETTER matches the lettering system, SUIT_SYMBOL/SUIT_NAME/
-   SUIT_COLOR match the deck, and `[RESOLVED_ATTRIBUTES]` matches the chosen rank and
-   the user's final intent (no leftover contradictions).
+7. Run the **Post-validation** checklist below. Fix and re-check until everything
+   passes — do not move on to "Presenting the result" with a failing check.
+
+## Post-validation
+
+Before presenting the prompt, verify all of the following against the assembled text:
+
+- [ ] **No raw placeholders** — no literal `[PLACEHOLDER]`-style token remains anywhere.
+- [ ] **Lettering consistency** — `RANK_LETTER` matches the lettering system from Step 2
+  (e.g. Russian → К/Д/В, not K/Q/J), and the rank/suit pairing matches Step 3–4.
+- [ ] **Suit consistency** — `SUIT_NAME`, `SUIT_SYMBOL`, `SUIT_COLOR` belong to the same
+  suit and to the deck chosen in Step 1 (no mixing, e.g. Spades symbol with Acorns name).
+- [ ] **Attribute resolution** — `[RESOLVED_ATTRIBUTES]` is deduplicated and
+  contradiction-free; replacements from Step 5c/6 fully replace (not coexist with) the
+  traditional item they replace, and reference-transfer attributes (Step 6) outrank
+  Step 5c, which outranks the traditional defaults.
+- [ ] **Style block integrity** — `[STYLE_BLOCK]` is the chosen style's block copied
+  verbatim and in full (every line, in order, nothing summarized or dropped), and is
+  identical across all cards generated for the same deck/session.
+- [ ] **Character description (court only)** — `[CHARACTER_NAME]` and
+  `[CHARACTER_FEATURES]` are both present and non-empty; if derived from a reference
+  image (Step 5b-A), the description reflects what was actually returned, not a
+  generic placeholder.
+- [ ] **Negative list** — `[NEGATIVE_LIST]` (from Step 7) contains only "no …"
+  exclusion phrases, deduplicated, with no positive attributes leaking in.
+- [ ] **Aspect ratio** — `[ASPECT_RATIO]` is a concrete `W:H` ratio (from Step 8 or the
+  user's custom value), not descriptive text.
+- [ ] **Template match** — the COURT/PIP/ACE template matches the resolved rank, and no
+  court-only fields (character, attributes, negatives) appear in a PIP/ACE prompt.
+
+If any check fails, correct the relevant field in place and re-run the checklist —
+don't ask the user to fix it unless the failure stems from missing/ambiguous
+information only they can resolve (e.g. no character name given at all).
 
 ## Presenting the result
 
@@ -242,9 +278,11 @@ Midjourney `--no`), mention that the trailing `[NEGATIVE_LIST]` line can be move
 there instead of staying in the main prompt. For Midjourney also note the `--ar`
 flag can carry the aspect ratio. If the assembled prompt feels long or cluttered,
 offer a shortened ~50–80 token version that keeps only: card type, character name,
-the 3–4 most important resolved attributes, style descriptor, and aspect ratio.
-Then offer to tweak any field or build another card. Never call an image tool — this
-skill produces prompt text only.
+the 3–4 most important resolved attributes, style descriptor, and aspect ratio —
+but **never shorten or drop lines from `[STYLE_BLOCK]` itself**, since trimming it
+would make the card's visual style diverge from the rest of the deck. Then offer to
+tweak any field or build another card. Never call an image tool — this skill produces
+prompt text only.
 
 ## Worked example
 
