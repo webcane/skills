@@ -1,28 +1,21 @@
-# Changelog
+# Changelog — repo tooling
+
+Changes to the distribution tooling itself (scripts, CI, repo layout).
+**Per-skill changes live in each skill's own `skills/<name>/CHANGELOG.md`**,
+and each skill is versioned and released independently.
 
 ## [Unreleased]
 
-### Added
-- `playing-card-prompt`: `scripts/manage_config.py` — dependency-free CLI to read/write/validate `config.json` (`show`, `get`, `set`, `unset`, `validate`, `reset`, `options`, `path`); validates `deck`/`style` against the files in `assets/` and enforces the index/lettering/aspect enums
-
 ### Changed
-- Trimmed `content-writer-linkedin` SKILL.md by ~31% — removed duplicate workflow section, condensed sentence rhythm examples, collapsed review loop dialogue to bullet points, dropped "When to Use" and "Typical User Prompts" sections
-- CI workflow now automatically promotes `[Unreleased]` to a versioned section in CHANGELOG.md when a release is published
-
-## [1.0.0] - 2026-06-04
-
-### Added
-- Initial release of content-writer-linkedin skill
-- Three-mode operation (Outline, Research/Verify, Write)
-- Collaborative review loop
-- Sentence rhythm guidance with examples
-- Flesch-Kincaid 6-8th grade readability target
-- 40+ word/phrase avoidance list
-- Word count targets per section
+- Switched to **per-skill versioning**: each skill carries its version in `SKILL.md` frontmatter (`metadata.version`), keeps its own `CHANGELOG.md`, and is released under a namespaced tag `<skill>/v<version>`
+- `package-skill.sh` now reads the version from `SKILL.md` frontmatter when no version argument is passed
+- CI (`package-skills.yml`) parses the release tag, packages and uploads only the tagged skill, and promotes that skill's `[Unreleased]` CHANGELOG section to a versioned one
 
 ## Versioning
 
-We follow [Semantic Versioning](https://semver.org/):
+We follow [Semantic Versioning](https://semver.org/) **per skill**:
 - PATCH: Bug fixes (1.0.1)
 - MINOR: New features (1.1.0)
 - MAJOR: Breaking changes (2.0.0)
+
+Tag format: `<skill-name>/v<version>` (e.g. `playing-card-prompt/v1.0.0`).

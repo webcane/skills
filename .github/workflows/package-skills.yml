@@ -6,13 +6,14 @@ on:
   release:
     types: [published]
 jobs:
-  package:
+  # On push to main: package every skill so the latest <name>.skill artifacts
+  # stay available. Does not touch releases.
+  package-all:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v3
-      - name: Package skills
+      - name: Package all skills
         run: |
           mkdir -p dist
           for skill_dir in skills/*/; do
@@ -24,24 +25,51 @@ jobs:
         with:
           name: skills
           path: dist/
+
+  # On a published release: the tag is <skill-name>/v<version>. Package and
+  # upload ONLY that skill, then promote its [Unreleased] CHANGELOG section.
+  release-skill:
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: main
+      - name: Parse skill + version from tag
+        id: parse
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          case "$TAG" in
+            */v*) ;;
+            *) echo "::error::Tag '$TAG' must be <skill-name>/v<version>"; exit 1 ;;
+          esac
+          SKILL_NAME="${TAG%/*}"
+          VERSION="${TAG##*/}"; VERSION="${VERSION#v}"
+          [ -f "skills/$SKILL_NAME/SKILL.md" ] || { echo "::error::skills/$SKILL_NAME/SKILL.md not found"; exit 1; }
+          echo "skill=$SKILL_NAME" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+      - name: Package the released skill
+        run: bash scripts/package-skill.sh "${{ steps.parse.outputs.skill }}" "${{ steps.parse.outputs.version }}"
       - name: Upload to release
-        if: github.event_name == 'release'
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/*.skill
+          files: |
+            dist/${{ steps.parse.outputs.skill }}.skill
+            dist/${{ steps.parse.outputs.skill }}-${{ steps.parse.outputs.version }}.skill
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Update CHANGELOG on release
-        if: github.event_name == 'release'
+      - name: Promote skill CHANGELOG
         run: |
-          VERSION="${{ github.event.release.tag_name }}"
-          VERSION="${VERSION#v}"
+          SKILL="${{ steps.parse.outputs.skill }}"
+          VERSION="${{ steps.parse.outputs.version }}"
+          CL="skills/$SKILL/CHANGELOG.md"
+          [ -f "$CL" ] || { echo "No $CL; skipping promotion."; exit 0; }
           DATE="$(date -u +%Y-%m-%d)"
-          git fetch origin main
-          git checkout main
-          sed -i "s/## \[Unreleased\]/## [${VERSION}] - ${DATE}/" CHANGELOG.md
+          sed -i "s/## \[Unreleased\]/## [${VERSION}] - ${DATE}/" "$CL"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add CHANGELOG.md
-          git diff --cached --quiet || git commit -m "chore: update CHANGELOG for v${VERSION}"
+          git add "$CL"
+          git diff --cached --quiet || git commit -m "chore: promote ${SKILL} CHANGELOG for v${VERSION}"
           git push origin main

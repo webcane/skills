@@ -10,20 +10,33 @@ A distribution system for Claude skills. Skills are Claude Code extensions defin
 
 ```
 skills/<skill-name>/    # Skill source files (git-tracked)
-  SKILL.md              # Required: skill definition with YAML frontmatter
+  SKILL.md              # Required: skill definition with YAML frontmatter (holds metadata.version)
+  CHANGELOG.md          # Per-skill changelog (this skill's history only)
   README.md             # Optional: user-facing documentation
 dist/                   # Generated output (gitignored for .skill files)
 scripts/                # Packaging and installation shell scripts
+CHANGELOG.md            # Repo-tooling changelog only (scripts/CI/layout)
 .github/workflows/      # CI: auto-packages skills on push to main
 ```
+
+## Versioning Model
+
+**Each skill is versioned and released independently.** There is no single
+repo-wide product version.
+
+- A skill's version is the `metadata.version` field in its `SKILL.md` frontmatter — the single source of truth.
+- Each skill keeps its own `skills/<name>/CHANGELOG.md`.
+- Release tags are namespaced: `<skill-name>/v<version>` (e.g. `playing-card-prompt/v1.0.0`).
+- The root `CHANGELOG.md` tracks only repo tooling (scripts, CI, layout), not skill content.
 
 ## Key Commands
 
 **Package a skill into a `.skill` file:**
 ```bash
 bash scripts/package-skill.sh <skill-name> [version]
-# e.g.: bash scripts/package-skill.sh content-writer-linkedin 1.0.0
+# e.g.: bash scripts/package-skill.sh content-writer-linkedin
 ```
+If `[version]` is omitted it is read from the skill's `SKILL.md` frontmatter (`metadata.version`).
 Outputs `dist/<skill-name>.skill` (latest), `dist/<skill-name>-<version>.skill` (versioned), and a JSON metadata file.
 
 **Install a skill from a remote repo:**
@@ -51,22 +64,29 @@ color: cyan
 # Skill content...
 ```
 
-## Release Workflow
+## Release Workflow (per skill)
 
-1. Edit `skills/<skill-name>/SKILL.md`
-2. Run `bash scripts/package-skill.sh <skill-name> <version>`
-3. Update `CHANGELOG.md`
-4. `git tag -a v<version> -m "Release v<version>"` and push
-5. `gh release create v<version> dist/<skill-name>-<version>.skill`
+1. Edit `skills/<skill-name>/SKILL.md` and bump `metadata.version` in its frontmatter.
+2. Add the change to `skills/<skill-name>/CHANGELOG.md` under `## [Unreleased]`.
+3. (Optional local check) `bash scripts/package-skill.sh <skill-name>` — version is read from frontmatter.
+4. Tag and push: `git tag -a <skill-name>/v<version> -m "<skill-name> v<version>"` then `git push origin <skill-name>/v<version>`.
+5. `gh release create <skill-name>/v<version> --title "<skill-name> v<version>"`.
 
-CI (`.github/workflows/package-skills.yml`) automatically packages all skills on push to `main` when files under `skills/` change, and uploads `.skill` files to GitHub Releases on published releases.
+On a published release CI parses the `<skill>/v<version>` tag, packages and
+uploads **only that skill**, and promotes that skill's `[Unreleased]` CHANGELOG
+section to `## [<version>] - YYYY-MM-DD`. On push to `main` CI also repackages
+all skills as `<name>.skill` artifacts.
 
 ## Adding a New Skill
 
-Create `skills/<new-skill-name>/SKILL.md` with the required frontmatter, then run the package script. The CI will pick it up automatically on push.
+Create `skills/<new-skill-name>/SKILL.md` with the required frontmatter (include
+`metadata.version`, start at `1.0.0`) and a `skills/<new-skill-name>/CHANGELOG.md`.
+Add it to the Skills table in `README.md`. CI packages it automatically on push.
 
 ## After Any Change
 
-Update `CLAUDE.md` (if structure/workflow changed) and add an entry to `CHANGELOG.md` under `## [Unreleased]`.
+- Skill content change → add an entry to that skill's `skills/<name>/CHANGELOG.md` under `## [Unreleased]`.
+- Tooling/CI/layout change → add an entry to the root `CHANGELOG.md` under `## [Unreleased]`.
+- Update `CLAUDE.md` if structure/workflow changed.
 
-When releasing a new skill version, move the `## [Unreleased]` entries into a new versioned section (e.g. `## [1.1.0] - YYYY-MM-DD`) before tagging and publishing.
+Releasing is handled by CI (it promotes `[Unreleased]` on a published release); only promote a CHANGELOG section by hand if releasing without CI.
