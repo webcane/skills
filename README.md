@@ -31,6 +31,27 @@ skill's `SKILL.md` frontmatter (`metadata.version`); release tags are
 
 For full setup instructions, see [QUICK_START.md](QUICK_START.md).
 
+## Local Build & Install (Reinstall)
+
+Build a skill from source and install/reinstall it into your local Claude
+skills directory (`~/.claude/skills` by default) without going through
+GitHub releases:
+
+```bash
+# Pick a skill interactively from skills/
+bash scripts/install-local.sh
+
+# Or specify it directly
+bash scripts/install-local.sh <skillname>
+
+# Install elsewhere
+INSTALL_DIR=/path/to/skills bash scripts/install-local.sh <skillname>
+```
+
+This packages the skill (version read from `SKILL.md` frontmatter) and
+re-extracts it over any existing local copy — safe to re-run after every
+local change to pick up edits.
+
 ## Repository Structure
 
 ```
