@@ -16,36 +16,38 @@ does not ask). The default expands to:
 `[CHARACTER_NAME]` and `[CHARACTER_FEATURES]` are REQUIRED (at minimum a name). The
 features may be typed by the user or derived from a reference image (see SKILL Step 5b).
 
-Attribute blocks are built in priority order (later overrides earlier):
-1. `[TRADITIONAL_ATTRIBUTES]` — auto-loaded from `assets/courts/<rank>.md`
-2. `[EXTRA_ATTRIBUTES]` — Step 5c additions/replacements
-3. `[REFERENCE_TRANSFERS]` — Step 6, takes priority over traditional
-4. `[EXCLUSIONS_LIST]` — Step 7, removes elements
+Before filling the template, resolve all attribute sources into ONE flowing,
+contradiction-free `[RESOLVED_ATTRIBUTES]` list — short comma-separated phrases, no
+bullet points, no section labels, no duplicated details:
+
+1. Start from `[TRADITIONAL_ATTRIBUTES]` (auto-loaded from `assets/courts/<rank>.md`).
+2. Apply the Step 5c additions/replacements — a replacement REMOVES the traditional
+   item it replaces rather than sitting next to it.
+3. Apply the Step 6 reference transfers — these win over anything from steps 1–2 that
+   describes the same feature (face, pose, hand, prop, etc.).
+4. Drop any remaining traditional item that conflicts with `[CHARACTER_FEATURES]` or
+   the user's stated intent (e.g. a weapon or full-body pose attribute when the user
+   asked for a bust portrait with no hands), even if nothing explicitly replaced it.
+5. Make sure each visual detail (face, hair, costume piece, color, prop) appears
+   exactly once, in whichever phrase describes the character.
+
+Build `[NEGATIVE_LIST]` as a single comma-separated "no …" sequence: start with
+`no watermark`, then append the Step 7 exclusions, each phrased as `no <thing>`.
+Never repeat a negative elsewhere in the prompt and never add a separate "exclusions"
+label — engines that support a negative-prompt field can take this list verbatim.
 
 ```
+[ASPECT_RATIO] aspect ratio, full card visible, transparent background outside the card,
 [CHARACTER_NAME] as [RANK_NAME] of [SUIT_NAME_TITLE] playing card,
+[STYLE_BLOCK]
 thin single black border with stepped corner cut-ins framing the index areas,
 [INDEX_LINE]
 large [SUIT_COLOR] [SUIT_NAME] suit symbols centered in upper and lower card fields,
 thin black horizontal dividing line through the exact center of the card,
-reversible two-way court card layout,
-identical upper and lower portraits rotated 180 degrees around the central horizontal axis,
-CHARACTER-SPECIFIC FEATURES:
-[CHARACTER_FEATURES]
-STANDARD [RANK_NAME] RANK ATTRIBUTES (traditional defaults for this rank):
-[TRADITIONAL_ATTRIBUTES]
-ADDITIONAL / REPLACED ATTRIBUTES (override the traditional set):
-[EXTRA_ATTRIBUTES]
-TRANSFERRED FROM REFERENCE IMAGE (takes priority over traditional attributes):
-[REFERENCE_TRANSFERS]
-EXCLUSIONS (elements that must NOT transfer from the reference image):
-[EXCLUSIONS_LIST]
-symmetrical costume design (upper/lower halves rotationally mirrored),
-[STYLE_BLOCK]
+reversible two-way court card layout, identical upper and lower portraits rotated 180 degrees around the central horizontal axis, symmetrical costume design,
+[CHARACTER_FEATURES], [RESOLVED_ATTRIBUTES],
 [SUIT_COLOR] [SUIT_NAME] suit symbols,
-full card visible,
-transparent background outside the card,
-aspect ratio [ASPECT_RATIO], no watermark
+[NEGATIVE_LIST]
 ```
 
 ---
@@ -55,17 +57,15 @@ aspect ratio [ASPECT_RATIO], no watermark
 No portrait, no character. `[RANK_COUNT]` = the rank number.
 
 ```
+[ASPECT_RATIO] aspect ratio, full card visible, transparent background outside the card,
 [RANK_NAME] of [SUIT_NAME_TITLE] playing card,
+[STYLE_BLOCK]
 thin single black border with stepped corner cut-ins framing the index areas,
 [INDEX_LINE]
-[RANK_COUNT] [SUIT_COLOR] [SUIT_NAME] pip symbols arranged in the traditional symmetrical layout for the [RANK_NAME],
-upper-half pips upright, lower-half pips rotated 180 degrees,
+[RANK_COUNT] [SUIT_COLOR] [SUIT_NAME] pip symbols arranged in the traditional symmetrical layout for the [RANK_NAME], upper-half pips upright, lower-half pips rotated 180 degrees,
 thin black horizontal dividing line through the exact center of the card,
-[STYLE_BLOCK]
 [SUIT_COLOR] [SUIT_NAME] suit symbols,
-full card visible,
-transparent background outside the card,
-aspect ratio [ASPECT_RATIO], no watermark
+no watermark
 ```
 
 ---
@@ -73,16 +73,14 @@ aspect ratio [ASPECT_RATIO], no watermark
 ## ACE template (A)
 
 ```
+[ASPECT_RATIO] aspect ratio, full card visible, transparent background outside the card,
 Ace of [SUIT_NAME_TITLE] playing card,
+[STYLE_BLOCK]
 thin single black border with stepped corner cut-ins framing the index areas,
 [INDEX_LINE]
-one single large ornamental [SUIT_COLOR] [SUIT_NAME] symbol centered on the card,
-decorative flourishes and fine scrollwork framing the central symbol,
-[STYLE_BLOCK]
+one single large ornamental [SUIT_COLOR] [SUIT_NAME] symbol centered on the card, decorative flourishes and fine scrollwork framing the central symbol,
 [SUIT_COLOR] [SUIT_NAME] suit symbols,
-full card visible,
-transparent background outside the card,
-aspect ratio [ASPECT_RATIO], no watermark
+no watermark
 ```
 
 ---

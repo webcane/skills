@@ -182,21 +182,21 @@ description from it and let them edit.
 
 Show the auto-loaded traditional attributes from `assets/courts/<rank>.md` and ask, free text,
 for any **additions or replacements** beyond the traditional set (e.g. "replace scepter
-with a telescope", "add a laurel wreath"). Fill `[EXTRA_ATTRIBUTES]`, one item per line
-prefixed with `- `. If none, drop the ADDITIONAL/REPLACED block entirely.
+with a telescope", "add a laurel wreath"). Note each as an addition or a replacement —
+a replacement will remove the traditional item it replaces when attributes are merged
+during assembly (see "Assembling the prompt"). If none, skip this.
 
 ### Step 6 — Transfer from reference image (court only) · _per-card_
 
 Ask what to carry over from the user's reference image (face, hairstyle, a specific
-weapon, an order/medal, etc.). These **take priority over traditional attributes** — note
-that in the prompt. Fill `[REFERENCE_TRANSFERS]`, one item per line prefixed with `- `.
-If the user has no reference image, drop this block.
+weapon, an order/medal, etc.). These **take priority over traditional attributes and
+over Step 5c** when merged during assembly. If the user has no reference image, skip this.
 
 ### Step 7 — Exclude from reference image (court only) · _per-card_
 
 Ask what must NOT carry over (background, decorative elements, props, landscape). Phrase
-each as "no <thing>" joined by commas (e.g. "no background, no cannon, no table"). Fill
-`[EXCLUSIONS_LIST]`. If nothing, use "no extra background objects".
+each as "no <thing>" — these get merged into the single `[NEGATIVE_LIST]` at the end of
+the prompt during assembly. If nothing, no extra exclusions are added.
 
 ---
 
@@ -221,18 +221,28 @@ Fill `[ASPECT_RATIO]` with the ratio only.
 2. Build `[INDEX_LINE]` from `assets/index/options.md` using the silent defaults (Standard size,
    4-Index, rank stacked above suit) — unless the user explicitly asked for a different
    index, in which case combine the chosen fragments.
-3. Substitute every placeholder. For courts, fill `[CHARACTER_NAME]`/`[CHARACTER_FEATURES]`
-   (required), then build the attribute blocks in priority order: traditional (from
-   `assets/courts/<rank>.md`) → additions/replacements → reference transfers → exclusions.
+3. For courts, fill `[CHARACTER_NAME]`/`[CHARACTER_FEATURES]` (required), then build
+   `[RESOLVED_ATTRIBUTES]` and `[NEGATIVE_LIST]` by following the merge rules in
+   `references/REFERENCE.md` (resolve conflicts down to one final, deduplicated,
+   contradiction-free state — do not list "traditional" and "override" side by side).
 4. Splice the chosen `[STYLE_BLOCK]` where `[STYLE_BLOCK]` appears.
-5. **Drop any block/line whose value is empty** — never output a literal `[PLACEHOLDER]`
-   or an empty section header.
-6. Consistency check: RANK_LETTER matches the lettering system, SUIT_SYMBOL/SUIT_NAME/
-   SUIT_COLOR match the deck, and "STANDARD <RANK_NAME> RANK ATTRIBUTES" matches the rank.
+5. **Drop any line whose placeholder is empty** — never output a literal `[PLACEHOLDER]`.
+6. Keep phrasing as short, comma-separated visual phrases (general → specific: card
+   type/style, then layout, then the portrait, then technical finish, then negatives
+   last) — avoid full sentences, section headers, or restating the same detail twice.
+7. Consistency check: RANK_LETTER matches the lettering system, SUIT_SYMBOL/SUIT_NAME/
+   SUIT_COLOR match the deck, and `[RESOLVED_ATTRIBUTES]` matches the chosen rank and
+   the user's final intent (no leftover contradictions).
 
 ## Presenting the result
 
 Output the finished prompt in a single fenced code block, with a one-line lead-in.
+If the target engine has a separate negative-prompt field (e.g. Stable Diffusion,
+Midjourney `--no`), mention that the trailing `[NEGATIVE_LIST]` line can be moved
+there instead of staying in the main prompt. For Midjourney also note the `--ar`
+flag can carry the aspect ratio. If the assembled prompt feels long or cluttered,
+offer a shortened ~50–80 token version that keeps only: card type, character name,
+the 3–4 most important resolved attributes, style descriptor, and aspect ratio.
 Then offer to tweak any field or build another card. Never call an image tool — this
 skill produces prompt text only.
 
