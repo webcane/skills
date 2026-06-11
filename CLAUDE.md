@@ -86,6 +86,7 @@ Add it to the Skills table in `README.md`. CI packages it automatically on push.
 ## After Any Change
 
 - Skill content change → add an entry to that skill's `skills/<name>/CHANGELOG.md` under `## [Unreleased]`.
+- Any change to a skill's `SKILL.md` → bump `metadata.version` (minor version, e.g. `1.1.1` → `1.2.0`) in that same change.
 - Tooling/CI/layout change → add an entry to the root `CHANGELOG.md` under `## [Unreleased]`.
 - Update `CLAUDE.md` if structure/workflow changed.
 

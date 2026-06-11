@@ -4,7 +4,7 @@ description: Interactive wizard that builds image-generation prompts for stylize
 color: emerald
 metadata:
   author: webcane
-  version: 1.1.1
+  version: 1.2.0
 ---
 
 # Playing Card Prompt Wizard
