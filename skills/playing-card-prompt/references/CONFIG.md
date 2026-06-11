@@ -37,6 +37,7 @@ Dotted keys address the index group: `index.size`, `index.count`, `index.layout`
   "lettering": "anglo-american",
   "style": "austrian",
   "aspect_ratio": "9:14",
+  "image_generator": "nanobanana",
   "index": {
     "size": "standard",
     "count": "4-index",
@@ -56,14 +57,18 @@ lookup order, ultimately to the built-in default.
 | `lettering`        | `anglo-american`, `french`, `german`, `russian`, `dutch`, `scandinavian` | per deck default   |
 | `style`            | `austrian`, `french`, `english` (or any custom pattern name)  | `austrian`         |
 | `aspect_ratio`     | `5:7`, `9:14`, `14:25`, `7:12`, or custom                    | `9:14`             |
+| `image_generator`  | `nanobanana`, `stable-diffusion`, `midjourney`, `dalle`, `kaze`, or custom | `nanobanana` |
 | `index.size`       | `standard`, `jumbo`, `magnum`                                 | `standard`         |
 | `index.count`      | `2-index`, `4-index`                                          | `4-index`          |
 | `index.layout`     | `stacked`, `side-by-side`, `peek`, `none`                     | `stacked`          |
 
+`image_generator` controls how the assembled prompt is adapted (negative-list
+placement, aspect-ratio syntax, extra parameters) — see `assets/engines/`.
+
 ### Which settings are "session" vs "persistent"
 
 **Persistent** (saved in config — rarely change between cards):
-`deck`, `lettering`, `style`, `aspect_ratio`, `index.*`
+`deck`, `lettering`, `style`, `aspect_ratio`, `image_generator`, `index.*`
 
 **Per-card** (always asked in the wizard — never saved):
 `rank`, `suit`, `character_name`, `character_features`, `extra_attributes`,
@@ -90,7 +95,8 @@ skills; this skill reads only the keys listed above from the top level (or from 
 {
   "playing-card-prompt": {
     "deck": "french",
-    "style": "austrian"
+    "style": "austrian",
+    "image_generator": "nanobanana"
   }
 }
 ```

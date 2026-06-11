@@ -30,7 +30,8 @@ The user may invoke the skill in three modes. Detect which one from their messag
 ## Startup: loading saved settings
 
 Before asking any wizard questions, load persistent settings (`deck`, `lettering`,
-`style`, `aspect_ratio`, `index.*`) via `python3 scripts/manage_config.py show`.
+`style`, `aspect_ratio`, `image_generator`, `index.*`) via
+`python3 scripts/manage_config.py show`.
 Everything else — schema, lookup order, field reference, and the full CLI — is in
 `references/CONFIG.md`; read it whenever you need to inspect, change, or validate
 `config.json`. Per-card fields (`rank`, `suit`, `character_name`,
@@ -41,7 +42,7 @@ always asked fresh and never saved.
 
 ## Mode: Config (`--init` / `--config`)
 
-Walk the user through **only the persistent settings** (Steps 1, 2, 5, 8 and
+Walk the user through **only the persistent settings** (Steps 1, 2, 5, 8, 9 and
 optionally index). Show current values if `config.json` already exists so the user
 can accept or change each one. At the end, persist each value with
 `python3 scripts/manage_config.py set <key> <value>` (it validates and writes
@@ -52,7 +53,8 @@ Steps to ask in config mode:
 2. Court lettering system
 3. Visual style / pattern
 4. Aspect ratio
-5. (Optional, only if user asks) Index settings
+5. Image generator (optional — see Step 9)
+6. (Optional, only if user asks) Index settings
 
 ## Mode: Reset (`--reset`)
 
@@ -65,8 +67,8 @@ Load config. Then run the card wizard with this logic:
 
 - **Config exists** → skip persistent-setting steps; show a one-line summary of the
   loaded settings (e.g. "Using: French deck, Anglo-American letters, Austrian style,
-  9:14") and go straight to per-card steps (rank → suit → court details if applicable).
-  Mention the user can run `--config` to change defaults.
+  9:14, NanoBanana") and go straight to per-card steps (rank → suit → court details
+  if applicable). Mention the user can run `--config` to change defaults.
 - **No config found** → run the full wizard (all steps), then offer to save the
   persistent settings to `config.json` for next time.
 
@@ -80,6 +82,9 @@ Folders under `assets/`:
 - `assets/courts/` — `king.md` / `queen.md` / `jack.md`, auto-loaded by chosen rank
 - `assets/pattern/` — one file per visual style; each holds a `[STYLE_BLOCK]`
 - `assets/index/options.md` — corner-index settings (advanced; NOT asked in the wizard)
+- `assets/engines/` — one file per image-generation engine, describing how to adapt
+  the assembled prompt (negative-list placement, aspect-ratio syntax, extra
+  parameters); `_config.md` documents the `image_generator` setting itself
 
 Scripts under `scripts/`:
 - `scripts/manage_config.py` — CLI to read/write/validate `config.json`
@@ -218,6 +223,26 @@ Fill `[ASPECT_RATIO]` with the ratio only.
 
 ---
 
+### Step 9 — Image generator (optional) · _persistent_
+
+_Skipped if loaded from config — just mention which engine is in use (e.g. "Using:
+Midjourney") and that `--config` can change it._ Otherwise ask, optional, with
+**NanoBanana as the default**:
+
+- **NanoBanana** — default, no adaptation needed
+- **Stable Diffusion** (SD 1.5 / SDXL / Flux)
+- **Midjourney**
+- **DALL·E**
+- **kaze.ai**
+- or another engine name (free text)
+
+If the user skips this step, use `nanobanana`. Load the matching
+`assets/engines/<engine>.md` (see `assets/engines/_config.md` for the lookup and
+fallback rules) — it defines how to adapt the assembled prompt for that engine.
+Offer to save the choice to `config.json` like the other persistent settings.
+
+---
+
 ## Assembling the prompt
 
 1. Pick the template (COURT / PIP / ACE) from `references/REFERENCE.md`.
@@ -236,7 +261,20 @@ Fill `[ASPECT_RATIO]` with the ratio only.
 6. Keep phrasing as short, comma-separated visual phrases (general → specific: card
    type/style, then layout, then the portrait, then technical finish, then negatives
    last) — avoid full sentences, section headers, or restating the same detail twice.
-7. Run the **Post-validation** checklist below. Fix and re-check until everything
+7. **Engine-aware prompt formatting** — apply the deltas from the
+   `assets/engines/<engine>.md` chosen in Step 9 to the otherwise-finished prompt:
+   - **Negative handling** — if the engine moves negatives out of the main body
+     (Stable Diffusion, Midjourney, kaze.ai, DALL·E), remove the trailing
+     `[NEGATIVE_LIST]` line from the main prompt and reformat it per that engine's
+     file (separate `Negative prompt:`/`Negative:` block, `--no` flags, or folded
+     into a positive avoidance clause for DALL·E).
+   - **Aspect ratio syntax** — if the engine replaces the
+     `[ASPECT_RATIO] aspect ratio,` lead-in (SD pixel size, Midjourney/kaze `--ar`,
+     DALL·E fixed size), drop the lead-in phrase and apply that engine's syntax.
+   - **Extra parameters** — append any engine-specific suffix flags (e.g.
+     Midjourney's `--v 7 --style raw`).
+   - For `nanobanana` (default), no changes apply — skip this step.
+8. Run the **Post-validation** checklist below. Fix and re-check until everything
    passes — do not move on to "Presenting the result" with a failing check.
 
 ## Post-validation
@@ -259,12 +297,18 @@ Before presenting the prompt, verify all of the following against the assembled 
   `[CHARACTER_FEATURES]` are both present and non-empty; if derived from a reference
   image (Step 5b-A), the description reflects what was actually returned, not a
   generic placeholder.
-- [ ] **Negative list** — `[NEGATIVE_LIST]` (from Step 7) contains only "no …"
-  exclusion phrases, deduplicated, with no positive attributes leaking in.
-- [ ] **Aspect ratio** — `[ASPECT_RATIO]` is a concrete `W:H` ratio (from Step 8 or the
-  user's custom value), not descriptive text.
+- [ ] **Negative list** — the negative content (from Step 7) contains only "no …"
+  exclusion phrases (or the engine's equivalent), deduplicated, with no positive
+  attributes leaking in.
+- [ ] **Aspect ratio** — the aspect ratio is a concrete `W:H` ratio (from Step 8 or
+  the user's custom value) or its engine-specific equivalent (pixel size, `--ar`,
+  fixed size), not descriptive text.
 - [ ] **Template match** — the COURT/PIP/ACE template matches the resolved rank, and no
   court-only fields (character, attributes, negatives) appear in a PIP/ACE prompt.
+- [ ] **Engine formatting** — the chosen `image_generator` (Step 9)'s negative
+  handling, aspect-ratio syntax, and extra parameters from
+  `assets/engines/<engine>.md` are all applied; for `nanobanana` the prompt matches
+  the base template unchanged.
 
 If any check fails, correct the relevant field in place and re-run the checklist —
 don't ask the user to fix it unless the failure stems from missing/ambiguous
@@ -272,11 +316,10 @@ information only they can resolve (e.g. no character name given at all).
 
 ## Presenting the result
 
-Output the finished prompt in a single fenced code block, with a one-line lead-in.
-If the target engine has a separate negative-prompt field (e.g. Stable Diffusion,
-Midjourney `--no`), mention that the trailing `[NEGATIVE_LIST]` line can be moved
-there instead of staying in the main prompt. For Midjourney also note the `--ar`
-flag can carry the aspect ratio. If the assembled prompt feels long or cluttered,
+Output the finished prompt in a single fenced code block, with a one-line lead-in
+naming the target engine (e.g. "For Midjourney:"), already adapted per Step 7's
+engine-aware formatting — don't make the user manually move the negative list or
+swap in `--ar` themselves. If the assembled prompt feels long or cluttered,
 offer a shortened ~50–80 token version that keeps only: card type, character name,
 the 3–4 most important resolved attributes, style descriptor, and aspect ratio —
 but **never shorten or drop lines from `[STYLE_BLOCK]` itself**, since trimming it
@@ -287,5 +330,9 @@ prompt text only.
 ## Worked example
 
 For a fully assembled reference prompt (King of Spades, French deck, Anglo-American
-letters, Austrian style), see `references/example-court-king.md`. Read it before
-your first assembly to confirm the expected structure, ordering, and spacing.
+letters, Austrian style, NanoBanana), see `references/example-court-king.md`. Read
+it before your first assembly to confirm the expected structure, ordering, and
+spacing.
+
+For the same card adapted to other engines (Midjourney, Stable Diffusion, kaze.ai,
+DALL·E), see `references/example-engine-variants.md`.

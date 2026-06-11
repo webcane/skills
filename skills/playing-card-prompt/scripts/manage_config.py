@@ -16,7 +16,8 @@ Usage:
   manage_config.py path                 # print the config.json path
   manage_config.py options [key]        # list allowed values
 
-Keys: deck, lettering, style, aspect_ratio, index.size, index.count, index.layout
+Keys: deck, lettering, style, aspect_ratio, image_generator,
+      index.size, index.count, index.layout
 """
 from __future__ import annotations
 
@@ -42,10 +43,11 @@ DEFAULTS = {
     "lettering": "anglo-american",
     "style": "austrian",
     "aspect_ratio": "9:14",
+    "image_generator": "nanobanana",
     "index": {"size": "standard", "count": "4-index", "layout": "stacked"},
 }
 
-PERSISTENT_KEYS = {"deck", "lettering", "style", "aspect_ratio",
+PERSISTENT_KEYS = {"deck", "lettering", "style", "aspect_ratio", "image_generator",
                    "index.size", "index.count", "index.layout"}
 
 
@@ -66,12 +68,18 @@ def allowed_styles() -> list[str]:
     return _discover("pattern") or ["austrian", "french", "english"]
 
 
+def allowed_engines() -> list[str]:
+    # Engines may be custom; this is the on-disk set used for suggestions.
+    return _discover("engines") or ["nanobanana", "stable-diffusion", "midjourney", "dalle", "kaze"]
+
+
 def options_for(key: str):
     return {
         "deck": (allowed_decks(), True),
         "lettering": (LETTERING, True),
         "style": (allowed_styles(), False),          # custom allowed
         "aspect_ratio": (ASPECT_PRESETS, False),     # custom N:M allowed
+        "image_generator": (allowed_engines(), False),  # custom allowed
         "index.size": (INDEX_SIZE, True),
         "index.count": (INDEX_COUNT, True),
         "index.layout": (INDEX_LAYOUT, True),
