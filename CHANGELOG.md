@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Added
+- `playing-card-prompt`: `scripts/manage_config.py` — dependency-free CLI to read/write/validate `config.json` (`show`, `get`, `set`, `unset`, `validate`, `reset`, `options`, `path`); validates `deck`/`style` against the files in `assets/` and enforces the index/lettering/aspect enums
+
 ### Changed
 - Trimmed `content-writer-linkedin` SKILL.md by ~31% — removed duplicate workflow section, condensed sentence rhythm examples, collapsed review loop dialogue to bullet points, dropped "When to Use" and "Typical User Prompts" sections
 - CI workflow now automatically promotes `[Unreleased]` to a versioned section in CHANGELOG.md when a release is published

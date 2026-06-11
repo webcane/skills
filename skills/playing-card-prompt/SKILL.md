@@ -1,6 +1,9 @@
 ---
 name: playing-card-prompt
-description: "Interactive wizard that builds stylized playing card prompts. Supports French, German, Swiss, and Italo-Spanish decks, regional court-lettering systems, and auto-loads traditional attributes for Kings, Queens, Jacks, pip cards, and Aces.\n **Trigger on:** “create/make/design/generate a playing card”, “court card”, “custom character card”, “playing card prompt”, “card generator”, or turning a person/character/reference image into a card.\n  **Process:** walk user through deck → lettering → rank → suit → style → attributes → reference transfers → aspect ratio → output final prompt."
+description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
+color: emerald
+metadata:
+  author: webcane
 ---
 
 # Playing Card Prompt Wizard
@@ -9,37 +12,129 @@ Runs an interactive wizard that collects choices and assembles a finished
 image-generation prompt for a stylized playing card. The deliverable is the completed
 prompt text in a code block for the user to copy. **Do not generate the image yourself.**
 
-## How to run the wizard
+---
+
+## Subcommands
+
+The user may invoke the skill in three modes. Detect which one from their message:
+
+| Trigger                                               | Mode        | What to do                                         |
+|-------------------------------------------------------|-------------|----------------------------------------------------|
+| `--init`, `--config`, `init`, `config`, "configure"   | **Config**  | Run config wizard only; save `config.json`; stop.  |
+| `--reset`                                             | **Reset**   | Delete `config.json`; confirm; stop.               |
+| _(anything else, or no flag)_                         | **Generate**| Load config → run card wizard → output prompt.     |
+
+---
+
+## Startup: loading saved settings
+
+Before asking any wizard questions, load persistent settings. See `references/CONFIG.md`
+for the full schema, lookup order, and field reference.
+
+Manage `config.json` with the bundled CLI rather than hand-editing it — it validates
+every value against the on-disk decks/patterns:
+
+```bash
+python3 scripts/manage_config.py show              # effective config + saved config.json
+python3 scripts/manage_config.py set deck german   # validate + persist one field
+python3 scripts/manage_config.py options [key]     # list allowed values
+python3 scripts/manage_config.py validate          # check config.json against the schema
+python3 scripts/manage_config.py reset --yes       # delete config.json (restore defaults)
+```
+
+Keys: `deck`, `lettering`, `style`, `aspect_ratio`, `index.size`, `index.count`,
+`index.layout`. Use `get`/`set`/`unset` for single fields.
+
+**Lookup order** (first found wins per field):
+1. `config.json` in the skill directory
+2. `$AGENT_SKILLS_SETTINGS` → global `settings.json` (read the
+   `"playing-card-prompt"` namespace if present, else top-level keys)
+3. Built-in defaults
+
+**Persistent fields** (saved in config — rarely change between cards):
+`deck`, `lettering`, `style`, `aspect_ratio`, `index.*`
+
+**Per-card fields** (always asked — never saved):
+`rank`, `suit`, `character_name`, `character_features`, `extra_attributes`,
+`reference_transfers`, `exclusions`
+
+---
+
+## Mode: Config (`--init` / `--config`)
+
+Walk the user through **only the persistent settings** (Steps 1, 2, 5, 9 and
+optionally index). Show current values if `config.json` already exists so the user
+can accept or change each one. At the end, persist each value with
+`python3 scripts/manage_config.py set <key> <value>` (it validates and writes
+`config.json`), then confirm. Do **not** proceed to card generation.
+
+Steps to ask in config mode:
+1. Deck type
+2. Court lettering system
+3. Visual style / pattern
+4. Aspect ratio
+5. (Optional, only if user asks) Index settings
+
+## Mode: Reset (`--reset`)
+
+Run `python3 scripts/manage_config.py reset --yes` to delete `config.json`, confirm to
+the user that defaults are restored, and stop.
+
+## Mode: Generate (default)
+
+Load config. Then run the card wizard with this logic:
+
+- **Config exists** → skip persistent-setting steps; show a one-line summary of the
+  loaded settings (e.g. "Using: French deck, Anglo-American letters, Austrian style,
+  9:14") and go straight to per-card steps (rank → suit → court details if applicable).
+  Mention the user can run `--config` to change defaults.
+- **No config found** → run the full wizard (all steps), then offer to save the
+  persistent settings to `config.json` for next time.
+
+---
+
+## File map
+
+Folders under `assets/`:
+- `assets/decks/` — one file per deck system (suits + available ranks + default lettering)
+- `assets/lettering/systems.md` — court-card index letters per region
+- `assets/courts/` — `king.md` / `queen.md` / `jack.md`, auto-loaded by chosen rank
+- `assets/pattern/` — one file per visual style; each holds a `[STYLE_BLOCK]`
+- `assets/index/options.md` — corner-index settings (advanced; NOT asked in the wizard)
+
+Scripts under `scripts/`:
+- `scripts/manage_config.py` — CLI to read/write/validate `config.json`
+  (`show`, `get`, `set`, `unset`, `validate`, `reset`, `options`, `path`)
+
+Reference files under `references/`:
+- `references/REFERENCE.md` — COURT / PIP / ACE templates, rank table, aspect ratios
+- `references/CONFIG.md` — config schema, lookup order, field reference
+- `references/example-court-king.md` — a fully assembled example prompt for reference
+
+---
+
+## Wizard steps
 
 Ask **one logical group at a time**, waiting for each answer. For fixed-choice questions
 use `ask_user_input_v0` (tappable options); for open-ended fields ask in plain prose.
 Always offer the default so the user can accept with one tap. Read each reference file
 as that step comes up — don't preload everything.
 
-Folders:
-- `decks/` — one file per deck system (suits + available ranks + default lettering)
-- `lettering/systems.md` — court-card index letters per region
-- `courts/` — `king.md` / `queen.md` / `jack.md`, auto-loaded by chosen rank
-- `pattern/` — one file per visual style; each holds a `[STYLE_BLOCK]`
-- `index/options.md` — corner-index settings (advanced; NOT asked in the wizard)
-- `references/templates.md` — COURT / PIP / ACE templates, rank table, aspect ratios
+### Step 1 — Deck type (suit system) · _persistent_
 
----
-
-### Step 1 — Deck type (suit system)
-
-Ask which deck. Options:
+_Skipped if loaded from config._ Ask which deck. Options:
 - **French / International** (Spades, Clubs, Hearts, Diamonds) — **default**
 - **German** (Acorns, Leaves, Hearts, Bells)
 - **Swiss** (Acorns, Shields, Roses, Bells)
 - **Italo-Spanish / Latin** (Swords, Batons, Cups, Coins)
 
-Load the matching `decks/<deck>.md`. It defines the suit table, the available ranks,
+Load the matching `assets/decks/<deck>.md`. It defines the suit table, the available ranks,
 and the deck's default lettering system.
 
-### Step 2 — Court lettering system
+### Step 2 — Court lettering system · _persistent_
 
-Ask which lettering system sets the printed court letters (see `lettering/systems.md`):
+_Skipped if loaded from config._ Ask which lettering system sets the printed court
+letters (see `assets/lettering/systems.md`):
 - **Anglo-American** (K / Q / J) — default for French & Latin decks
 - **French** (R / D / V)
 - **German / Austrian** (K / D / B) — default for German & Swiss decks
@@ -50,30 +145,30 @@ Ask which lettering system sets the printed court letters (see `lettering/system
 Default to the chosen deck's default system. This only affects court cards (and the Ace
 letter); for number cards it's unused, but ask it here to keep the flow consistent.
 
-### Step 3 — Rank (branches the flow)
+### Step 3 — Rank · _per-card_
 
-Ask the rank, offering only the ranks listed in the chosen `decks/<deck>.md`
-(standard set: A, 2–10, J, Q, K). Resolve via the rank table in `templates.md`:
-- **K / Q / J → COURT** → auto-load `courts/<rank>.md` and continue the full flow.
+Always ask. Offer only the ranks listed in the chosen `assets/decks/<deck>.md`
+(standard set: A, 2–10, J, Q, K). Resolve via the rank table in `references/REFERENCE.md`:
+- **K / Q / J → COURT** → auto-load `assets/courts/<rank>.md` and continue the full flow.
 - **A → ACE** → skip court Steps 5b–7; go Suit → Style → Aspect ratio.
 - **2–10 → PIP** → same skip as Ace.
 
 Set `RANK_NAME` (English word) and `RANK_LETTER` (localized letter from Step 2 for
 courts; the numeral for pips; `A` for Ace unless the user wants `1`).
 
-### Step 4 — Suit
+### Step 4 — Suit · _per-card_
 
-Ask the suit, offering the four suits from the chosen deck (show symbol/shape + name,
+Always ask. Offer the four suits from the chosen deck (show symbol/shape + name,
 e.g. "♠ Spades" or "Acorns"). Fill `SUIT_NAME_TITLE`, `SUIT_NAME`, `SUIT_SYMBOL`,
 `SUIT_COLOR` from the deck file.
 
-### Step 5 — Visual style / pattern (REQUIRED — always ask)
+### Step 5 — Visual style / pattern (REQUIRED) · _persistent_
 
-Always ask this; never skip it. List the `*.md` files in `pattern/` (ignore names
-starting with `_`) as options: **Austrian (default) · French · English**, and note they
-can request another style. Load the chosen `pattern/<style>.md` and take its
-`[STYLE_BLOCK]`. For a style not on disk, improvise a block following
-`pattern/_adding-a-pattern.md`.
+_Skipped if loaded from config._ Always ask this on first run; never skip it. List the
+`*.md` files in `assets/pattern/` (ignore names starting with `_`) as options:
+**Austrian (default) · French · English**, and note they can request another style.
+Load the chosen `assets/pattern/<style>.md` and take its `[STYLE_BLOCK]`. For a style
+not on disk, improvise a block following `assets/pattern/_adding-a-pattern.md`.
 
 ---
 
@@ -81,7 +176,7 @@ can request another style. Load the chosen `pattern/<style>.md` and take its
 
 ---
 
-### Step 5b — Character (court only, REQUIRED)
+### Step 5b — Character (court only, REQUIRED) · _per-card_
 
 Every court card must have a character description — **at minimum a name**. Two paths:
 
@@ -104,21 +199,21 @@ description from it and let them edit.
 > If the figure is a real, identifiable public figure: keep it a neutral descriptive
 > depiction (appearance, costume, pose). Don't fabricate quotes or claims.
 
-### Step 5c — Additional / replaced attributes (court only)
+### Step 5c — Additional / replaced attributes (court only) · _per-card_
 
-Briefly note the traditional attributes from `courts/<rank>.md` and ask, free text,
-for any **additions or replacements** (e.g. "replace scepter with a telescope", "add a
-laurel wreath"). **Merge silently** into the final portrait block instead of listing
-separately. If none, skip entirely.
+Show the auto-loaded traditional attributes from `assets/courts/<rank>.md` and ask, free text,
+for any **additions or replacements** beyond the traditional set (e.g. "replace scepter
+with a telescope", "add a laurel wreath"). Fill `[EXTRA_ATTRIBUTES]`, one item per line
+prefixed with `- `. If none, drop the ADDITIONAL/REPLACED block entirely.
 
-### Step 6 — Transfer from reference image (court only)
+### Step 6 — Transfer from reference image (court only) · _per-card_
 
 Ask what to carry over from the user's reference image (face, hairstyle, a specific
 weapon, an order/medal, etc.). These **take priority over traditional attributes** — note
 that in the prompt. Fill `[REFERENCE_TRANSFERS]`, one item per line prefixed with `- `.
 If the user has no reference image, drop this block.
 
-### Step 7 — Exclude from reference image (court only)
+### Step 7 — Exclude from reference image (court only) · _per-card_
 
 Ask what must NOT carry over (background, decorative elements, props, landscape). Phrase
 each as "no <thing>" joined by commas (e.g. "no background, no cannon, no table"). Fill
@@ -126,9 +221,10 @@ each as "no <thing>" joined by commas (e.g. "no background, no cannon, no table"
 
 ---
 
-### Step 8 — Card type / aspect ratio (all ranks)
+### Step 9 — Card type / aspect ratio · _persistent_
 
-Ask the card type (see the aspect-ratio table in `templates.md`):
+_Skipped if loaded from config._ Ask the card type (see the aspect-ratio table in
+`references/REFERENCE.md`):
 - **Bridge / Preferans (Narrow)** — 9:14 — **default**
 - **Poker (Wide)** — 5:7
 - **European / German (Skat)** — 14:25
@@ -140,56 +236,29 @@ Fill `[ASPECT_RATIO]` with the ratio only.
 
 ---
 
-## Assembling the prompt — COMPACT STYLE
+## Assembling the prompt
 
-**The prompt must be compact and dense** — suitable for image generation models.
-Merge related information into 3–4 logical blocks. Avoid verbose descriptions,
-redundant attributes, and ALL-CAPS section headers.
-
-**Compact structure:**
-
-1. **First line:** `[CHARACTER_NAME] as [RANK_NAME] of [SUIT_NAME] playing card` (courts)
-   or `[RANK_NAME] of [SUIT_NAME] playing card` (pip/ace).
-2. **Style & format block:** copy `[INDEX_LINE]` + `[STYLE_BLOCK]` **verbatim** —
-   every word of оформление (border, corner indices, index size, index orientation,
-   suit symbols, dividing line, reversible layout, portrait rotation, symmetrical costume,
-   cross-hatching specifics, linework quality, palette, card stock, paper grain, finish,
-   printing imperfections, background) must be preserved exactly as in the original.
-   NO shortening of оформление. Only reorganize into a `Layout:` + `Style:` split for
-   readability, without dropping a single descriptor.
-3. **Portrait / visual block:** merge `[CHARACTER_FEATURES]` + traditional rank attributes
-   (prioritized: traditional defaults → additions/replacements → reference transfers)
-   into one flowing paragraph. Resolve all overrides silently — never list a traditional
-   attribute that is later replaced. Drop attributes not applicable to the composition
-   (e.g. "hands with halberd" if portrait is chest-up only).
-4. **Exclusions & constraints block:** list all negative constraints (no hands, no
-   background, no watermark), plus color palette, as one compact paragraph.
-
-**Key rules:**
-- Drop empty blocks entirely; never output `[PLACEHOLDER]` or empty headers.
-- Use short block headers: `Layout:`, `Portrait:`, `Style:`, `Exclusions:`.
-- Eliminate redundancy: don't repeat attributes across blocks.
-- Merge traditional attributes silently into the portrait block; don't list them
-  separately unless the user explicitly asks.
-- Consistency check: RANK_LETTER matches lettering system, SUIT_SYMBOL/SUIT_NAME/
-  SUIT_COLOR match the deck.
+1. Pick the template (COURT / PIP / ACE) from `references/REFERENCE.md`.
+2. Build `[INDEX_LINE]` from `assets/index/options.md` using the silent defaults (Standard size,
+   4-Index, rank stacked above suit) — unless the user explicitly asked for a different
+   index, in which case combine the chosen fragments.
+3. Substitute every placeholder. For courts, fill `[CHARACTER_NAME]`/`[CHARACTER_FEATURES]`
+   (required), then build the attribute blocks in priority order: traditional (from
+   `assets/courts/<rank>.md`) → additions/replacements → reference transfers → exclusions.
+4. Splice the chosen `[STYLE_BLOCK]` where `[STYLE_BLOCK]` appears.
+5. **Drop any block/line whose value is empty** — never output a literal `[PLACEHOLDER]`
+   or an empty section header.
+6. Consistency check: RANK_LETTER matches the lettering system, SUIT_SYMBOL/SUIT_NAME/
+   SUIT_COLOR match the deck, and "STANDARD <RANK_NAME> RANK ATTRIBUTES" matches the rank.
 
 ## Presenting the result
 
-Output the finished compact prompt in a single fenced code block, with a one-line
-lead-in. Then offer to tweak any field or build another card. Never call an image
-tool — this skill produces prompt text only.
+Output the finished prompt in a single fenced code block, with a one-line lead-in.
+Then offer to tweak any field or build another card. Never call an image tool — this
+skill produces prompt text only.
 
-## Worked example (King of Spades, French deck, Anglo-American letters, Austrian style)
+## Worked example
 
-```
-Peter the Great as King of Spades playing card.
-
-Layout: Highly detailed Austrian-style playing card, aspect ratio 9:14. Full card visible. Transparent background outside the card. Thin single black border with stepped corner cut-ins framing the index areas. Four corner indices, each with rank K stacked above suit symbol ♠, standard small index size, upper indices upright, lower indices rotated 180 degrees. Large black spade suit symbols centered in upper and lower card fields. Thin black horizontal dividing line through the exact center of the card. Reversible two-way court card layout, identical upper and lower portraits rotated 180 degrees around the central horizontal axis. Symmetrical costume design (upper/lower halves rotationally mirrored).
-
-Portrait: Tall strong-jawed mature man, dark wavy hair, neat mustache, authoritative pose, piercing gaze. Dark green military caftan with gold buttons, rapier. Light blue Order of Saint Andrew sash and star medallion. Early-18th-century military appearance.
-
-Style: Vintage chromolithographic playing-card illustration. Sharp crisp black outlines, fine engraved linework with dense cross-hatching on face, hair, costume and fabric folds. Colors: rich crimson red, royal cobalt blue, burnished gold accents, warm ochre skin tones. Aged ivory playing-card stock, subtle paper grain, matte finish, slight vintage printing imperfections.
-
-Exclusions: No crown, no cannon, no winter landscape, no fortress, no table, no background objects, no watermark.
-```
+For a fully assembled reference prompt (King of Spades, French deck, Anglo-American
+letters, Austrian style), see `references/example-court-king.md`. Read it before
+your first assembly to confirm the expected structure, ordering, and spacing.

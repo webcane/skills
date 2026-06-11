@@ -47,6 +47,7 @@ For full setup instructions, see [QUICK_START.md](QUICK_START.md).
 | Skill | Description |
 |-------|-------------|
 | [content-writer-linkedin](skills/content-writer-linkedin/) | Write authentic LinkedIn articles |
+| [playing-card-prompt](skills/playing-card-prompt/) | Interactive wizard that builds stylized playing card image prompts |
 
 ## Installation URLs
 
