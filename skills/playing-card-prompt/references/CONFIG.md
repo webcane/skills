@@ -42,7 +42,16 @@ Dotted keys address the index group: `index.size`, `index.count`, `index.layout`
     "size": "standard",
     "count": "4-index",
     "layout": "stacked"
-  }
+  },
+  "content_style": {
+    "pip": "false",
+    "ace": "true"
+  },
+  "frame": {
+    "pip": "false",
+    "ace": "true"
+  },
+  "pip_decoration_extra": ""
 }
 ```
 
@@ -51,24 +60,35 @@ lookup order, ultimately to the built-in default.
 
 ### Field reference
 
-| Field              | Values                                                        | Default            |
-|--------------------|---------------------------------------------------------------|--------------------|
-| `deck`             | `french`, `german`, `swiss`, `latin`                          | `french`           |
-| `lettering`        | `anglo-american`, `french`, `german`, `russian`, `dutch`, `scandinavian` | per deck default   |
-| `style`            | `austrian`, `french`, `english` (or any custom pattern name)  | `austrian`         |
-| `aspect_ratio`     | `5:7`, `9:14`, `14:25`, `7:12`, or custom                    | `9:14`             |
-| `image_generator`  | `nanobanana`, `stable-diffusion`, `midjourney`, `dalle`, `kaze`, or custom | `nanobanana` |
-| `index.size`       | `standard`, `jumbo`, `magnum`                                 | `standard`         |
-| `index.count`      | `2-index`, `4-index`                                          | `4-index`          |
-| `index.layout`     | `stacked`, `side-by-side`, `peek`, `none`                     | `stacked`          |
+| Field                    | Values                                                        | Default            |
+|--------------------------|---------------------------------------------------------------|--------------------|
+| `deck`                   | `french`, `german`, `swiss`, `latin`                          | `french`           |
+| `lettering`              | `anglo-american`, `french`, `german`, `russian`, `dutch`, `scandinavian` | per deck default   |
+| `style`                  | `austrian`, `french`, `english` (or any custom pattern name)  | `austrian`         |
+| `aspect_ratio`           | `5:7`, `9:14`, `14:25`, `7:12`, or custom                    | `9:14`             |
+| `image_generator`        | `nanobanana`, `stable-diffusion`, `midjourney`, `dalle`, `kaze`, or custom | `nanobanana` |
+| `index.size`             | `standard`, `jumbo`, `magnum`                                 | `standard`         |
+| `index.count`            | `2-index`, `4-index`                                          | `4-index`          |
+| `index.layout`           | `stacked`, `side-by-side`, `peek`, `none`                     | `stacked`          |
+| `content_style.pip`      | `true`, `false`                                               | `false`            |
+| `content_style.ace`      | `true`, `false`                                               | `true`             |
+| `frame.pip`              | `true`, `false`                                               | `false`            |
+| `frame.ace`              | `true`, `false`                                               | `true`             |
+| `pip_decoration_extra`   | free text                                                      | `""`               |
 
 `image_generator` controls how the assembled prompt is adapted (negative-list
 placement, aspect-ratio syntax, extra parameters) — see `assets/engines/`.
 
+`content_style.*` / `frame.*` / `pip_decoration_extra` control how `[STYLE_BLOCK]` and
+the border line are resolved for PIP and ACE cards — see "Style block on PIP/ACE
+cards" in `references/REFERENCE.md`. COURT cards always use the full `[STYLE_BLOCK]`
+with a border (these are structural to the COURT template and not configurable).
+
 ### Which settings are "session" vs "persistent"
 
 **Persistent** (saved in config — rarely change between cards):
-`deck`, `lettering`, `style`, `aspect_ratio`, `image_generator`, `index.*`
+`deck`, `lettering`, `style`, `aspect_ratio`, `image_generator`, `index.*`,
+`content_style.*`, `frame.*`, `pip_decoration_extra`
 
 **Per-card** (always asked in the wizard — never saved):
 `rank`, `suit`, `character_name`, `character_features`, `extra_attributes`,

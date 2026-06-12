@@ -6,9 +6,20 @@ All notable changes to this skill. Released per skill as tag
 
 ## [Unreleased]
 
+### Added
+- `content_style.pip`/`content_style.ace` and `frame.pip`/`frame.ace` config fields (default: pip = off/off, ace = on/on) controlling how `[STYLE_BLOCK]` and the bordered-index-area line resolve on PIP/ACE cards
+- New persistent wizard Step 5a — "PIP card decoration": **Plain** (default; suit-color pips only, no accent colors, no border) or **Decorated** (keeps the style's accent line, adds the border, and asks for `pip_decoration_extra` — free text describing what extra decoration to add)
+- `references/example-pip-two.md` — fully assembled PIP example (Two of Spades, Austrian style) showing both the plain default and the decorated variant
+- "Style block on PIP/ACE cards" section in `references/REFERENCE.md` defining `[STYLE_BLOCK_PIP]`/`[STYLE_BLOCK_ACE]`/`[FRAME_LINE]` resolution from the pattern's accent/figure-only lines
+
+### Changed
+- Each `assets/pattern/*.md` now marks which `[STYLE_BLOCK]` line is the "accent" line (extra decoration, suppressed on plain PIP/ACE) and which (if any) is "figure-only" (e.g. Austrian's `warm ochre skin tones,` — always dropped on PIP/ACE, which have no portrait)
+- `scripts/manage_config.py` generalized its nested-group handling (previously `index`-only) to also cover `content_style` and `frame`, and added free-text support for `pip_decoration_extra`
+
 ### Fixed
 - Reworded the figure-specific wording in each `[STYLE_BLOCK]` (Austrian, French, English patterns) so the same verbatim block reads correctly on PIP/ACE cards, which have no portrait — "on face, hair, costume and fabric folds" / "stylized faces" became generic phrasing covering pip symbols and ornamental details
 - Removed the `thin black horizontal dividing line through the exact center of the card,` line from the PIP template — that line exists for COURT cards' reversible two-way (double-headed) layout and doesn't apply to pip cards, which the ACE template already omits it for
+- PIP cards now default to a plain look (no extra accent colors, no border) matching traditional simple number-card designs, instead of inheriting the full court-card style block's decoration
 
 ### Added
 - `scripts/manage_config.py` — dependency-free CLI to read/write/validate `config.json` (`show`, `get`, `set`, `unset`, `validate`, `reset`, `options`, `path`); validates `deck`/`style` against the files in `assets/` and enforces the index/lettering/aspect enums

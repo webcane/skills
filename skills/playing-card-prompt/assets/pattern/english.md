@@ -12,3 +12,7 @@ smooth matte finish,
 sharp modern print quality,
 highly detailed English-style playing card,
 ```
+
+**PIP/ACE line categories** (see "Style block on PIP/ACE cards" in `references/REFERENCE.md`):
+- Accent line (drop unless `content_style.<group>` is on): `classic red, blue, and yellow with restrained gold detailing,`
+- Figure-only line: none

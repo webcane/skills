@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 1.3.0
+  version: 1.4.0
 ---
 
 # Playing Card Prompt Wizard
@@ -29,8 +29,8 @@ The user may invoke the skill in three modes. Detect which one from their messag
 ## Startup: loading saved settings
 
 Before asking any wizard questions, load persistent settings (`deck`, `lettering`,
-`style`, `aspect_ratio`, `image_generator`, `index.*`) via
-`python3 scripts/manage_config.py show`.
+`style`, `aspect_ratio`, `image_generator`, `index.*`, `content_style.*`, `frame.*`,
+`pip_decoration_extra`) via `python3 scripts/manage_config.py show`.
 Everything else — schema, lookup order, field reference, and the full CLI — is in
 `references/CONFIG.md`; read it whenever you need to inspect, change, or validate
 `config.json`. Per-card fields (`rank`, `suit`, `character_name`,
@@ -51,9 +51,10 @@ Steps to ask in config mode:
 1. Deck type
 2. Court lettering system
 3. Visual style / pattern
-4. Aspect ratio
-5. Image generator (optional — see Step 9)
-6. (Optional, only if user asks) Index settings
+4. PIP card decoration (Step 5a)
+5. Aspect ratio
+6. Image generator (optional — see Step 9)
+7. (Optional, only if user asks) Index settings, or `content_style.ace`/`frame.ace`
 
 ## Mode: Reset (`--reset`)
 
@@ -79,7 +80,8 @@ Folders under `assets/`:
 - `assets/decks/` — one file per deck system (suits + available ranks + default lettering)
 - `assets/lettering/systems.md` — court-card index letters per region
 - `assets/courts/` — `king.md` / `queen.md` / `jack.md`, auto-loaded by chosen rank
-- `assets/pattern/` — one file per visual style; each holds a `[STYLE_BLOCK]`
+- `assets/pattern/` — one file per visual style; each holds a `[STYLE_BLOCK]` and marks
+  its accent/figure-only lines for PIP/ACE resolution (see `references/REFERENCE.md`)
 - `assets/index/options.md` — corner-index settings (advanced; NOT asked in the wizard)
 - `assets/engines/` — one file per image-generation engine, describing how to adapt
   the assembled prompt (negative-list placement, aspect-ratio syntax, extra
@@ -92,7 +94,8 @@ Scripts under `scripts/`:
 Reference files under `references/`:
 - `references/REFERENCE.md` — COURT / PIP / ACE templates, rank table, aspect ratios
 - `references/CONFIG.md` — config schema, lookup order, field reference
-- `references/example-court-king.md` — a fully assembled example prompt for reference
+- `references/example-court-king.md` — a fully assembled COURT example prompt for reference
+- `references/example-pip-two.md` — a fully assembled PIP example prompt (plain default and decorated variant)
 
 ---
 
@@ -155,6 +158,24 @@ not on disk, improvise a block following `assets/pattern/_adding-a-pattern.md`, 
 save that improvised block (e.g. note it in the conversation) so later cards in the
 same deck reuse the identical wording — every card should carry the SAME `[STYLE_BLOCK]`
 text verbatim so the whole deck looks like one consistent set.
+
+### Step 5a — PIP card decoration · _persistent_
+
+_Skipped if loaded from config._ Ask how number cards (2–10) should look:
+
+- **Plain (default)** — large suit-color pip symbols only: no extra accent colors
+  from the style, and no border around the card. Sets `content_style.pip = false`
+  and `frame.pip = false`.
+- **Decorated** — keep the style's accent color line and add the border. Sets
+  `content_style.pip = true` and `frame.pip = true`, then ask, free text, what extra
+  decorative element to add (e.g. "small corner flourishes", "ornamental pip
+  surrounds") and save it as `pip_decoration_extra`.
+
+Ace cards keep their traditional ornamental flourish and border by default
+(`content_style.ace = true`, `frame.ace = true`); these aren't asked in the wizard —
+change via `python3 scripts/manage_config.py set content_style.ace false` (and
+`frame.ace`) if a plainer Ace is wanted. Court cards always use the full
+`[STYLE_BLOCK]` with a border — not configurable.
 
 ---
 
@@ -252,10 +273,13 @@ Offer to save the choice to `config.json` like the other persistent settings.
    `[RESOLVED_ATTRIBUTES]` and `[NEGATIVE_LIST]` by following the merge rules in
    `references/REFERENCE.md` (resolve conflicts down to one final, deduplicated,
    contradiction-free state — do not list "traditional" and "override" side by side).
-4. Splice the chosen `[STYLE_BLOCK]` where `[STYLE_BLOCK]` appears, **copied verbatim and
-   in full** (every line, in order, trailing comma kept) — never summarize, reorder, or
-   drop lines from it. When generating multiple cards for the same deck, reuse the exact
-   same `[STYLE_BLOCK]` text on every card so the set stays visually consistent.
+4. For COURT, splice the chosen `[STYLE_BLOCK]` **copied verbatim and in full** (every
+   line, in order, trailing comma kept) — never summarize, reorder, or drop lines from
+   it. For PIP/ACE, resolve `[STYLE_BLOCK_PIP]` / `[STYLE_BLOCK_ACE]` and `[FRAME_LINE]`
+   per "Style block on PIP/ACE cards" in `references/REFERENCE.md`, using
+   `content_style.pip`/`content_style.ace` and `frame.pip`/`frame.ace`. When generating
+   multiple cards for the same deck, reuse the exact same resolved style text on every
+   card of the same template type so the set stays visually consistent.
 5. **Drop any line whose placeholder is empty** — never output a literal `[PLACEHOLDER]`.
 6. Keep phrasing as short, comma-separated visual phrases (general → specific: card
    type/style, then layout, then the portrait, then technical finish, then negatives
@@ -289,9 +313,18 @@ Before presenting the prompt, verify all of the following against the assembled 
   contradiction-free; replacements from Step 5c/6 fully replace (not coexist with) the
   traditional item they replace, and reference-transfer attributes (Step 6) outrank
   Step 5c, which outranks the traditional defaults.
-- [ ] **Style block integrity** — `[STYLE_BLOCK]` is the chosen style's block copied
-  verbatim and in full (every line, in order, nothing summarized or dropped), and is
-  identical across all cards generated for the same deck/session.
+- [ ] **Style block integrity** — for COURT, `[STYLE_BLOCK]` is the chosen style's
+  block copied verbatim and in full (every line, in order, nothing summarized or
+  dropped). For PIP/ACE, the resolved style lines follow "Style block on PIP/ACE
+  cards" — accent line dropped unless `content_style.<group>` is on, figure-only
+  line(s) always dropped, and (PIP, when `content_style.pip` is off) the
+  `plain card face, no additional ornament beyond the pip symbols,` line is present.
+  The resolved style text is identical across all cards of the same template type
+  generated for the same deck/session.
+- [ ] **Frame line** — `[FRAME_LINE]` (`thin single black border with stepped corner
+  cut-ins framing the index areas,`) is present for COURT always, and for PIP/ACE only
+  if `frame.pip`/`frame.ace` is on; otherwise the line is absent entirely (not an empty
+  placeholder).
 - [ ] **Character description (court only)** — `[CHARACTER_NAME]` and
   `[CHARACTER_FEATURES]` are both present and non-empty; if derived from a reference
   image (Step 5b-A), the description reflects what was actually returned, not a
@@ -328,10 +361,15 @@ prompt text only.
 
 ## Worked example
 
-For a fully assembled reference prompt (King of Spades, French deck, Anglo-American
-letters, Austrian style, NanoBanana), see `references/example-court-king.md`. Read
-it before your first assembly to confirm the expected structure, ordering, and
-spacing.
+For a fully assembled COURT reference prompt (King of Spades, French deck,
+Anglo-American letters, Austrian style, NanoBanana), see
+`references/example-court-king.md`. Read it before your first assembly to confirm the
+expected structure, ordering, and spacing.
 
-For the same card adapted to other engines (Midjourney, Stable Diffusion, kaze.ai,
-DALL·E), see `references/example-engine-variants.md`.
+For a fully assembled PIP reference prompt (Two of Spades, French deck, Austrian
+style, 9:14), including both the default "plain" resolution and the "decorated"
+variant, see `references/example-pip-two.md`. Read it before assembling any PIP/ACE
+card to confirm how `[STYLE_BLOCK_PIP]`/`[STYLE_BLOCK_ACE]` and `[FRAME_LINE]` resolve.
+
+For the King of Spades card adapted to other engines (Midjourney, Stable Diffusion,
+kaze.ai, DALL·E), see `references/example-engine-variants.md`.

@@ -14,3 +14,7 @@ matte finish,
 slight vintage printing imperfections,
 highly detailed Austrian-style playing card,
 ```
+
+**PIP/ACE line categories** (see "Style block on PIP/ACE cards" in `references/REFERENCE.md`):
+- Accent line (drop unless `content_style.<group>` is on): `rich crimson red, royal cobalt blue, burnished gold accents,`
+- Figure-only line (always drop on pip/ace — no portrait): `warm ochre skin tones,`

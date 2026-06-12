@@ -17,7 +17,9 @@ Usage:
   manage_config.py options [key]        # list allowed values
 
 Keys: deck, lettering, style, aspect_ratio, image_generator,
-      index.size, index.count, index.layout
+      index.size, index.count, index.layout,
+      content_style.pip, content_style.ace, frame.pip, frame.ace,
+      pip_decoration_extra
 """
 from __future__ import annotations
 
@@ -37,6 +39,7 @@ INDEX_SIZE = ["standard", "jumbo", "magnum"]
 INDEX_COUNT = ["2-index", "4-index"]
 INDEX_LAYOUT = ["stacked", "side-by-side", "peek", "none"]
 ASPECT_PRESETS = ["5:7", "9:14", "14:25", "7:12"]
+BOOL_VALUES = ["true", "false"]
 
 DEFAULTS = {
     "deck": "french",
@@ -45,10 +48,17 @@ DEFAULTS = {
     "aspect_ratio": "9:14",
     "image_generator": "nanobanana",
     "index": {"size": "standard", "count": "4-index", "layout": "stacked"},
+    "content_style": {"pip": "false", "ace": "true"},
+    "frame": {"pip": "false", "ace": "true"},
+    "pip_decoration_extra": "",
 }
 
 PERSISTENT_KEYS = {"deck", "lettering", "style", "aspect_ratio", "image_generator",
-                   "index.size", "index.count", "index.layout"}
+                   "index.size", "index.count", "index.layout",
+                   "content_style.pip", "content_style.ace",
+                   "frame.pip", "frame.ace", "pip_decoration_extra"}
+
+NESTED_GROUPS = ("index", "content_style", "frame")
 
 
 def _discover(subdir: str) -> list[str]:
@@ -83,6 +93,11 @@ def options_for(key: str):
         "index.size": (INDEX_SIZE, True),
         "index.count": (INDEX_COUNT, True),
         "index.layout": (INDEX_LAYOUT, True),
+        "content_style.pip": (BOOL_VALUES, True),
+        "content_style.ace": (BOOL_VALUES, True),
+        "frame.pip": (BOOL_VALUES, True),
+        "frame.ace": (BOOL_VALUES, True),
+        "pip_decoration_extra": (None, False),       # free text
     }.get(key)
 
 
@@ -93,6 +108,8 @@ def validate_value(key: str, value: str) -> tuple[bool, str]:
     if opt is None:
         return False, f"unknown key '{key}' (valid: {', '.join(sorted(PERSISTENT_KEYS))})"
     allowed, strict = opt
+    if allowed is None:  # free text
+        return True, ""
     if key == "aspect_ratio":
         if value in allowed or re.fullmatch(r"\d+:\d+", value):
             return True, ""
@@ -124,8 +141,8 @@ def effective() -> dict:
     cfg = json.loads(json.dumps(DEFAULTS))  # deep copy
     raw = load_raw()
     for k, v in raw.items():
-        if k == "index" and isinstance(v, dict):
-            cfg["index"].update(v)
+        if k in NESTED_GROUPS and isinstance(v, dict):
+            cfg[k].update(v)
         else:
             cfg[k] = v
     return cfg
@@ -221,9 +238,9 @@ def cmd_validate(_args):
     errors, notes = [], []
     flat = {}
     for k, v in raw.items():
-        if k == "index" and isinstance(v, dict):
+        if k in NESTED_GROUPS and isinstance(v, dict):
             for sk, sv in v.items():
-                flat[f"index.{sk}"] = sv
+                flat[f"{k}.{sk}"] = sv
         else:
             flat[k] = v
     for k, v in flat.items():
@@ -254,6 +271,9 @@ def cmd_options(args):
         if opt is None:
             sys.exit(f"error: unknown key '{k}'")
         allowed, strict = opt
+        if allowed is None:
+            print(f"{k}: <free text>  [default: '{get_path(DEFAULTS, k)}']")
+            continue
         suffix = "" if strict else " (or custom)"
         print(f"{k}: {', '.join(allowed)}{suffix}  [default: {get_path(DEFAULTS, k)}]")
 

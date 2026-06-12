@@ -11,6 +11,36 @@ does not ask). The default expands to:
 
 ---
 
+## Style block on PIP/ACE cards
+
+`[STYLE_BLOCK]` (from `assets/pattern/<style>.md`) is used **verbatim and in full** for
+COURT cards. Each pattern file also marks two kinds of lines within that same block:
+
+- **Accent line** — extra decorative color/illustration phrasing beyond the card's own
+  suit color.
+- **Figure-only line** (if any) — phrasing that only makes sense with a portrait (e.g.
+  skin tones).
+
+For PIP and ACE cards, resolve the block into `[STYLE_BLOCK_PIP]` / `[STYLE_BLOCK_ACE]`
+based on `content_style.pip` / `content_style.ace` (`references/CONFIG.md`, default:
+pip = off, ace = on):
+
+- **`content_style.<group>` = false** — start from `[STYLE_BLOCK]`, drop the accent
+  line(s) and the figure-only line(s) (keep the rest in order), then append the line
+  `plain card face, no additional ornament beyond the pip symbols,` (PIP only — ACE
+  keeps its own ornamental flourish from the template below).
+- **`content_style.<group>` = true** — start from `[STYLE_BLOCK]`, drop only the
+  figure-only line(s) (accent line(s) stay). If the user supplied
+  `pip_decoration_extra` (PIP only, Step 5), append it as its own short comma phrase
+  after the style lines.
+
+`[FRAME_LINE]` is the line `thin single black border with stepped corner cut-ins
+framing the index areas,`. It is always present for COURT. For PIP/ACE it's controlled
+by `frame.pip` / `frame.ace` (default: pip = off, ace = on): include the line verbatim
+if true, drop it entirely if false.
+
+---
+
 ## COURT template (King / Queen / Jack)
 
 `[CHARACTER_NAME]` and `[CHARACTER_FEATURES]` are REQUIRED (at minimum a name). The
@@ -54,13 +84,15 @@ reversible two-way court card layout, identical upper and lower portraits rotate
 
 ## PIP template (2 through 10)
 
-No portrait, no character. `[RANK_COUNT]` = the rank number.
+No portrait, no character. `[RANK_COUNT]` = the rank number. `[STYLE_BLOCK_PIP]` and
+`[FRAME_LINE]` are resolved per "Style block on PIP/ACE cards" above, using
+`content_style.pip` / `frame.pip` (default: both off — plain pip card).
 
 ```
 [ASPECT_RATIO] aspect ratio, full card visible, transparent background outside the card,
 [RANK_NAME] of [SUIT_NAME_TITLE] playing card,
-[STYLE_BLOCK]
-thin single black border with stepped corner cut-ins framing the index areas,
+[STYLE_BLOCK_PIP]
+[FRAME_LINE]
 [INDEX_LINE]
 [RANK_COUNT] [SUIT_COLOR] [SUIT_NAME] pip symbols arranged in the traditional symmetrical layout for the [RANK_NAME], upper-half pips upright, lower-half pips rotated 180 degrees,
 [SUIT_COLOR] [SUIT_NAME] suit symbols,
@@ -71,11 +103,15 @@ no watermark
 
 ## ACE template (A)
 
+`[STYLE_BLOCK_ACE]` and `[FRAME_LINE]` are resolved per "Style block on PIP/ACE cards"
+above, using `content_style.ace` / `frame.ace` (default: both on — matches the
+previous unconditional behavior).
+
 ```
 [ASPECT_RATIO] aspect ratio, full card visible, transparent background outside the card,
 Ace of [SUIT_NAME_TITLE] playing card,
-[STYLE_BLOCK]
-thin single black border with stepped corner cut-ins framing the index areas,
+[STYLE_BLOCK_ACE]
+[FRAME_LINE]
 [INDEX_LINE]
 one single large ornamental [SUIT_COLOR] [SUIT_NAME] symbol centered on the card, decorative flourishes and fine scrollwork framing the central symbol,
 [SUIT_COLOR] [SUIT_NAME] suit symbols,

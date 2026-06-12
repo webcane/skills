@@ -12,3 +12,7 @@ even matte finish,
 crisp lithographic print quality,
 highly detailed French-style playing card,
 ```
+
+**PIP/ACE line categories** (see "Style block on PIP/ACE cards" in `references/REFERENCE.md`):
+- Accent line (drop unless `content_style.<group>` is on): `bright vermilion red, deep ultramarine blue, mustard yellow and emerald green accents,`
+- Figure-only line: none
