@@ -63,7 +63,6 @@ No portrait, no character. `[RANK_COUNT]` = the rank number.
 thin single black border with stepped corner cut-ins framing the index areas,
 [INDEX_LINE]
 [RANK_COUNT] [SUIT_COLOR] [SUIT_NAME] pip symbols arranged in the traditional symmetrical layout for the [RANK_NAME], upper-half pips upright, lower-half pips rotated 180 degrees,
-thin black horizontal dividing line through the exact center of the card,
 [SUIT_COLOR] [SUIT_NAME] suit symbols,
 no watermark
 ```

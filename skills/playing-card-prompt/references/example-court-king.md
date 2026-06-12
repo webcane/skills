@@ -18,7 +18,7 @@ Note how the attributes are resolved into ONE list with no contradictions or lab
 ```
 9:14 aspect ratio, full card visible, transparent background outside the card,
 Peter the Great as King of Spades playing card,
-sharp crisp black outlines, fine engraved linework with dense cross-hatching on face, hair, costume and fabric folds,
+sharp crisp black outlines, fine engraved linework with dense cross-hatching on all illustrated elements and ornamental details,
 vintage chromolithographic playing-card illustration,
 rich crimson red, royal cobalt blue, burnished gold accents,
 warm ochre skin tones,

@@ -4,7 +4,7 @@ Vintage chromolithographic look with dense engraving — matches the reference e
 This is the `[STYLE_BLOCK]`; copy verbatim, keep the trailing comma on the last line.
 
 ```
-sharp crisp black outlines, fine engraved linework with dense cross-hatching on face, hair, costume and fabric folds,
+sharp crisp black outlines, fine engraved linework with dense cross-hatching on all illustrated elements and ornamental details,
 vintage chromolithographic playing-card illustration,
 rich crimson red, royal cobalt blue, burnished gold accents,
 warm ochre skin tones,

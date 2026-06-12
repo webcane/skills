@@ -10,7 +10,7 @@ The shared middle (omitted below as `...`) is:
 
 ```
 Peter the Great as King of Spades playing card,
-sharp crisp black outlines, fine engraved linework with dense cross-hatching on face, hair, costume and fabric folds,
+sharp crisp black outlines, fine engraved linework with dense cross-hatching on all illustrated elements and ornamental details,
 vintage chromolithographic playing-card illustration,
 rich crimson red, royal cobalt blue, burnished gold accents,
 warm ochre skin tones,

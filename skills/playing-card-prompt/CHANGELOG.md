@@ -6,6 +6,10 @@ All notable changes to this skill. Released per skill as tag
 
 ## [Unreleased]
 
+### Fixed
+- Reworded the figure-specific wording in each `[STYLE_BLOCK]` (Austrian, French, English patterns) so the same verbatim block reads correctly on PIP/ACE cards, which have no portrait — "on face, hair, costume and fabric folds" / "stylized faces" became generic phrasing covering pip symbols and ornamental details
+- Removed the `thin black horizontal dividing line through the exact center of the card,` line from the PIP template — that line exists for COURT cards' reversible two-way (double-headed) layout and doesn't apply to pip cards, which the ACE template already omits it for
+
 ### Added
 - `scripts/manage_config.py` — dependency-free CLI to read/write/validate `config.json` (`show`, `get`, `set`, `unset`, `validate`, `reset`, `options`, `path`); validates `deck`/`style` against the files in `assets/` and enforces the index/lettering/aspect enums
 - New optional Step 9 — image generator selection (NanoBanana default, Stable Diffusion, Midjourney, DALL·E, kaze.ai, or custom), persisted via the new `image_generator` config field (`assets/engines/_config.md`)
