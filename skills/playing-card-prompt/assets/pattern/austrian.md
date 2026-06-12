@@ -27,7 +27,7 @@ sharp crisp black outlines, fine engraved linework with dense cross-hatching on 
 vintage chromolithographic playing-card illustration,
 warm ochre skin tones,
 ```
-- Figure-only line (drop for PIP/ACE): `warm ochre skin tones,`
+- Figure-only line (drop unless `layers.figure.<group>` is on): `warm ochre skin tones,`
 
 ## Finish
 ```

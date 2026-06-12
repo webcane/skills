@@ -32,6 +32,14 @@ The rest are **configurable layers**, each controlled per card group (`court` / 
 - **Highlights** — gilding, lacquer, glow, shine — accents that can sit over the
   figure/pips.
 - **Frame** — the border/architectural framing (`[FRAME_LINE]`).
+- **Figure** — whether this group's center motif carries a figure/portrait at all.
+  Gates the Center motif style's figure-only line and `[FACE_STYLE_LINE]`. On for
+  `court` by default (the portrait); off for `pip`/`ace` (no figure) — turn on for
+  `pip`/`ace` only for transformation-style decks where number/ace cards carry small
+  figures.
+- **Mood** — whether `[MOOD_LINE]` (the deck's overall atmosphere, from the `mood`
+  setting) applies to this group. On for every group by default; the line itself is
+  empty (and dropped) unless `mood` is set.
 
 Each `assets/pattern/<style>.md` provides the text for Background, Decor, Ornaments,
 Highlights, and "Center motif style" (the linework/illustration descriptor applied to
@@ -46,25 +54,69 @@ in this order, only the layers where `layers.<layer>.g` is `true`:
 1. **Background** — the pattern's Background lines.
 2. **Decor** — the pattern's Decor lines.
 3. **Ornaments** — the pattern's Ornaments lines (if any), then `ornaments_extra.g`
-   (free text, own comma phrase) if set.
+   (free text, own comma phrase) if set — see "Theme-derived ornaments/highlights"
+   below if `ornaments_extra.g` is empty and `theme` is set.
 4. **Highlights** — the pattern's Highlights lines (if any), then `highlights_extra.g`
-   (free text, own comma phrase) if set.
+   (free text, own comma phrase) if set — same theme fallback as Ornaments.
 
-Then, always (these aren't gated — they're part of the structural center motif and
-finish):
+Then, always (these aren't gated by layers — they're part of the structural center
+motif and finish):
 
-5. **Center motif style** — the pattern's lines, dropping the figure-only line for
-   `pip`/`ace` (no portrait there).
+5. **Center motif style** — the pattern's lines, including the figure-only line only
+   if `layers.figure.g` is `true` (default: on for `court`, off for `pip`/`ace`).
 6. **Finish** — the pattern's Finish lines.
 
-7. **Plain fallback** — if `g` is `pip` and both `layers.decor.pip` and
-   `layers.ornaments.pip` are `false`, append the line `plain card face, no additional
-   ornament beyond the pip symbols,` after Finish (a pip card with nothing else added
-   should read as a plain number card).
+7. **Mood** — if `layers.mood.g` is `true` and `mood` is non-empty, append
+   `[MOOD_LINE]` — the `mood` text as its own comma phrase (e.g. `gothic and brooding
+   atmosphere,`). Empty `mood` → no line, regardless of `layers.mood.g`.
+
+8. **Plain fallback** — if `g` is `pip` and `layers.decor.pip`, `layers.ornaments.pip`,
+   and `layers.highlights.pip` are all `false`, append the line `plain card face, no
+   additional ornament beyond the pip symbols,` after Mood (a pip card with nothing
+   else added should read as a plain number card).
 
 `[FRAME_LINE]` is the line `thin single black border with stepped corner cut-ins
 framing the index areas,`, included verbatim if `layers.frame.g` is `true` and dropped
 entirely otherwise — it sits in its own template slot, not inside `[STYLE_BLOCK]`.
+
+### Figure & face style resolution (`[FACE_STYLE_LINE]`)
+
+`[FACE_STYLE_LINE]` is a separate template slot, placed next to the figure itself
+(`[CHARACTER_FEATURES]` on COURT, or the pip/ace symbol line for transformation
+decks). It is non-empty only when `layers.figure.g` is `true` AND `face_style.g` is
+not `individual` (the default — "individual portrait" is already what
+`[CHARACTER_FEATURES]` describes, so it adds nothing extra):
+
+| `face_style.g`          | `[FACE_STYLE_LINE]` text |
+|--------------------------|--------------------------|
+| `individual` (default)  | _(empty — line dropped)_ |
+| `archetypal`             | `archetypal symmetrical mask-like face, idealized features, no individualized expression,` |
+| `expressive`             | `expressive individualized facial features, naturalistic emotion,` |
+| `faceless`               | `figure depicted with face obscured or abstracted, no facial features,` |
+
+For COURT with `face_style.court = faceless`, also drop any facial description from
+`[CHARACTER_FEATURES]` (silhouette/costume only — see SKILL Step 5b).
+
+For `pip`/`ace`, `[FACE_STYLE_LINE]` only matters if `layers.figure.<group> = true`
+(transformation decks); otherwise it's empty and the slot is dropped.
+
+### Theme-derived ornaments/highlights
+
+If `theme` (a free-text deck-wide concept, e.g. "celestial mythology", "botanical
+garden") is set, and for group `g` a layer is enabled but its `_extra` field is empty:
+
+- `layers.ornaments.g = true` and `ornaments_extra.g == ""` → derive a short ornament
+  phrase expressing `theme` (e.g. theme "celestial mythology" → `star and
+  constellation motifs in the corner ornaments,`) and use it as that card's
+  `ornaments_extra.g` for this generation.
+- `layers.highlights.g = true` and `highlights_extra.g == ""` → same derivation for
+  highlights (e.g. → `faint star-glow highlights,`).
+
+An explicit `ornaments_extra.g` / `highlights_extra.g` (set by the user or saved in
+config) always wins — `theme` only fills empty slots. Reuse the same derived phrase
+across all cards of the same group/deck so the set stays consistent. For COURT,
+`theme` may also inform the character concept and Step 5c attribute suggestions
+(suggest, don't force).
 
 ### Defaults
 
@@ -75,18 +127,21 @@ entirely otherwise — it sits in its own template slot, not inside `[STYLE_BLOC
 | ornaments    | true  | false | true  |
 | highlights   | false | false | false |
 | frame        | true  | false | true  |
+| figure       | true  | false | false |
+| mood         | true  | true  | true  |
 
 These reproduce the traditional look out of the box: Court cards carry the full
-pattern; plain Pip cards show only background + center motif + finish (no border, no
-extra accents); Aces keep their ornamental flourish and border. Highlights is a new
-layer with nothing in it by default for any existing pattern, so it's off everywhere
-until a pattern defines Highlights content or the user supplies `highlights_extra`.
-Court layers are configurable via `--config` (see `references/CONFIG.md`) but default
-to fully on, matching prior behavior.
+pattern including the portrait's figure-only line; plain Pip cards show only
+background + center motif + finish (no border, no extra accents, no figure); Aces
+keep their ornamental flourish and border but no figure. Highlights is off everywhere
+by default. `mood` and `theme` are both empty by default, so `[MOOD_LINE]` and the
+theme-derived ornaments/highlights produce nothing unless set. Court layers are
+configurable via `--config` (see `references/CONFIG.md`) but default to fully on
+(except highlights), matching prior behavior.
 
 When generating multiple cards for the same deck, reuse the exact same resolved
-`[STYLE_BLOCK]` (and `[FRAME_LINE]` presence) for every card of the same group so the
-set stays visually consistent.
+`[STYLE_BLOCK]`, `[FRAME_LINE]`, and `[FACE_STYLE_LINE]` for every card of the same
+group so the set stays visually consistent.
 
 ---
 
@@ -124,6 +179,7 @@ label — engines that support a negative-prompt field can take this list verbat
 large [SUIT_COLOR] [SUIT_NAME] suit symbols centered in upper and lower card fields,
 thin black horizontal dividing line through the exact center of the card,
 reversible two-way court card layout, identical upper and lower portraits rotated 180 degrees around the central horizontal axis, symmetrical costume design,
+[FACE_STYLE_LINE]
 [CHARACTER_FEATURES], [RESOLVED_ATTRIBUTES],
 [SUIT_COLOR] [SUIT_NAME] suit symbols,
 [NEGATIVE_LIST]
@@ -133,10 +189,11 @@ reversible two-way court card layout, identical upper and lower portraits rotate
 
 ## PIP template (2 through 10)
 
-No portrait, no character. `[RANK_COUNT]` = the rank number. `[STYLE_BLOCK]` and
-`[FRAME_LINE]` are resolved per "Layers and `[STYLE_BLOCK]` assembly" above for the
-`pip` group (default: background + center motif + finish only — plain pip card, no
-frame).
+No portrait, no character — unless `layers.figure.pip` is on (transformation-style
+decks), in which case `[FACE_STYLE_LINE]` may apply to the small figure within the pip
+layout. `[RANK_COUNT]` = the rank number. `[STYLE_BLOCK]` and `[FRAME_LINE]` are
+resolved per "Layers and `[STYLE_BLOCK]` assembly" above for the `pip` group (default:
+background + center motif + finish only — plain pip card, no frame, no figure).
 
 ```
 [ASPECT_RATIO] aspect ratio, full card visible, transparent background outside the card,
@@ -145,6 +202,7 @@ frame).
 [FRAME_LINE]
 [INDEX_LINE]
 [RANK_COUNT] [SUIT_COLOR] [SUIT_NAME] pip symbols arranged in the traditional symmetrical layout for the [RANK_NAME], upper-half pips upright, lower-half pips rotated 180 degrees,
+[FACE_STYLE_LINE]
 [SUIT_COLOR] [SUIT_NAME] suit symbols,
 no watermark
 ```
@@ -154,8 +212,9 @@ no watermark
 ## ACE template (A)
 
 `[STYLE_BLOCK]` and `[FRAME_LINE]` are resolved per "Layers and `[STYLE_BLOCK]`
-assembly" above for the `ace` group (default: everything on — matches the previous
-unconditional behavior).
+assembly" above for the `ace` group (default: everything on except figure — matches
+the previous unconditional behavior). `[FACE_STYLE_LINE]` only applies if
+`layers.figure.ace` is on (transformation-style decks with a figure on the Ace).
 
 ```
 [ASPECT_RATIO] aspect ratio, full card visible, transparent background outside the card,
@@ -164,6 +223,7 @@ Ace of [SUIT_NAME_TITLE] playing card,
 [FRAME_LINE]
 [INDEX_LINE]
 one single large ornamental [SUIT_COLOR] [SUIT_NAME] symbol centered on the card, decorative flourishes and fine scrollwork framing the central symbol,
+[FACE_STYLE_LINE]
 [SUIT_COLOR] [SUIT_NAME] suit symbols,
 no watermark
 ```

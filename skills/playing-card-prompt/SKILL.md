@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 2.1.0
+  version: 2.2.0
 ---
 
 # Playing Card Prompt Wizard
@@ -30,7 +30,8 @@ The user may invoke the skill in three modes. Detect which one from their messag
 
 Before asking any wizard questions, load persistent settings (`deck`, `lettering`,
 `style`, `aspect_ratio`, `image_generator`, `index.*`, `layers.*`, `ornaments_extra.*`,
-`highlights_extra.*`) via `python3 scripts/manage_config.py show`.
+`highlights_extra.*`, `mood`, `theme`, `face_style.*`) via
+`python3 scripts/manage_config.py show`.
 Everything else — schema, lookup order, field reference, and the full CLI — is in
 `references/CONFIG.md`; read it whenever you need to inspect, change, or validate
 `config.json`. Per-card fields (`rank`, `suit`, `character_name`,
@@ -51,11 +52,13 @@ Steps to ask in config mode:
 1. Deck type
 2. Court lettering system
 3. Visual style / pattern
-4. Card decoration layers (Step 5a)
-5. Aspect ratio
-6. Image generator (optional — see Step 9)
-7. (Optional, only if user asks) Index settings, or per-layer overrides via
-   `layers.<layer>.<group>` for Court/Ace (e.g. `layers.ornaments.ace`)
+4. Card decoration layers, mood, and theme (Step 5a)
+5. Face style for the court figure (Step 5b's `face_style.court` question)
+6. Aspect ratio
+7. Image generator (optional — see Step 9)
+8. (Optional, only if user asks) Index settings, or per-layer overrides via
+   `layers.<layer>.<group>` for Court/Pip/Ace (e.g. `layers.ornaments.ace`,
+   `layers.figure.pip`, `layers.mood.court`)
 
 ## Mode: Reset (`--reset`)
 
@@ -157,7 +160,9 @@ e.g. "♠ Spades" or "Acorns"). Fill `SUIT_NAME_TITLE`, `SUIT_NAME`, `SUIT_SYMBO
 
 _Skipped if loaded from config._ Always ask this on first run; never skip it. List the
 `*.md` files in `assets/pattern/` (ignore names starting with `_`) as options:
-**Austrian (default) · French · English**, and note they can request another style.
+**Austrian (default) · French · English · Art Nouveau · Japanese (ukiyo-e)**, and note
+they can request another style or era/cultural setting (e.g. "Art Deco", "Mexican
+Loteria", "Egyptian").
 Load the chosen `assets/pattern/<style>.md` and note its layer sections (Background,
 Decor, Ornaments, Highlights, Center motif style, Finish). For a style not on disk,
 improvise these sections following `assets/pattern/_adding-a-pattern.md`, then save
@@ -165,14 +170,15 @@ the improvised text (e.g. note it in the conversation) so later cards in the sam
 reuse identical wording — every card of the same group should resolve to the SAME
 `[STYLE_BLOCK]` text verbatim so the whole deck looks like one consistent set.
 
-### Step 5a — Card decoration layers · _persistent_
+### Step 5a — Card decoration, mood, and theme · _persistent_
 
 _Skipped if loaded from config._ Every card is built from layers — background, decor
-(background pattern/accents), ornaments, highlights/overlays, and frame, plus the
-structural index and center-motif layers that are always present (see "Layers and
-`[STYLE_BLOCK]` assembly" in `references/REFERENCE.md`). Defaults reproduce the
-traditional look: Court and Ace get every layer; plain Pip cards get only background +
-center motif + finish. Ask two things here:
+(background pattern/accents), ornaments, highlights/overlays, frame, figure, and mood,
+plus the structural index and center-motif layers that are always present (see "Layers
+and `[STYLE_BLOCK]` assembly" in `references/REFERENCE.md`). Defaults reproduce the
+traditional look: Court gets every layer including a figure; Ace gets every layer
+except figure; plain Pip cards get only background + center motif + finish, no figure.
+Ask these here:
 
 1. **Number cards (2–10)** — how should they look:
    - **Plain (default)** — large suit-color pip symbols only: no extra decor, no
@@ -191,11 +197,28 @@ center motif + finish. Ask two things here:
    set `layers.highlights.<group> = true` for all three groups. If skipped, leave the
    highlights layer off everywhere (the default).
 
-Court and Ace cards keep every other layer on by default (`layers.<layer>.court` /
-`layers.<layer>.ace` all `true` except highlights) — not asked in the wizard, but
-tunable per layer via `python3 scripts/manage_config.py set layers.<layer>.<group>
-false` (e.g. `layers.ornaments.ace false` for a plainer Ace, or `layers.decor.court
-false` for a stripped-down court).
+3. **Mood / atmosphere (optional, deck-wide)** — ask, free text, for the deck's
+   overall atmosphere (e.g. "gothic and brooding", "warm and whimsical", "eerie
+   nocturnal"). If given, save it verbatim as the `mood` setting — it becomes
+   `[MOOD_LINE]`, appended on every card group where `layers.mood.<group>` is true
+   (all groups, by default). If skipped, leave `mood` empty (no line is added).
+
+4. **Theme / symbolism (optional, deck-wide)** — ask, free text, for an overarching
+   concept tying the deck together (e.g. "celestial mythology", "botanical garden",
+   "clockwork/steampunk"). If given, save it as the `theme` setting — when an
+   ornaments/highlights layer is on for a group but that group's
+   `ornaments_extra`/`highlights_extra` is empty, derive a short thematic phrase from
+   `theme` to fill it (see "Theme-derived ornaments/highlights" in
+   `references/REFERENCE.md`); explicit `ornaments_extra`/`highlights_extra` values
+   always win. If skipped, leave `theme` empty.
+
+Court cards keep every other layer on by default (`layers.<layer>.court` all `true`
+except highlights), and Ace keeps every layer on except `figure` and `highlights` —
+not asked in the wizard, but tunable per layer via `python3 scripts/manage_config.py
+set layers.<layer>.<group> false/true` (e.g. `layers.ornaments.ace false` for a
+plainer Ace, `layers.decor.court false` for a stripped-down court, or
+`layers.figure.pip true` for a transformation-style deck where number cards carry
+small figures).
 
 ---
 
@@ -225,6 +248,19 @@ description from it and let them edit.
 
 > If the figure is a real, identifiable public figure: keep it a neutral descriptive
 > depiction (appearance, costume, pose). Don't fabricate quotes or claims.
+
+**Face style (persistent, asked once).** _Skipped if loaded from config._ Ask how the
+court figure's face should read:
+- **Individual (default)** — a normal individualized portrait; no extra line added.
+- **Archetypal** — symmetrical, mask-like, idealized — no individual expression.
+- **Expressive** — naturalistic, emotionally expressive features.
+- **Faceless** — face obscured or abstracted entirely; drop facial description from
+  `[CHARACTER_FEATURES]` too.
+
+Save as `face_style.court`. This becomes `[FACE_STYLE_LINE]` (see "Figure & face style
+resolution" in `references/REFERENCE.md`); `individual` adds no line. (`face_style.pip`
+/ `face_style.ace` only matter if `layers.figure.pip`/`.ace` is turned on for a
+transformation-style deck — set those via `--config` if needed, not asked here.)
 
 ### Step 5c — Additional / replaced attributes (court only) · _per-card_
 
@@ -293,13 +329,16 @@ Offer to save the choice to `config.json` like the other persistent settings.
    `[RESOLVED_ATTRIBUTES]` and `[NEGATIVE_LIST]` by following the merge rules in
    `references/REFERENCE.md` (resolve conflicts down to one final, deduplicated,
    contradiction-free state — do not list "traditional" and "override" side by side).
-4. Resolve `[STYLE_BLOCK]` and `[FRAME_LINE]` for this card's group (court/pip/ace)
-   per "Layers and `[STYLE_BLOCK]` assembly" in `references/REFERENCE.md`, using the
-   `layers.*`, `ornaments_extra.*`, and `highlights_extra.*` settings. Splice the
-   result **in full** — never summarize, reorder, or drop a line from an enabled
-   layer. When generating multiple cards for the same deck, reuse the exact same
-   resolved `[STYLE_BLOCK]`/`[FRAME_LINE]` for every card of the same group so the set
-   stays visually consistent.
+4. Resolve `[STYLE_BLOCK]`, `[FRAME_LINE]`, and `[FACE_STYLE_LINE]` for this card's
+   group (court/pip/ace) per "Layers and `[STYLE_BLOCK]` assembly" and "Figure & face
+   style resolution" in `references/REFERENCE.md`, using the `layers.*`,
+   `ornaments_extra.*`, `highlights_extra.*`, `mood`, `theme`, and `face_style.*`
+   settings (deriving thematic ornaments/highlights per "Theme-derived
+   ornaments/highlights" where applicable). Splice the result **in full** — never
+   summarize, reorder, or drop a line from an enabled layer. When generating multiple
+   cards for the same deck, reuse the exact same resolved `[STYLE_BLOCK]`/
+   `[FRAME_LINE]`/`[FACE_STYLE_LINE]`/derived theme phrases for every card of the same
+   group so the set stays visually consistent.
 5. **Drop any line whose placeholder is empty** — never output a literal `[PLACEHOLDER]`.
 6. Keep phrasing as short, comma-separated visual phrases (general → specific: card
    type/style, then layout, then the portrait, then technical finish, then negatives
@@ -337,15 +376,30 @@ Before presenting the prompt, verify all of the following against the assembled 
   assembly" in `references/REFERENCE.md` for this card's group: background/decor/
   ornaments/highlights lines appear only when `layers.<layer>.<group>` is `true` (with
   `ornaments_extra`/`highlights_extra` appended when their layer is on), followed by
-  the center-motif style (figure-only line dropped for PIP/ACE) and finish lines, and
-  the `plain card face, no additional ornament beyond the pip symbols,` fallback is
-  present for PIP when decor and ornaments are both off. Nothing from an enabled
-  layer is summarized, reordered, or dropped. The resolved text is identical across
-  all cards of the same group generated for the same deck/session.
+  the center-motif style (figure-only line included only if `layers.figure.<group>` is
+  `true`) and finish lines, then `[MOOD_LINE]` if applicable, and the `plain card face,
+  no additional ornament beyond the pip symbols,` fallback is present for PIP when
+  decor, ornaments, and highlights are all off. Nothing from an enabled layer is
+  summarized, reordered, or dropped. The resolved text is identical across all cards
+  of the same group generated for the same deck/session.
 - [ ] **Frame line** — `[FRAME_LINE]` (`thin single black border with stepped corner
   cut-ins framing the index areas,`) is present only if `layers.frame.<group>` is
   `true` for this card's group; otherwise the line is absent entirely (not an empty
   placeholder).
+- [ ] **Mood line** — `[MOOD_LINE]` is present only if `layers.mood.<group>` is `true`
+  for this card's group AND `mood` is non-empty, and its text matches the `mood`
+  setting verbatim; otherwise the line is absent entirely.
+- [ ] **Face style line** — `[FACE_STYLE_LINE]` is present only if
+  `layers.figure.<group>` is `true` AND `face_style.<group>` is not `individual`, and
+  its text matches the table in "Figure & face style resolution"
+  (`references/REFERENCE.md`); for `face_style.court = faceless`,
+  `[CHARACTER_FEATURES]` contains no facial description. Otherwise the line is absent
+  entirely.
+- [ ] **Theme-derived ornaments/highlights** — if `theme` is set and an
+  `ornaments_extra`/`highlights_extra` slot was empty for an enabled layer, the derived
+  phrase reflects `theme` and is reused identically across all cards of the same
+  group/deck; an explicit `ornaments_extra`/`highlights_extra` value was never
+  overridden by a derived one.
 - [ ] **Character description (court only)** — `[CHARACTER_NAME]` and
   `[CHARACTER_FEATURES]` are both present and non-empty; if derived from a reference
   image (Step 5b-A), the description reflects what was actually returned, not a

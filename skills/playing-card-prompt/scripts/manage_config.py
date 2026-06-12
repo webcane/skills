@@ -18,8 +18,9 @@ Usage:
 
 Keys: deck, lettering, style, aspect_ratio, image_generator,
       index.size, index.count, index.layout,
-      layers.<background|decor|ornaments|highlights|frame>.<court|pip|ace>,
-      ornaments_extra.<court|pip|ace>, highlights_extra.<court|pip|ace>
+      layers.<background|decor|ornaments|highlights|frame|figure|mood>.<court|pip|ace>,
+      ornaments_extra.<court|pip|ace>, highlights_extra.<court|pip|ace>,
+      mood, theme, face_style.<court|pip|ace>
 """
 from __future__ import annotations
 
@@ -40,18 +41,23 @@ INDEX_COUNT = ["2-index", "4-index"]
 INDEX_LAYOUT = ["stacked", "side-by-side", "peek", "none"]
 ASPECT_PRESETS = ["5:7", "9:14", "14:25", "7:12"]
 BOOL_VALUES = ["true", "false"]
+FACE_STYLES = ["individual", "archetypal", "expressive", "faceless"]
 
 GROUPS = ("court", "pip", "ace")
-LAYERS = ("background", "decor", "ornaments", "highlights", "frame")
+LAYERS = ("background", "decor", "ornaments", "highlights", "frame", "figure", "mood")
 
-# Defaults reproduce the traditional look: courts get every layer, plain pips get
-# only background + center motif + finish, aces keep their ornamental flourish.
+# Defaults reproduce the traditional look: courts get every layer including a
+# portrait, plain pips get only background + center motif + finish, aces keep their
+# ornamental flourish but no figure. `mood` is on everywhere (but inert until the
+# free-text `mood` field is set).
 LAYER_DEFAULTS = {
     "background": {"court": "true", "pip": "true", "ace": "true"},
     "decor": {"court": "true", "pip": "false", "ace": "true"},
     "ornaments": {"court": "true", "pip": "false", "ace": "true"},
     "highlights": {"court": "false", "pip": "false", "ace": "false"},
     "frame": {"court": "true", "pip": "false", "ace": "true"},
+    "figure": {"court": "true", "pip": "false", "ace": "false"},
+    "mood": {"court": "true", "pip": "true", "ace": "true"},
 }
 
 DEFAULTS = {
@@ -64,16 +70,20 @@ DEFAULTS = {
     "layers": {layer: dict(groups) for layer, groups in LAYER_DEFAULTS.items()},
     "ornaments_extra": {g: "" for g in GROUPS},
     "highlights_extra": {g: "" for g in GROUPS},
+    "mood": "",
+    "theme": "",
+    "face_style": {g: "individual" for g in GROUPS},
 }
 
 PERSISTENT_KEYS = {"deck", "lettering", "style", "aspect_ratio", "image_generator",
-                   "index.size", "index.count", "index.layout"}
+                   "index.size", "index.count", "index.layout", "mood", "theme"}
 PERSISTENT_KEYS |= {f"layers.{layer}.{g}" for layer in LAYERS for g in GROUPS}
 PERSISTENT_KEYS |= {f"ornaments_extra.{g}" for g in GROUPS}
 PERSISTENT_KEYS |= {f"highlights_extra.{g}" for g in GROUPS}
+PERSISTENT_KEYS |= {f"face_style.{g}" for g in GROUPS}
 
 # Top-level keys that hold nested dicts (any depth).
-NESTED_GROUPS = ("index", "layers", "ornaments_extra", "highlights_extra")
+NESTED_GROUPS = ("index", "layers", "ornaments_extra", "highlights_extra", "face_style")
 
 
 def _discover(subdir: str) -> list[str]:
@@ -108,6 +118,8 @@ def options_for(key: str):
         "index.size": (INDEX_SIZE, True),
         "index.count": (INDEX_COUNT, True),
         "index.layout": (INDEX_LAYOUT, True),
+        "mood": (None, False),    # free text deck-wide atmosphere
+        "theme": (None, False),   # free text deck-wide theme/symbolism
     }.get(key)
     if fixed is not None:
         return fixed
@@ -120,6 +132,11 @@ def options_for(key: str):
         _, group = key.split(".", 1)
         if group in GROUPS:
             return (None, False)  # free text
+        return None
+    if key.startswith("face_style.") and key.count(".") == 1:
+        _, group = key.split(".")
+        if group in GROUPS:
+            return (FACE_STYLES, True)
         return None
     return None
 

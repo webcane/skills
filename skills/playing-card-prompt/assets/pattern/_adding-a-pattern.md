@@ -6,6 +6,11 @@ here (except files starting with `_`) as a style option. See "Layers and `[STYLE
 assembly" in `references/REFERENCE.md` for how these sections combine per card type
 (Court / Pip / Ace) according to the `layers.*` config.
 
+Ground the pattern in a specific era and/or cultural context (e.g. "Art Nouveau,
+fin-de-siècle Europe", "ukiyo-e, Edo-period Japan", "Art Deco, 1920s") — this should
+shape the color palette, ornament motifs, and "Center motif style" linework
+consistently, not just the Finish line's name.
+
 ## Background
 Base cardstock color/texture for the card (e.g. `aged ivory playing-card stock, subtle
 paper grain,`). Always at least one line — this is the only layer that's on for every
@@ -33,8 +38,9 @@ illustration descriptor, and so on. Follow this order: linework → illustration
 descriptor → (optional figure-only line, e.g. skin tones).
 
 If one line only makes sense with a portrait (skin tones, facial rendering), mark it
-explicitly below — it gets dropped for Pip/Ace, which have no figure:
-- Figure-only line (drop for PIP/ACE): `<line text>` (or "none")
+explicitly below — it's included only if `layers.figure.<group>` is on for that group
+(default: on for court, off for pip/ace):
+- Figure-only line (drop unless `layers.figure.<group>` is on): `<line text>` (or "none")
 
 ## Finish
 Print-quality / final descriptor lines, ending with

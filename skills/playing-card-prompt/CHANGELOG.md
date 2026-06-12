@@ -6,6 +6,44 @@ All notable changes to this skill. Released per skill as tag
 
 ## [Unreleased]
 
+### Added
+- Two new configurable layers, `figure` and `mood`, extending the `layers.<layer>.<group>`
+  matrix to 7×3: `figure` gates whether a card group's center motif carries a
+  figure/portrait at all (and thus its figure-only style line and `[FACE_STYLE_LINE]`),
+  default on for court / off for pip and ace (transformation decks can flip
+  `layers.figure.pip`/`.ace` on); `mood` gates `[MOOD_LINE]`, default on everywhere but
+  inert until `mood` is set
+- New deck-wide free-text config fields `mood` (overall atmosphere, e.g. "gothic and
+  brooding") and `theme` (deck-wide concept/symbolism, e.g. "celestial mythology"), each
+  asked once in Step 5a and persisted
+- New `face_style.<group>` config field (`individual` default, `archetypal`,
+  `expressive`, `faceless`) controlling `[FACE_STYLE_LINE]` — asked once for
+  `face_style.court` alongside Step 5b; see "Figure & face style resolution" in
+  `references/REFERENCE.md` for the text mapping
+- "Theme-derived ornaments/highlights": when `theme` is set and an enabled
+  ornaments/highlights layer's `_extra` field is empty, a short thematic phrase is
+  derived and reused consistently across the deck — explicit `_extra` values always win
+- Two new pattern presets: `assets/pattern/art-nouveau.md` (Mucha-era Art Nouveau) and
+  `assets/pattern/japanese.md` (Edo-period ukiyo-e woodblock)
+- `_adding-a-pattern.md` now requires new patterns to be grounded in a specific era/
+  cultural context, shaping palette, ornament motifs, and center-motif linework together
+
+### Changed
+- `references/REFERENCE.md`: `[STYLE_BLOCK]` resolution step 5 (Center motif style) now
+  includes the figure-only line based on `layers.figure.<group>` instead of a hardcoded
+  "drop for PIP/ACE"; added step 7 appending `[MOOD_LINE]`; the PIP "plain fallback"
+  condition now also requires `layers.highlights.pip = false`; the Defaults table is now
+  7×3; COURT/PIP/ACE templates gained a `[FACE_STYLE_LINE]` slot
+- `scripts/manage_config.py`: `LAYERS`/`LAYER_DEFAULTS` extended with `figure`/`mood`;
+  added `FACE_STYLES`, `mood`, `theme`, `face_style.<group>` to `DEFAULTS`,
+  `PERSISTENT_KEYS`, `NESTED_GROUPS`, and `options_for()`
+- `assets/pattern/_adding-a-pattern.md` and `austrian.md`: figure-only-line wording now
+  references `layers.figure.<group>` instead of a hardcoded PIP/ACE drop
+- SKILL.md Step 5a ("Card decoration, mood, and theme") and Step 5b gained mood/theme/
+  face_style questions; pattern menu in Step 5 lists the two new presets; Assembling
+  step 4 and the Post-validation checklist updated for `[MOOD_LINE]`,
+  `[FACE_STYLE_LINE]`, and theme-derived ornaments/highlights
+
 ### Fixed
 - Wizard steps now call the `AskUserQuestion` tool (tappable choices) instead of the
   non-existent `ask_user_input_v0`, which was never callable and made every

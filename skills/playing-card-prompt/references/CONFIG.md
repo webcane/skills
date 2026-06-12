@@ -22,8 +22,10 @@ python3 scripts/manage_config.py path              # print the config.json path
 ```
 
 Dotted keys address nested groups: `index.size`, `index.count`, `index.layout`,
-`ornaments_extra.<group>`, `highlights_extra.<group>`, and the two-level
-`layers.<layer>.<group>` (e.g. `layers.frame.pip`, `layers.highlights.ace`).
+`ornaments_extra.<group>`, `highlights_extra.<group>`, `face_style.<group>`, and the
+two-level `layers.<layer>.<group>` (e.g. `layers.frame.pip`, `layers.highlights.ace`,
+`layers.figure.pip`, `layers.mood.court`). `mood` and `theme` are flat free-text
+fields (no `<group>`).
 
 ## Lookup order
 
@@ -50,10 +52,15 @@ Dotted keys address nested groups: `index.size`, `index.count`, `index.layout`,
     "decor":      {"court": "true",  "pip": "false", "ace": "true"},
     "ornaments":  {"court": "true",  "pip": "false", "ace": "true"},
     "highlights": {"court": "false", "pip": "false", "ace": "false"},
-    "frame":      {"court": "true",  "pip": "false", "ace": "true"}
+    "frame":      {"court": "true",  "pip": "false", "ace": "true"},
+    "figure":     {"court": "true",  "pip": "false", "ace": "false"},
+    "mood":       {"court": "true",  "pip": "true",  "ace": "true"}
   },
   "ornaments_extra": {"court": "", "pip": "", "ace": ""},
-  "highlights_extra": {"court": "", "pip": "", "ace": ""}
+  "highlights_extra": {"court": "", "pip": "", "ace": ""},
+  "mood": "",
+  "theme": "",
+  "face_style": {"court": "individual", "pip": "individual", "ace": "individual"}
 }
 ```
 
@@ -77,26 +84,35 @@ lookup order, ultimately to the built-in default.
 | `layers.ornaments.<group>`  | `true`, `false`                                               | court/ace `true`, pip `false` |
 | `layers.highlights.<group>` | `true`, `false`                                               | all `false`        |
 | `layers.frame.<group>`      | `true`, `false`                                               | court/ace `true`, pip `false` |
+| `layers.figure.<group>`     | `true`, `false`                                               | court `true`, pip/ace `false` |
+| `layers.mood.<group>`       | `true`, `false`                                               | all `true`         |
 | `ornaments_extra.<group>`   | free text                                                      | `""`               |
 | `highlights_extra.<group>`  | free text                                                      | `""`               |
+| `mood`                      | free text (deck-wide atmosphere, e.g. `gothic and brooding atmosphere,`) | `""` |
+| `theme`                     | free text (deck-wide concept/symbolism, e.g. `celestial mythology`) | `""` |
+| `face_style.<group>`        | `individual`, `archetypal`, `expressive`, `faceless`          | `individual`       |
 
 `<group>` is one of `court`, `pip`, `ace`.
 
 `image_generator` controls how the assembled prompt is adapted (negative-list
 placement, aspect-ratio syntax, extra parameters) — see `assets/engines/`.
 
-`layers.*` controls which layers (background, decor, ornaments, highlights, frame)
-contribute to `[STYLE_BLOCK]` / `[FRAME_LINE]` for each card group — see "Layers and
-`[STYLE_BLOCK]` assembly" in `references/REFERENCE.md`. `ornaments_extra.<group>` and
-`highlights_extra.<group>` are free-text additions appended within those layers when
-enabled. Court cards default to every layer on (matching prior behavior) but, like
-Pip/Ace, can be tuned per layer via `--config`.
+`layers.*` controls which layers (background, decor, ornaments, highlights, frame,
+figure, mood) contribute to `[STYLE_BLOCK]` / `[FRAME_LINE]` / `[FACE_STYLE_LINE]` /
+`[MOOD_LINE]` for each card group — see "Layers and `[STYLE_BLOCK]` assembly" in
+`references/REFERENCE.md`. `ornaments_extra.<group>` and `highlights_extra.<group>`
+are free-text additions appended within those layers when enabled (and may be
+auto-derived from `theme` if left empty — see "Theme-derived ornaments/highlights").
+`mood` is a deck-wide free-text atmosphere description; `face_style.<group>` controls
+how a figure's face reads when `layers.figure.<group>` is on. Court cards default to
+every layer on except highlights (matching prior behavior) but, like Pip/Ace, can be
+tuned per layer via `--config`.
 
 ### Which settings are "session" vs "persistent"
 
 **Persistent** (saved in config — rarely change between cards):
 `deck`, `lettering`, `style`, `aspect_ratio`, `image_generator`, `index.*`,
-`layers.*`, `ornaments_extra.*`, `highlights_extra.*`
+`layers.*`, `ornaments_extra.*`, `highlights_extra.*`, `mood`, `theme`, `face_style.*`
 
 **Per-card** (always asked in the wizard — never saved):
 `rank`, `suit`, `character_name`, `character_features`, `extra_attributes`,
