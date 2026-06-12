@@ -27,6 +27,16 @@ curl -L --fail --progress-bar "$URL" -o "$TEMP/${SKILL_NAME}.skill" || {
 }
 
 mkdir -p "$INSTALL_DIR/$SKILL_NAME"
+
+# Back up an existing config.json (it may hold the user's saved profiles) before
+# extraction overwrites it with the skill's shipped factory-default config.json.
+EXISTING_CONFIG="$INSTALL_DIR/$SKILL_NAME/config.json"
+if [ -f "$EXISTING_CONFIG" ]; then
+  BACKUP="$EXISTING_CONFIG.bak.$(date +%Y%m%d%H%M%S)"
+  cp "$EXISTING_CONFIG" "$BACKUP"
+  echo "Backed up existing config.json to $(basename "$BACKUP")"
+fi
+
 tar -xzf "$TEMP/${SKILL_NAME}.skill" -C "$INSTALL_DIR/$SKILL_NAME"
 rm -rf "$TEMP"
 

@@ -1,0 +1,71 @@
+{
+  "active_profile": "default",
+  "profiles": {
+    "default": {
+      "deck": "french",
+      "lettering": "anglo-american",
+      "style": "austrian",
+      "aspect_ratio": "9:14",
+      "image_generator": "nanobanana",
+      "index": {
+        "size": "standard",
+        "count": "4-index",
+        "layout": "stacked"
+      },
+      "layers": {
+        "background": {
+          "court": "true",
+          "pip": "true",
+          "ace": "true"
+        },
+        "decor": {
+          "court": "true",
+          "pip": "false",
+          "ace": "true"
+        },
+        "ornaments": {
+          "court": "true",
+          "pip": "false",
+          "ace": "true"
+        },
+        "highlights": {
+          "court": "false",
+          "pip": "false",
+          "ace": "false"
+        },
+        "frame": {
+          "court": "true",
+          "pip": "false",
+          "ace": "true"
+        },
+        "figure": {
+          "court": "true",
+          "pip": "false",
+          "ace": "false"
+        },
+        "mood": {
+          "court": "true",
+          "pip": "true",
+          "ace": "true"
+        }
+      },
+      "ornaments_extra": {
+        "court": "",
+        "pip": "",
+        "ace": ""
+      },
+      "highlights_extra": {
+        "court": "",
+        "pip": "",
+        "ace": ""
+      },
+      "mood": "",
+      "theme": "",
+      "face_style": {
+        "court": "individual",
+        "pip": "individual",
+        "ace": "individual"
+      }
+    }
+  }
+}

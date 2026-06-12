@@ -7,6 +7,31 @@ All notable changes to this skill. Released per skill as tag
 ## [Unreleased]
 
 ### Added
+- **Profiles**: `config.json` now wraps settings in named profiles plus an
+  `active_profile` pointer (`{"active_profile": "default", "profiles": {"default":
+  {...}}}`), so users can save multiple "looks" (e.g. an Austrian gothic deck and a
+  separate ukiyo-e deck) and switch between them without redoing the config wizard
+- `scripts/manage_config.py` gained `profile list|show|create|switch|rename|delete|
+  reset`, plus a `--profile <name>` flag on `get`/`set`/`unset`/`show` to target a
+  non-active profile; a pre-3.0 flat `config.json` is auto-migrated into a `default`
+  profile on first read
+- The skill now ships `config.json` at its root, pre-populated with a `default`
+  profile holding every factory setting — this file is the canonical source of
+  default values (previously only documented, scattered across `CONFIG.md`'s field
+  table and `manage_config.py`'s `DEFAULTS` dict)
+- `scripts/install-skill.sh` backs up an existing `config.json` (as
+  `config.json.bak.<timestamp>`) before extraction overwrites it with the shipped
+  default, so upgrading the skill doesn't silently drop a user's saved profiles
+- New **Profile** subcommand mode and a Step 0 (profile selection: continue, switch,
+  or create-from-clone) in Config mode
+
+### Changed
+- `references/CONFIG.md`: documents the profile concept, schema, and CLI; lookup
+  order is now "active profile → global `settings.json` → built-in defaults"
+- SKILL.md Reset mode now clarifies that `--reset` deletes **all** profiles, and
+  points to `profile reset <name> --yes` for clearing a single profile instead
+
+### Added
 - Two new configurable layers, `figure` and `mood`, extending the `layers.<layer>.<group>`
   matrix to 7×3: `figure` gates whether a card group's center motif carries a
   figure/portrait at all (and thus its figure-only style line and `[FACE_STYLE_LINE]`),

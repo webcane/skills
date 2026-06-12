@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 2.2.0
+  version: 3.0.0
 ---
 
 # Playing Card Prompt Wizard
@@ -16,37 +16,48 @@ prompt text in a code block for the user to copy. **Do not generate the image yo
 
 ## Subcommands
 
-The user may invoke the skill in three modes. Detect which one from their message:
+The user may invoke the skill in four modes. Detect which one from their message:
 
 | Trigger                                               | Mode        | What to do                                         |
 |-------------------------------------------------------|-------------|----------------------------------------------------|
-| `--init`, `--config`, `init`, `config`, "configure"   | **Config**  | Run config wizard only; save `config.json`; stop.  |
-| `--reset`                                             | **Reset**   | Delete `config.json`; confirm; stop.               |
-| _(anything else, or no flag)_                         | **Generate**| Load config → run card wizard → output prompt.     |
+| `--init`, `--config`, `init`, `config`, "configure"   | **Config**  | Run config wizard (profile choice + persistent settings); save to the active profile; stop. |
+| `--profile <name>`, "switch/use the `<name>` profile", "list my profiles", "create/rename/delete profile `<name>`" | **Profile** | Manage profiles directly via `python3 scripts/manage_config.py profile ...`; report the result; stop. |
+| `--reset`                                             | **Reset**   | Delete `config.json` (all profiles); confirm; stop. |
+| _(anything else, or no flag)_                         | **Generate**| Load active profile → run card wizard → output prompt. |
 
 ---
 
 ## Startup: loading saved settings
 
-Before asking any wizard questions, load persistent settings (`deck`, `lettering`,
-`style`, `aspect_ratio`, `image_generator`, `index.*`, `layers.*`, `ornaments_extra.*`,
-`highlights_extra.*`, `mood`, `theme`, `face_style.*`) via
-`python3 scripts/manage_config.py show`.
-Everything else — schema, lookup order, field reference, and the full CLI — is in
-`references/CONFIG.md`; read it whenever you need to inspect, change, or validate
-`config.json`. Per-card fields (`rank`, `suit`, `character_name`,
-`character_features`, `extra_attributes`, `reference_transfers`, `exclusions`) are
-always asked fresh and never saved.
+Before asking any wizard questions, load the active profile's persistent settings
+(`deck`, `lettering`, `style`, `aspect_ratio`, `image_generator`, `index.*`,
+`layers.*`, `ornaments_extra.*`, `highlights_extra.*`, `mood`, `theme`,
+`face_style.*`) via `python3 scripts/manage_config.py show`. This also lists every
+saved profile and which one is active.
+Everything else — schema, profile concept, lookup order, field reference, and the
+full CLI — is in `references/CONFIG.md`; read it whenever you need to inspect,
+change, or validate `config.json`. Per-card fields (`rank`, `suit`,
+`character_name`, `character_features`, `extra_attributes`, `reference_transfers`,
+`exclusions`) are always asked fresh and never saved.
 
 ---
 
 ## Mode: Config (`--init` / `--config`)
 
-Walk the user through **only the persistent settings** (Steps 1, 2, 5, 8, 9 and
-optionally index). Show current values if `config.json` already exists so the user
-can accept or change each one. At the end, persist each value with
-`python3 scripts/manage_config.py set <key> <value>` (it validates and writes
-`config.json`), then confirm. Do **not** proceed to card generation.
+**Step 0 — Profile.** Run `python3 scripts/manage_config.py profile list`. If more
+than one profile exists, or the user's message implies they want a different "look"
+(e.g. "set up a new deck profile"), ask whether to: continue editing the active
+profile, switch to an existing one (`profile switch <name>`), or create a new one
+(`profile create <name>`, optionally `--from <existing>` to clone the active
+profile's settings as a starting point). Otherwise skip straight to Step 1 and edit
+the active profile.
+
+Then walk the user through **only the persistent settings** (Steps 1, 2, 5, 8, 9 and
+optionally index). Show current values for the target profile (from `profile show`)
+so the user can accept or change each one. At the end, persist each value with
+`python3 scripts/manage_config.py set <key> <value>` (it validates and writes to the
+active profile in `config.json`; pass `--profile <name>` if editing a non-active
+profile), then confirm. Do **not** proceed to card generation.
 
 Steps to ask in config mode:
 1. Deck type
@@ -60,21 +71,35 @@ Steps to ask in config mode:
    `layers.<layer>.<group>` for Court/Pip/Ace (e.g. `layers.ornaments.ace`,
    `layers.figure.pip`, `layers.mood.court`)
 
+## Mode: Profile (`--profile <name>` or other profile commands)
+
+For direct profile-management requests that don't need the settings wizard, call the
+matching `python3 scripts/manage_config.py profile <list|show|create|switch|rename|
+delete|reset>` subcommand (see `references/CONFIG.md`) and report the result. E.g.
+"switch to my gothic-deck profile" → `profile switch gothic-deck`; "make a new
+profile called tarot-set based on my current one" → `profile create tarot-set --from
+<active>`. If the requested profile doesn't exist, list the available ones and ask
+which to use instead of guessing.
+
 ## Mode: Reset (`--reset`)
 
-Run `python3 scripts/manage_config.py reset --yes` to delete `config.json`, confirm to
-the user that defaults are restored, and stop.
+Run `python3 scripts/manage_config.py reset --yes` to delete `config.json` —
+**this removes every saved profile**, restoring the single built-in `default`
+profile. Confirm this with the user before running it if they have more than one
+profile (check `profile list` first). To clear just the active profile's overrides
+without affecting other profiles, use `profile reset <name> --yes` instead.
 
 ## Mode: Generate (default)
 
-Load config. Then run the card wizard with this logic:
+Load the active profile. Then run the card wizard with this logic:
 
 - **Config exists** → skip persistent-setting steps; show a one-line summary of the
-  loaded settings (e.g. "Using: French deck, Anglo-American letters, Austrian style,
-  9:14, NanoBanana") and go straight to per-card steps (rank → suit → court details
-  if applicable). Mention the user can run `--config` to change defaults.
+  loaded settings including the active profile's name (e.g. "Using profile 'default':
+  French deck, Anglo-American letters, Austrian style, 9:14, NanoBanana") and go
+  straight to per-card steps (rank → suit → court details if applicable). Mention the
+  user can run `--config` to change settings or switch profiles.
 - **No config found** → run the full wizard (all steps), then offer to save the
-  persistent settings to `config.json` for next time.
+  persistent settings to the active (`default`) profile in `config.json` for next time.
 
 ---
 
@@ -93,11 +118,16 @@ Folders under `assets/`:
 
 Scripts under `scripts/`:
 - `scripts/manage_config.py` — CLI to read/write/validate `config.json`
-  (`show`, `get`, `set`, `unset`, `validate`, `reset`, `options`, `path`)
+  (`show`, `get`, `set`, `unset`, `validate`, `reset`, `options`, `path`, and
+  `profile list|show|create|switch|rename|delete|reset`)
+
+`config.json` ships at the skill root with a `default` profile populated with
+factory settings — it's the canonical source of defaults (see
+`references/CONFIG.md`). User edits add/switch profiles in the same file.
 
 Reference files under `references/`:
 - `references/REFERENCE.md` — COURT / PIP / ACE templates, rank table, aspect ratios
-- `references/CONFIG.md` — config schema, lookup order, field reference
+- `references/CONFIG.md` — config schema, profiles, lookup order, field reference
 - `references/example-court-king.md` — a fully assembled COURT example prompt for reference
 - `references/example-pip-two.md` — a fully assembled PIP example prompt (plain default and decorated variant)
 

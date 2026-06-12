@@ -2,21 +2,31 @@
 """Manage config.json for the playing-card-prompt skill.
 
 A small, dependency-free CLI for reading, writing, and validating the
-persistent settings the wizard loads at startup. Allowed values for
-`deck` and `style` are discovered from the skill's assets/ folder so the
-tool stays in sync with what is actually on disk.
+persistent settings the wizard loads at startup. config.json holds one or
+more named *profiles* — each a full bundle of persistent settings (deck,
+style, layers, mood, theme, ...) — plus an `active_profile` pointer. Allowed
+values for `deck` and `style` are discovered from the skill's assets/ folder
+so the tool stays in sync with what is actually on disk.
 
 Usage:
-  manage_config.py show                 # effective config + raw config.json
-  manage_config.py get <key>            # print one value (e.g. deck, index.size)
-  manage_config.py set <key> <value>    # validate + persist one value
-  manage_config.py unset <key>          # remove one field
-  manage_config.py reset [--yes]        # delete config.json
+  manage_config.py show [--profile <name>]      # effective + saved settings
+  manage_config.py get <key> [--profile <name>] # print one value (e.g. deck, index.size)
+  manage_config.py set <key> <value> [--profile <name>]  # validate + persist
+  manage_config.py unset <key> [--profile <name>]        # remove one field
+  manage_config.py reset [--yes]        # delete config.json (ALL profiles)
   manage_config.py validate             # check config.json against the schema
   manage_config.py path                 # print the config.json path
   manage_config.py options [key]        # list allowed values
 
-Keys: deck, lettering, style, aspect_ratio, image_generator,
+  manage_config.py profile list                       # list profiles, mark active
+  manage_config.py profile show [<name>]              # show one profile
+  manage_config.py profile create <name> [--from <existing>]
+  manage_config.py profile switch <name>              # change active profile
+  manage_config.py profile rename <old> <new>
+  manage_config.py profile delete <name>
+  manage_config.py profile reset <name> --yes         # clear a profile's overrides
+
+Keys (within a profile): deck, lettering, style, aspect_ratio, image_generator,
       index.size, index.count, index.layout,
       layers.<background|decor|ornaments|highlights|frame|figure|mood>.<court|pip|ace>,
       ornaments_extra.<court|pip|ace>, highlights_extra.<court|pip|ace>,
@@ -34,6 +44,8 @@ SKILL_DIR = Path(__file__).resolve().parent.parent
 CONFIG_PATH = SKILL_DIR / "config.json"
 ASSETS = SKILL_DIR / "assets"
 
+DEFAULT_PROFILE_NAME = "default"
+
 # Enumerations that do not depend on disk contents.
 LETTERING = ["anglo-american", "french", "german", "russian", "dutch", "scandinavian"]
 INDEX_SIZE = ["standard", "jumbo", "magnum"]
@@ -49,7 +61,9 @@ LAYERS = ("background", "decor", "ornaments", "highlights", "frame", "figure", "
 # Defaults reproduce the traditional look: courts get every layer including a
 # portrait, plain pips get only background + center motif + finish, aces keep their
 # ornamental flourish but no figure. `mood` is on everywhere (but inert until the
-# free-text `mood` field is set).
+# free-text `mood` field is set). This dict mirrors the `profiles.default` entry
+# shipped in config.json — that file is the human-readable copy; this dict is what
+# every profile falls back to for fields it doesn't override.
 LAYER_DEFAULTS = {
     "background": {"court": "true", "pip": "true", "ace": "true"},
     "decor": {"court": "true", "pip": "false", "ace": "true"},
@@ -75,6 +89,15 @@ DEFAULTS = {
     "face_style": {g: "individual" for g in GROUPS},
 }
 
+# Top-level field names of a profile — used to detect a pre-3.0 flat config.json
+# (one that has no "profiles" wrapper) for migration.
+PROFILE_FIELD_KEYS = set(DEFAULTS.keys())
+
+BUILTIN_CONFIG = {
+    "active_profile": DEFAULT_PROFILE_NAME,
+    "profiles": {DEFAULT_PROFILE_NAME: DEFAULTS},
+}
+
 PERSISTENT_KEYS = {"deck", "lettering", "style", "aspect_ratio", "image_generator",
                    "index.size", "index.count", "index.layout", "mood", "theme"}
 PERSISTENT_KEYS |= {f"layers.{layer}.{g}" for layer in LAYERS for g in GROUPS}
@@ -82,7 +105,7 @@ PERSISTENT_KEYS |= {f"ornaments_extra.{g}" for g in GROUPS}
 PERSISTENT_KEYS |= {f"highlights_extra.{g}" for g in GROUPS}
 PERSISTENT_KEYS |= {f"face_style.{g}" for g in GROUPS}
 
-# Top-level keys that hold nested dicts (any depth).
+# Top-level keys (within a profile) that hold nested dicts (any depth).
 NESTED_GROUPS = ("index", "layers", "ornaments_extra", "highlights_extra", "face_style")
 
 
@@ -161,15 +184,35 @@ def validate_value(key: str, value: str) -> tuple[bool, str]:
     return True, f"note: '{value}' is a custom {key} (not in {', '.join(allowed)})"
 
 
-# --- config io -------------------------------------------------------------
+def _flatten(d: dict, prefix: str = "") -> dict:
+    flat = {}
+    for k, v in d.items():
+        full = f"{prefix}{k}"
+        if isinstance(v, dict):
+            flat.update(_flatten(v, f"{full}."))
+        else:
+            flat[full] = v
+    return flat
+
+
+# --- config io ---------------------------------------------------------------
 
 def load_raw() -> dict:
+    """Load config.json, migrating a pre-3.0 flat file into a profile if needed."""
     if not CONFIG_PATH.exists():
-        return {}
+        return json.loads(json.dumps(BUILTIN_CONFIG))
     try:
-        return json.loads(CONFIG_PATH.read_text())
+        cfg = json.loads(CONFIG_PATH.read_text())
     except json.JSONDecodeError as e:
         sys.exit(f"error: config.json is not valid JSON: {e}")
+    if "profiles" not in cfg and (PROFILE_FIELD_KEYS & cfg.keys()):
+        cfg = {"active_profile": DEFAULT_PROFILE_NAME, "profiles": {DEFAULT_PROFILE_NAME: cfg}}
+        save_raw(cfg)
+        print(f"note: migrated legacy config.json into profile '{DEFAULT_PROFILE_NAME}'", file=sys.stderr)
+    cfg.setdefault("active_profile", DEFAULT_PROFILE_NAME)
+    cfg.setdefault("profiles", {})
+    cfg["profiles"].setdefault(DEFAULT_PROFILE_NAME, {})
+    return cfg
 
 
 def save_raw(cfg: dict) -> None:
@@ -185,16 +228,18 @@ def _deep_merge(base: dict, overlay: dict) -> None:
             base[k] = v
 
 
-def effective() -> dict:
-    """Defaults overlaid with whatever is saved (config.json wins)."""
-    cfg = json.loads(json.dumps(DEFAULTS))  # deep copy
-    raw = load_raw()
-    for k, v in raw.items():
-        if k in NESTED_GROUPS and isinstance(v, dict) and isinstance(cfg.get(k), dict):
-            _deep_merge(cfg[k], v)
-        else:
-            cfg[k] = v
-    return cfg
+def active_profile_name(cfg: dict) -> str:
+    return cfg.get("active_profile", DEFAULT_PROFILE_NAME)
+
+
+def effective(cfg: dict | None = None, profile: str | None = None) -> dict:
+    """Built-in defaults overlaid with the given (or active) profile's overrides."""
+    if cfg is None:
+        cfg = load_raw()
+    name = profile or active_profile_name(cfg)
+    out = json.loads(json.dumps(DEFAULTS))  # deep copy
+    _deep_merge(out, cfg.get("profiles", {}).get(name, {}))
+    return out
 
 
 def get_path(cfg: dict, key: str):
@@ -206,37 +251,64 @@ def get_path(cfg: dict, key: str):
     return node
 
 
-# --- commands --------------------------------------------------------------
+def _pop_profile_flag(args: list[str]) -> tuple[list[str], str | None]:
+    if "--profile" in args:
+        i = args.index("--profile")
+        if i + 1 >= len(args):
+            sys.exit("error: --profile requires a value")
+        return args[:i] + args[i + 2:], args[i + 1]
+    return args, None
 
-def cmd_show(_args):
+
+# --- commands ----------------------------------------------------------------
+
+def cmd_show(args):
+    args, profile = _pop_profile_flag(args)
+    cfg = load_raw()
+    active = active_profile_name(cfg)
+    target = profile or active
+    if target not in cfg["profiles"]:
+        sys.exit(f"error: unknown profile '{target}' (see: profile list)")
     print(f"config file: {CONFIG_PATH}"
-          f" ({'exists' if CONFIG_PATH.exists() else 'not created — using defaults'})")
-    print("\neffective settings:")
-    print(json.dumps(effective(), indent=2))
-    if CONFIG_PATH.exists():
-        print("\nsaved config.json:")
-        print(json.dumps(load_raw(), indent=2))
+          f" ({'exists' if CONFIG_PATH.exists() else 'not created — using built-in defaults'})")
+    names = ", ".join(
+        f"{n}{' (active)' if n == active else ''}" for n in sorted(cfg["profiles"])
+    )
+    print(f"profiles: {names}")
+    print(f"\neffective settings for profile '{target}':")
+    print(json.dumps(effective(cfg, target), indent=2))
+    print(f"\nsaved overrides for profile '{target}':")
+    print(json.dumps(cfg["profiles"][target], indent=2))
 
 
 def cmd_get(args):
+    args, profile = _pop_profile_flag(args)
     if not args:
-        sys.exit("usage: get <key>")
-    val = get_path(effective(), args[0])
+        sys.exit("usage: get <key> [--profile <name>]")
+    cfg = load_raw()
+    name = profile or active_profile_name(cfg)
+    if name not in cfg["profiles"]:
+        sys.exit(f"error: unknown profile '{name}' (see: profile list)")
+    val = get_path(effective(cfg, name), args[0])
     if val is None:
         sys.exit(f"error: no value for '{args[0]}'")
     print(val if not isinstance(val, dict) else json.dumps(val, indent=2))
 
 
 def cmd_set(args):
+    args, profile = _pop_profile_flag(args)
     if len(args) < 2:
-        sys.exit("usage: set <key> <value>")
+        sys.exit("usage: set <key> <value> [--profile <name>]")
     key, value = args[0], args[1]
     ok, msg = validate_value(key, value)
     if not ok:
         sys.exit(f"error: {msg}")
     cfg = load_raw()
+    name = profile or active_profile_name(cfg)
+    if name not in cfg["profiles"]:
+        sys.exit(f"error: unknown profile '{name}' (see: profile list)")
+    node = cfg["profiles"][name]
     parts = key.split(".")
-    node = cfg
     for part in parts[:-1]:
         if not isinstance(node.get(part), dict):
             node[part] = {}
@@ -245,24 +317,28 @@ def cmd_set(args):
     save_raw(cfg)
     if msg:
         print(msg)
-    print(f"✓ {key} = {value}  → {CONFIG_PATH}")
+    print(f"✓ {key} = {value}  → profile '{name}' in {CONFIG_PATH}")
 
 
 def cmd_unset(args):
+    args, profile = _pop_profile_flag(args)
     if not args:
-        sys.exit("usage: unset <key>")
+        sys.exit("usage: unset <key> [--profile <name>]")
     key = args[0]
     cfg = load_raw()
+    name = profile or active_profile_name(cfg)
+    if name not in cfg["profiles"]:
+        sys.exit(f"error: unknown profile '{name}' (see: profile list)")
     parts = key.split(".")
-    parents = [cfg]
-    node = cfg
+    node = cfg["profiles"][name]
+    parents = [node]
     for part in parts[:-1]:
         if not isinstance(node.get(part), dict):
-            sys.exit(f"error: '{key}' is not set in config.json")
+            sys.exit(f"error: '{key}' is not set in profile '{name}'")
         node = node[part]
         parents.append(node)
     if parts[-1] not in node:
-        sys.exit(f"error: '{key}' is not set in config.json")
+        sys.exit(f"error: '{key}' is not set in profile '{name}'")
     del node[parts[-1]]
     # Prune now-empty parent dicts, from deepest to shallowest.
     for i in range(len(parts) - 1, 0, -1):
@@ -271,7 +347,8 @@ def cmd_unset(args):
         else:
             break
     save_raw(cfg)
-    print(f"✓ unset {key} (now falls back to default '{get_path(effective(), key)}')")
+    print(f"✓ unset {key} in profile '{name}' "
+          f"(now falls back to default '{get_path(effective(cfg, name), key)}')")
 
 
 def cmd_reset(args):
@@ -279,38 +356,30 @@ def cmd_reset(args):
         print("config.json does not exist; nothing to reset.")
         return
     if "--yes" not in args and "-y" not in args:
-        sys.exit("refusing to delete config.json without --yes")
+        sys.exit("refusing to delete config.json without --yes (this removes ALL profiles)")
     CONFIG_PATH.unlink()
-    print("✓ deleted config.json — built-in defaults restored.")
+    print("✓ deleted config.json — built-in defaults restored (single 'default' profile).")
 
 
 def cmd_validate(_args):
     if not CONFIG_PATH.exists():
-        print("config.json not found — defaults apply, nothing to validate.")
+        print("config.json not found — built-in defaults apply, nothing to validate.")
         return
-    raw = load_raw()
+    cfg = load_raw()
     errors, notes = [], []
-
-    def _flatten(d: dict, prefix: str = "") -> dict:
-        flat = {}
-        for k, v in d.items():
-            full = f"{prefix}{k}"
-            if isinstance(v, dict):
-                flat.update(_flatten(v, f"{full}."))
-            else:
-                flat[full] = v
-        return flat
-
-    flat = _flatten(raw)
-    for k, v in flat.items():
-        if k not in PERSISTENT_KEYS:
-            errors.append(f"unknown key '{k}'")
-            continue
-        ok, msg = validate_value(k, str(v))
-        if not ok:
-            errors.append(msg)
-        elif msg:
-            notes.append(msg)
+    active = cfg.get("active_profile")
+    if active not in cfg.get("profiles", {}):
+        errors.append(f"active_profile '{active}' is not a defined profile")
+    for name, prof in cfg.get("profiles", {}).items():
+        for k, v in _flatten(prof).items():
+            if k not in PERSISTENT_KEYS:
+                errors.append(f"profile '{name}': unknown key '{k}'")
+                continue
+            ok, msg = validate_value(k, str(v))
+            if not ok:
+                errors.append(f"profile '{name}': {msg}")
+            elif msg:
+                notes.append(f"profile '{name}': {msg}")
     for n in notes:
         print(n)
     if errors:
@@ -337,11 +406,135 @@ def cmd_options(args):
         print(f"{k}: {', '.join(allowed)}{suffix}  [default: {get_path(DEFAULTS, k)}]")
 
 
+# --- profile subcommands -------------------------------------------------------
+
+def profile_list(_args):
+    cfg = load_raw()
+    active = active_profile_name(cfg)
+    for name in sorted(cfg["profiles"]):
+        print(f"{'* ' if name == active else '  '}{name}")
+
+
+def profile_show(args):
+    cfg = load_raw()
+    name = args[0] if args else active_profile_name(cfg)
+    if name not in cfg["profiles"]:
+        sys.exit(f"error: unknown profile '{name}' (see: profile list)")
+    suffix = " (active)" if name == active_profile_name(cfg) else ""
+    print(f"profile '{name}'{suffix}")
+    print("\neffective settings:")
+    print(json.dumps(effective(cfg, name), indent=2))
+    print("\nsaved overrides:")
+    print(json.dumps(cfg["profiles"][name], indent=2))
+
+
+def profile_create(args):
+    if not args:
+        sys.exit("usage: profile create <name> [--from <existing>]")
+    name = args[0]
+    cfg = load_raw()
+    if name in cfg["profiles"]:
+        sys.exit(f"error: profile '{name}' already exists")
+    source = None
+    if "--from" in args:
+        i = args.index("--from")
+        if i + 1 >= len(args):
+            sys.exit("usage: profile create <name> [--from <existing>]")
+        source = args[i + 1]
+        if source not in cfg["profiles"]:
+            sys.exit(f"error: unknown profile '{source}' to clone from (see: profile list)")
+    cfg["profiles"][name] = effective(cfg, source) if source else {}
+    save_raw(cfg)
+    origin = f"cloned from '{source}'" if source else "blank (inherits built-in defaults)"
+    print(f"✓ created profile '{name}' ({origin})")
+
+
+def profile_switch(args):
+    if not args:
+        sys.exit("usage: profile switch <name>")
+    name = args[0]
+    cfg = load_raw()
+    if name not in cfg["profiles"]:
+        sys.exit(f"error: unknown profile '{name}' (see: profile list)")
+    cfg["active_profile"] = name
+    save_raw(cfg)
+    print(f"✓ active profile is now '{name}'")
+
+
+def profile_rename(args):
+    if len(args) < 2:
+        sys.exit("usage: profile rename <old> <new>")
+    old, new = args[0], args[1]
+    cfg = load_raw()
+    if old not in cfg["profiles"]:
+        sys.exit(f"error: unknown profile '{old}' (see: profile list)")
+    if new in cfg["profiles"]:
+        sys.exit(f"error: profile '{new}' already exists")
+    cfg["profiles"][new] = cfg["profiles"].pop(old)
+    if cfg.get("active_profile") == old:
+        cfg["active_profile"] = new
+    save_raw(cfg)
+    print(f"✓ renamed profile '{old}' → '{new}'")
+
+
+def profile_delete(args):
+    if not args:
+        sys.exit("usage: profile delete <name>")
+    name = args[0]
+    cfg = load_raw()
+    if name not in cfg["profiles"]:
+        sys.exit(f"error: unknown profile '{name}' (see: profile list)")
+    if name == active_profile_name(cfg):
+        sys.exit(f"error: '{name}' is the active profile — switch to another profile first")
+    if len(cfg["profiles"]) == 1:
+        sys.exit("error: cannot delete the only remaining profile")
+    del cfg["profiles"][name]
+    save_raw(cfg)
+    print(f"✓ deleted profile '{name}'")
+
+
+def profile_reset(args):
+    if not args:
+        sys.exit("usage: profile reset <name> --yes")
+    name = args[0]
+    cfg = load_raw()
+    if name not in cfg["profiles"]:
+        sys.exit(f"error: unknown profile '{name}' (see: profile list)")
+    if "--yes" not in args and "-y" not in args:
+        sys.exit(f"refusing to clear profile '{name}' without --yes")
+    cfg["profiles"][name] = {}
+    save_raw(cfg)
+    print(f"✓ profile '{name}' reset to built-in defaults")
+
+
+PROFILE_COMMANDS = {
+    "list": profile_list, "ls": profile_list,
+    "show": profile_show,
+    "create": profile_create, "new": profile_create,
+    "switch": profile_switch, "use": profile_switch,
+    "rename": profile_rename, "mv": profile_rename,
+    "delete": profile_delete, "rm": profile_delete,
+    "reset": profile_reset,
+}
+
+
+def cmd_profile(args):
+    if not args:
+        sys.exit(f"usage: profile <{'|'.join(['list', 'show', 'create', 'switch', 'rename', 'delete', 'reset'])}> ...")
+    sub, rest = args[0], args[1:]
+    fn = PROFILE_COMMANDS.get(sub)
+    if fn is None:
+        sys.exit(f"error: unknown profile command '{sub}' "
+                 f"(valid: {', '.join(['list', 'show', 'create', 'switch', 'rename', 'delete', 'reset'])})")
+    fn(rest)
+
+
 COMMANDS = {
     "show": cmd_show, "list": cmd_show,
     "get": cmd_get, "set": cmd_set, "unset": cmd_unset,
     "reset": cmd_reset, "validate": cmd_validate,
     "path": cmd_path, "options": cmd_options,
+    "profile": cmd_profile,
 }
 
 

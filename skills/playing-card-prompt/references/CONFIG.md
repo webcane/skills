@@ -1,8 +1,23 @@
 # Configuration
 
-The skill stores user defaults in `config.json` at the skill root. Settings can also
-be inherited from a global `settings.json` (path given by the `AGENT_SKILLS_SETTINGS`
-environment variable). Skill-level `config.json` overrides global settings.
+The skill ships with `config.json` at the skill root, pre-populated with a `default`
+profile holding every setting's factory value — this file *is* the source of truth
+for defaults (the field reference below documents allowed values and the factory
+values, but the canonical copy lives in `config.json`). Settings can also be
+inherited from a global `settings.json` (path given by the `AGENT_SKILLS_SETTINGS`
+environment variable), which sits below profile overrides and above built-in
+defaults.
+
+## Profiles
+
+`config.json` holds one or more named **profiles** — each a full bundle of the
+persistent settings below (deck, style, layers, mood, theme, ...) — plus an
+`active_profile` pointer saying which one is currently in use. Profiles let a user
+keep multiple saved "looks" (e.g. one profile for an Austrian gothic deck, another
+for a Japanese ukiyo-e deck) and switch between them without re-running the whole
+config wizard. A profile's stored overrides only need to contain the fields that
+differ from the built-in defaults — anything missing falls back to `DEFAULTS` in
+`scripts/manage_config.py` (which mirrors the shipped `profiles.default`).
 
 ## Managing config.json (`scripts/manage_config.py`)
 
@@ -11,15 +26,35 @@ against the actual files in `assets/`, enforces the index enums, and accepts cus
 `style`/`aspect_ratio` values with a note.
 
 ```bash
-python3 scripts/manage_config.py show              # effective config + raw config.json
+python3 scripts/manage_config.py show              # effective + saved settings for the active profile
 python3 scripts/manage_config.py get <key>         # e.g. deck, index.size
 python3 scripts/manage_config.py set <key> <value> # validate + persist
 python3 scripts/manage_config.py unset <key>       # remove a field (falls back to default)
 python3 scripts/manage_config.py options [key]     # list allowed values
 python3 scripts/manage_config.py validate          # check config.json against the schema
-python3 scripts/manage_config.py reset --yes       # delete config.json
+python3 scripts/manage_config.py reset --yes       # delete config.json (ALL profiles)
 python3 scripts/manage_config.py path              # print the config.json path
 ```
+
+`show`, `get`, `set`, and `unset` operate on the **active** profile by default; pass
+`--profile <name>` to target a different one without switching, e.g.
+`manage_config.py get theme --profile gothic-deck`.
+
+### Profile commands
+
+```bash
+python3 scripts/manage_config.py profile list                  # list profiles, * marks active
+python3 scripts/manage_config.py profile show [<name>]         # show a profile (default: active)
+python3 scripts/manage_config.py profile create <name> [--from <existing>]
+python3 scripts/manage_config.py profile switch <name>         # change the active profile
+python3 scripts/manage_config.py profile rename <old> <new>
+python3 scripts/manage_config.py profile delete <name>         # refuses the active or last profile
+python3 scripts/manage_config.py profile reset <name> --yes    # clear one profile's overrides
+```
+
+`profile create <name>` with no `--from` starts blank (inherits every built-in
+default); `--from <existing>` clones that profile's full *effective* settings, so the
+new profile is a self-contained copy a user can then tweak independently.
 
 Dotted keys address nested groups: `index.size`, `index.count`, `index.layout`,
 `ornaments_extra.<group>`, `highlights_extra.<group>`, `face_style.<group>`, and the
@@ -29,43 +64,52 @@ fields (no `<group>`).
 
 ## Lookup order
 
-1. `config.json` in the skill directory (highest priority)
+1. The active profile's overrides in `config.json` (highest priority)
 2. `$AGENT_SKILLS_SETTINGS` → path to global `settings.json`
-3. Built-in defaults (lowest priority)
+3. Built-in defaults (lowest priority) — mirrored in `config.json`'s `default` profile
 
 ## Schema
 
+`config.json` is an `active_profile` pointer plus a map of named profiles. Each
+profile holds the fields below:
+
 ```json
 {
-  "deck": "french",
-  "lettering": "anglo-american",
-  "style": "austrian",
-  "aspect_ratio": "9:14",
-  "image_generator": "nanobanana",
-  "index": {
-    "size": "standard",
-    "count": "4-index",
-    "layout": "stacked"
-  },
-  "layers": {
-    "background": {"court": "true",  "pip": "true",  "ace": "true"},
-    "decor":      {"court": "true",  "pip": "false", "ace": "true"},
-    "ornaments":  {"court": "true",  "pip": "false", "ace": "true"},
-    "highlights": {"court": "false", "pip": "false", "ace": "false"},
-    "frame":      {"court": "true",  "pip": "false", "ace": "true"},
-    "figure":     {"court": "true",  "pip": "false", "ace": "false"},
-    "mood":       {"court": "true",  "pip": "true",  "ace": "true"}
-  },
-  "ornaments_extra": {"court": "", "pip": "", "ace": ""},
-  "highlights_extra": {"court": "", "pip": "", "ace": ""},
-  "mood": "",
-  "theme": "",
-  "face_style": {"court": "individual", "pip": "individual", "ace": "individual"}
+  "active_profile": "default",
+  "profiles": {
+    "default": {
+      "deck": "french",
+      "lettering": "anglo-american",
+      "style": "austrian",
+      "aspect_ratio": "9:14",
+      "image_generator": "nanobanana",
+      "index": {
+        "size": "standard",
+        "count": "4-index",
+        "layout": "stacked"
+      },
+      "layers": {
+        "background": {"court": "true",  "pip": "true",  "ace": "true"},
+        "decor":      {"court": "true",  "pip": "false", "ace": "true"},
+        "ornaments":  {"court": "true",  "pip": "false", "ace": "true"},
+        "highlights": {"court": "false", "pip": "false", "ace": "false"},
+        "frame":      {"court": "true",  "pip": "false", "ace": "true"},
+        "figure":     {"court": "true",  "pip": "false", "ace": "false"},
+        "mood":       {"court": "true",  "pip": "true",  "ace": "true"}
+      },
+      "ornaments_extra": {"court": "", "pip": "", "ace": ""},
+      "highlights_extra": {"court": "", "pip": "", "ace": ""},
+      "mood": "",
+      "theme": "",
+      "face_style": {"court": "individual", "pip": "individual", "ace": "individual"}
+    }
+  }
 }
 ```
 
-All fields are optional. Any missing field falls back to the next source in the
-lookup order, ultimately to the built-in default.
+Within a profile, all fields are optional. Any missing field falls back to the next
+source in the lookup order, ultimately to the built-in default (the field reference
+below).
 
 ### Field reference
 
@@ -110,7 +154,7 @@ tuned per layer via `--config`.
 
 ### Which settings are "session" vs "persistent"
 
-**Persistent** (saved in config — rarely change between cards):
+**Persistent** (saved per profile — rarely change between cards):
 `deck`, `lettering`, `style`, `aspect_ratio`, `image_generator`, `index.*`,
 `layers.*`, `ornaments_extra.*`, `highlights_extra.*`, `mood`, `theme`, `face_style.*`
 
@@ -120,12 +164,22 @@ tuned per layer via `--config`.
 
 ## Example `config.json`
 
+A minimal `config.json` with one custom profile that only overrides a few fields
+(everything else falls back to the built-in defaults):
+
 ```json
 {
-  "deck": "french",
-  "lettering": "anglo-american",
-  "style": "austrian",
-  "aspect_ratio": "9:14"
+  "active_profile": "gothic-deck",
+  "profiles": {
+    "default": {},
+    "gothic-deck": {
+      "deck": "french",
+      "style": "austrian",
+      "aspect_ratio": "9:14",
+      "mood": "gothic and brooding atmosphere,",
+      "theme": "celestial mythology"
+    }
+  }
 }
 ```
 
