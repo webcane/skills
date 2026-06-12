@@ -1,6 +1,41 @@
 # Adding a new pattern
 
-Create `assets/pattern/<name>.md` with a single fenced `[STYLE_BLOCK]` following this shape:
-linework → illustration descriptor → palette → face treatment → paper stock → finish →
-print quality → final `highly detailed <Name>-style playing card,` line (trailing comma).
-The wizard lists every `*.md` here (except files starting with `_`) as a style option.
+Create `assets/pattern/<name>.md` with the layer sections below, each a fenced block of
+short comma-phrases (trailing comma kept on every line). The wizard lists every `*.md`
+here (except files starting with `_`) as a style option. See "Layers and `[STYLE_BLOCK]`
+assembly" in `references/REFERENCE.md` for how these sections combine per card type
+(Court / Pip / Ace) according to the `layers.*` config.
+
+## Background
+Base cardstock color/texture for the card (e.g. `aged ivory playing-card stock, subtle
+paper grain,`). Always at least one line — this is the only layer that's on for every
+group by default.
+
+## Decor (background pattern)
+Extra accent colors or background decoration beyond the suit's own color (e.g.
+`rich crimson red, royal cobalt blue, burnished gold accents,`). Leave the fenced block
+empty (just `(none)`) if the style has nothing here.
+
+## Ornaments
+Vignettes, corner flourishes, or decorative elements that are NOT the frame/border
+itself. Often empty for a first draft — `ornaments_extra.<group>` (free text from the
+wizard or config) is appended after whatever's here.
+
+## Highlights / Overlays
+Gilding, lacquer, glow, or shine phrasing that can sit on top of the figure/pips (e.g.
+`gold leaf highlights catching the light along raised linework,`). Usually empty —
+`highlights_extra.<group>` covers most cases via free text.
+
+## Center motif style
+The rendering style applied to whatever sits in the card's center (the portrait on
+Court cards, the pip layout on number cards, the large suit symbol on Aces): linework,
+illustration descriptor, and so on. Follow this order: linework → illustration
+descriptor → (optional figure-only line, e.g. skin tones).
+
+If one line only makes sense with a portrait (skin tones, facial rendering), mark it
+explicitly below — it gets dropped for Pip/Ace, which have no figure:
+- Figure-only line (drop for PIP/ACE): `<line text>` (or "none")
+
+## Finish
+Print-quality / final descriptor lines, ending with
+`highly detailed <Name>-style playing card,`.

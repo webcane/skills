@@ -21,7 +21,9 @@ python3 scripts/manage_config.py reset --yes       # delete config.json
 python3 scripts/manage_config.py path              # print the config.json path
 ```
 
-Dotted keys address the index group: `index.size`, `index.count`, `index.layout`.
+Dotted keys address nested groups: `index.size`, `index.count`, `index.layout`,
+`ornaments_extra.<group>`, `highlights_extra.<group>`, and the two-level
+`layers.<layer>.<group>` (e.g. `layers.frame.pip`, `layers.highlights.ace`).
 
 ## Lookup order
 
@@ -43,15 +45,15 @@ Dotted keys address the index group: `index.size`, `index.count`, `index.layout`
     "count": "4-index",
     "layout": "stacked"
   },
-  "content_style": {
-    "pip": "false",
-    "ace": "true"
+  "layers": {
+    "background": {"court": "true",  "pip": "true",  "ace": "true"},
+    "decor":      {"court": "true",  "pip": "false", "ace": "true"},
+    "ornaments":  {"court": "true",  "pip": "false", "ace": "true"},
+    "highlights": {"court": "false", "pip": "false", "ace": "false"},
+    "frame":      {"court": "true",  "pip": "false", "ace": "true"}
   },
-  "frame": {
-    "pip": "false",
-    "ace": "true"
-  },
-  "pip_decoration_extra": ""
+  "ornaments_extra": {"court": "", "pip": "", "ace": ""},
+  "highlights_extra": {"court": "", "pip": "", "ace": ""}
 }
 ```
 
@@ -60,35 +62,41 @@ lookup order, ultimately to the built-in default.
 
 ### Field reference
 
-| Field                    | Values                                                        | Default            |
-|--------------------------|---------------------------------------------------------------|--------------------|
-| `deck`                   | `french`, `german`, `swiss`, `latin`                          | `french`           |
-| `lettering`              | `anglo-american`, `french`, `german`, `russian`, `dutch`, `scandinavian` | per deck default   |
-| `style`                  | `austrian`, `french`, `english` (or any custom pattern name)  | `austrian`         |
-| `aspect_ratio`           | `5:7`, `9:14`, `14:25`, `7:12`, or custom                    | `9:14`             |
-| `image_generator`        | `nanobanana`, `stable-diffusion`, `midjourney`, `dalle`, `kaze`, or custom | `nanobanana` |
-| `index.size`             | `standard`, `jumbo`, `magnum`                                 | `standard`         |
-| `index.count`            | `2-index`, `4-index`                                          | `4-index`          |
-| `index.layout`           | `stacked`, `side-by-side`, `peek`, `none`                     | `stacked`          |
-| `content_style.pip`      | `true`, `false`                                               | `false`            |
-| `content_style.ace`      | `true`, `false`                                               | `true`             |
-| `frame.pip`              | `true`, `false`                                               | `false`            |
-| `frame.ace`              | `true`, `false`                                               | `true`             |
-| `pip_decoration_extra`   | free text                                                      | `""`               |
+| Field                       | Values                                                        | Default            |
+|-----------------------------|-----------------------------------------------------------------|--------------------|
+| `deck`                      | `french`, `german`, `swiss`, `latin`                          | `french`           |
+| `lettering`                 | `anglo-american`, `french`, `german`, `russian`, `dutch`, `scandinavian` | per deck default   |
+| `style`                     | `austrian`, `french`, `english` (or any custom pattern name)  | `austrian`         |
+| `aspect_ratio`              | `5:7`, `9:14`, `14:25`, `7:12`, or custom                    | `9:14`             |
+| `image_generator`           | `nanobanana`, `stable-diffusion`, `midjourney`, `dalle`, `kaze`, or custom | `nanobanana` |
+| `index.size`                | `standard`, `jumbo`, `magnum`                                 | `standard`         |
+| `index.count`               | `2-index`, `4-index`                                          | `4-index`          |
+| `index.layout`              | `stacked`, `side-by-side`, `peek`, `none`                     | `stacked`          |
+| `layers.background.<group>` | `true`, `false`                                               | all `true`         |
+| `layers.decor.<group>`      | `true`, `false`                                               | court/ace `true`, pip `false` |
+| `layers.ornaments.<group>`  | `true`, `false`                                               | court/ace `true`, pip `false` |
+| `layers.highlights.<group>` | `true`, `false`                                               | all `false`        |
+| `layers.frame.<group>`      | `true`, `false`                                               | court/ace `true`, pip `false` |
+| `ornaments_extra.<group>`   | free text                                                      | `""`               |
+| `highlights_extra.<group>`  | free text                                                      | `""`               |
+
+`<group>` is one of `court`, `pip`, `ace`.
 
 `image_generator` controls how the assembled prompt is adapted (negative-list
 placement, aspect-ratio syntax, extra parameters) — see `assets/engines/`.
 
-`content_style.*` / `frame.*` / `pip_decoration_extra` control how `[STYLE_BLOCK]` and
-the border line are resolved for PIP and ACE cards — see "Style block on PIP/ACE
-cards" in `references/REFERENCE.md`. COURT cards always use the full `[STYLE_BLOCK]`
-with a border (these are structural to the COURT template and not configurable).
+`layers.*` controls which layers (background, decor, ornaments, highlights, frame)
+contribute to `[STYLE_BLOCK]` / `[FRAME_LINE]` for each card group — see "Layers and
+`[STYLE_BLOCK]` assembly" in `references/REFERENCE.md`. `ornaments_extra.<group>` and
+`highlights_extra.<group>` are free-text additions appended within those layers when
+enabled. Court cards default to every layer on (matching prior behavior) but, like
+Pip/Ace, can be tuned per layer via `--config`.
 
 ### Which settings are "session" vs "persistent"
 
 **Persistent** (saved in config — rarely change between cards):
 `deck`, `lettering`, `style`, `aspect_ratio`, `image_generator`, `index.*`,
-`content_style.*`, `frame.*`, `pip_decoration_extra`
+`layers.*`, `ornaments_extra.*`, `highlights_extra.*`
 
 **Per-card** (always asked in the wizard — never saved):
 `rank`, `suit`, `character_name`, `character_features`, `extra_attributes`,

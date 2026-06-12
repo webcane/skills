@@ -15,15 +15,18 @@ Note how the attributes are resolved into ONE list with no contradictions or lab
 - All Step 7 exclusions are merged into one trailing `no …` list together with
   `no watermark` — nothing is repeated or labeled "exclusions".
 
+`[STYLE_BLOCK]` for the `court` group with all default layers on (background, decor,
+ornaments — empty for Austrian, highlights — off by default, center motif style with
+its figure-only line, finish):
+
 ```
 9:14 aspect ratio, full card visible, transparent background outside the card,
 Peter the Great as King of Spades playing card,
+aged ivory playing-card stock, subtle paper grain,
+rich crimson red, royal cobalt blue, burnished gold accents,
 sharp crisp black outlines, fine engraved linework with dense cross-hatching on all illustrated elements and ornamental details,
 vintage chromolithographic playing-card illustration,
-rich crimson red, royal cobalt blue, burnished gold accents,
 warm ochre skin tones,
-aged ivory playing-card stock,
-subtle paper grain,
 matte finish,
 slight vintage printing imperfections,
 highly detailed Austrian-style playing card,

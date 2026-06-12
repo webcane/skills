@@ -10,12 +10,11 @@ The shared middle (omitted below as `...`) is:
 
 ```
 Peter the Great as King of Spades playing card,
+aged ivory playing-card stock, subtle paper grain,
+rich crimson red, royal cobalt blue, burnished gold accents,
 sharp crisp black outlines, fine engraved linework with dense cross-hatching on all illustrated elements and ornamental details,
 vintage chromolithographic playing-card illustration,
-rich crimson red, royal cobalt blue, burnished gold accents,
 warm ochre skin tones,
-aged ivory playing-card stock,
-subtle paper grain,
 matte finish,
 slight vintage printing imperfections,
 highly detailed Austrian-style playing card,

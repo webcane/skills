@@ -7,19 +7,38 @@ All notable changes to this skill. Released per skill as tag
 ## [Unreleased]
 
 ### Added
-- `content_style.pip`/`content_style.ace` and `frame.pip`/`frame.ace` config fields (default: pip = off/off, ace = on/on) controlling how `[STYLE_BLOCK]` and the bordered-index-area line resolve on PIP/ACE cards
-- New persistent wizard Step 5a — "PIP card decoration": **Plain** (default; suit-color pips only, no accent colors, no border) or **Decorated** (keeps the style's accent line, adds the border, and asks for `pip_decoration_extra` — free text describing what extra decoration to add)
-- `references/example-pip-two.md` — fully assembled PIP example (Two of Spades, Austrian style) showing both the plain default and the decorated variant
-- "Style block on PIP/ACE cards" section in `references/REFERENCE.md` defining `[STYLE_BLOCK_PIP]`/`[STYLE_BLOCK_ACE]`/`[FRAME_LINE]` resolution from the pattern's accent/figure-only lines
+- Layer-based visual system replacing the old monolithic `[STYLE_BLOCK]`: every card
+  is now composed of **Background**, **Decor** (background pattern/accents),
+  **Ornaments**, **Highlights/Overlays**, and **Frame**, plus the structural
+  **Index** and **Center motif** (figure/pips/ace pip) layers that are always present
+  — see "Layers and `[STYLE_BLOCK]` assembly" in `references/REFERENCE.md`
+- `config.json` `layers.<background|decor|ornaments|highlights|frame>.<court|pip|ace>`
+  boolean matrix controlling which layers contribute per card group, plus
+  `ornaments_extra.<group>` and `highlights_extra.<group>` free-text fields
+- New optional "Highlights / overlays" question in Step 5a — free text describing
+  gilding/lacquer/glow/shine accents, applied across Court/Pip/Ace when given
+- `assets/pattern/*.md` now define named layer sections (Background, Decor,
+  Ornaments, Highlights, Center motif style, Finish) instead of one undifferentiated
+  `[STYLE_BLOCK]`; `_adding-a-pattern.md` documents the new per-layer template
+- Court cards' layers are now configurable via `--config` /
+  `manage_config.py set layers.<layer>.court <bool>` (previously hardcoded "always
+  full"), defaulting to fully on to match prior behavior
 
 ### Changed
-- Each `assets/pattern/*.md` now marks which `[STYLE_BLOCK]` line is the "accent" line (extra decoration, suppressed on plain PIP/ACE) and which (if any) is "figure-only" (e.g. Austrian's `warm ochre skin tones,` — always dropped on PIP/ACE, which have no portrait)
-- `scripts/manage_config.py` generalized its nested-group handling (previously `index`-only) to also cover `content_style` and `frame`, and added free-text support for `pip_decoration_extra`
-
-### Fixed
-- Reworded the figure-specific wording in each `[STYLE_BLOCK]` (Austrian, French, English patterns) so the same verbatim block reads correctly on PIP/ACE cards, which have no portrait — "on face, hair, costume and fabric folds" / "stylized faces" became generic phrasing covering pip symbols and ornamental details
-- Removed the `thin black horizontal dividing line through the exact center of the card,` line from the PIP template — that line exists for COURT cards' reversible two-way (double-headed) layout and doesn't apply to pip cards, which the ACE template already omits it for
-- PIP cards now default to a plain look (no extra accent colors, no border) matching traditional simple number-card designs, instead of inheriting the full court-card style block's decoration
+- Replaced `content_style.{pip,ace}` / `frame.{pip,ace}` / `pip_decoration_extra`
+  with the `layers.*` / `ornaments_extra.*` / `highlights_extra.*` schema;
+  `scripts/manage_config.py` now supports arbitrary-depth dotted keys (deep merge,
+  recursive get/set/unset/validate) instead of one-level nested groups
+- Step 5a renamed "Card decoration layers" — the existing Plain/Decorated choice for
+  number cards now bundles `layers.decor.pip` / `layers.ornaments.pip` /
+  `layers.frame.pip` (was `content_style.pip` / `frame.pip`)
+- `references/REFERENCE.md`: "Style block on PIP/ACE cards" replaced by "Layers and
+  `[STYLE_BLOCK]` assembly", describing one resolution algorithm shared by
+  Court/Pip/Ace; COURT template now uses `[FRAME_LINE]` instead of a hardcoded border
+  line
+- Updated `references/example-court-king.md`, `references/example-pip-two.md`, and
+  `references/example-engine-variants.md` to the new layer ordering (Background →
+  Decor → Ornaments → Highlights → Center motif style → Finish)
 
 ### Added
 - `scripts/manage_config.py` — dependency-free CLI to read/write/validate `config.json` (`show`, `get`, `set`, `unset`, `validate`, `reset`, `options`, `path`); validates `deck`/`style` against the files in `assets/` and enforces the index/lettering/aspect enums

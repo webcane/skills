@@ -18,8 +18,8 @@ Usage:
 
 Keys: deck, lettering, style, aspect_ratio, image_generator,
       index.size, index.count, index.layout,
-      content_style.pip, content_style.ace, frame.pip, frame.ace,
-      pip_decoration_extra
+      layers.<background|decor|ornaments|highlights|frame>.<court|pip|ace>,
+      ornaments_extra.<court|pip|ace>, highlights_extra.<court|pip|ace>
 """
 from __future__ import annotations
 
@@ -41,6 +41,19 @@ INDEX_LAYOUT = ["stacked", "side-by-side", "peek", "none"]
 ASPECT_PRESETS = ["5:7", "9:14", "14:25", "7:12"]
 BOOL_VALUES = ["true", "false"]
 
+GROUPS = ("court", "pip", "ace")
+LAYERS = ("background", "decor", "ornaments", "highlights", "frame")
+
+# Defaults reproduce the traditional look: courts get every layer, plain pips get
+# only background + center motif + finish, aces keep their ornamental flourish.
+LAYER_DEFAULTS = {
+    "background": {"court": "true", "pip": "true", "ace": "true"},
+    "decor": {"court": "true", "pip": "false", "ace": "true"},
+    "ornaments": {"court": "true", "pip": "false", "ace": "true"},
+    "highlights": {"court": "false", "pip": "false", "ace": "false"},
+    "frame": {"court": "true", "pip": "false", "ace": "true"},
+}
+
 DEFAULTS = {
     "deck": "french",
     "lettering": "anglo-american",
@@ -48,17 +61,19 @@ DEFAULTS = {
     "aspect_ratio": "9:14",
     "image_generator": "nanobanana",
     "index": {"size": "standard", "count": "4-index", "layout": "stacked"},
-    "content_style": {"pip": "false", "ace": "true"},
-    "frame": {"pip": "false", "ace": "true"},
-    "pip_decoration_extra": "",
+    "layers": {layer: dict(groups) for layer, groups in LAYER_DEFAULTS.items()},
+    "ornaments_extra": {g: "" for g in GROUPS},
+    "highlights_extra": {g: "" for g in GROUPS},
 }
 
 PERSISTENT_KEYS = {"deck", "lettering", "style", "aspect_ratio", "image_generator",
-                   "index.size", "index.count", "index.layout",
-                   "content_style.pip", "content_style.ace",
-                   "frame.pip", "frame.ace", "pip_decoration_extra"}
+                   "index.size", "index.count", "index.layout"}
+PERSISTENT_KEYS |= {f"layers.{layer}.{g}" for layer in LAYERS for g in GROUPS}
+PERSISTENT_KEYS |= {f"ornaments_extra.{g}" for g in GROUPS}
+PERSISTENT_KEYS |= {f"highlights_extra.{g}" for g in GROUPS}
 
-NESTED_GROUPS = ("index", "content_style", "frame")
+# Top-level keys that hold nested dicts (any depth).
+NESTED_GROUPS = ("index", "layers", "ornaments_extra", "highlights_extra")
 
 
 def _discover(subdir: str) -> list[str]:
@@ -84,7 +99,7 @@ def allowed_engines() -> list[str]:
 
 
 def options_for(key: str):
-    return {
+    fixed = {
         "deck": (allowed_decks(), True),
         "lettering": (LETTERING, True),
         "style": (allowed_styles(), False),          # custom allowed
@@ -93,12 +108,20 @@ def options_for(key: str):
         "index.size": (INDEX_SIZE, True),
         "index.count": (INDEX_COUNT, True),
         "index.layout": (INDEX_LAYOUT, True),
-        "content_style.pip": (BOOL_VALUES, True),
-        "content_style.ace": (BOOL_VALUES, True),
-        "frame.pip": (BOOL_VALUES, True),
-        "frame.ace": (BOOL_VALUES, True),
-        "pip_decoration_extra": (None, False),       # free text
     }.get(key)
+    if fixed is not None:
+        return fixed
+    if key.startswith("layers.") and key.count(".") == 2:
+        _, layer, group = key.split(".")
+        if layer in LAYERS and group in GROUPS:
+            return (BOOL_VALUES, True)
+        return None
+    if key.startswith("ornaments_extra.") or key.startswith("highlights_extra."):
+        _, group = key.split(".", 1)
+        if group in GROUPS:
+            return (None, False)  # free text
+        return None
+    return None
 
 
 # --- validation ------------------------------------------------------------
@@ -136,23 +159,34 @@ def save_raw(cfg: dict) -> None:
     CONFIG_PATH.write_text(json.dumps(cfg, indent=2) + "\n")
 
 
+def _deep_merge(base: dict, overlay: dict) -> None:
+    """Recursively merge overlay into base (overlay wins), in place."""
+    for k, v in overlay.items():
+        if isinstance(v, dict) and isinstance(base.get(k), dict):
+            _deep_merge(base[k], v)
+        else:
+            base[k] = v
+
+
 def effective() -> dict:
     """Defaults overlaid with whatever is saved (config.json wins)."""
     cfg = json.loads(json.dumps(DEFAULTS))  # deep copy
     raw = load_raw()
     for k, v in raw.items():
-        if k in NESTED_GROUPS and isinstance(v, dict):
-            cfg[k].update(v)
+        if k in NESTED_GROUPS and isinstance(v, dict) and isinstance(cfg.get(k), dict):
+            _deep_merge(cfg[k], v)
         else:
             cfg[k] = v
     return cfg
 
 
 def get_path(cfg: dict, key: str):
-    if "." in key:
-        top, sub = key.split(".", 1)
-        return cfg.get(top, {}).get(sub) if isinstance(cfg.get(top), dict) else None
-    return cfg.get(key)
+    node = cfg
+    for part in key.split("."):
+        if not isinstance(node, dict) or part not in node:
+            return None
+        node = node[part]
+    return node
 
 
 # --- commands --------------------------------------------------------------
@@ -184,14 +218,13 @@ def cmd_set(args):
     if not ok:
         sys.exit(f"error: {msg}")
     cfg = load_raw()
-    if "." in key:
-        top, sub = key.split(".", 1)
-        cfg.setdefault(top, {})
-        if not isinstance(cfg[top], dict):
-            cfg[top] = {}
-        cfg[top][sub] = value
-    else:
-        cfg[key] = value
+    parts = key.split(".")
+    node = cfg
+    for part in parts[:-1]:
+        if not isinstance(node.get(part), dict):
+            node[part] = {}
+        node = node[part]
+    node[parts[-1]] = value
     save_raw(cfg)
     if msg:
         print(msg)
@@ -203,19 +236,23 @@ def cmd_unset(args):
         sys.exit("usage: unset <key>")
     key = args[0]
     cfg = load_raw()
-    removed = False
-    if "." in key:
-        top, sub = key.split(".", 1)
-        if isinstance(cfg.get(top), dict) and sub in cfg[top]:
-            del cfg[top][sub]
-            if not cfg[top]:
-                del cfg[top]
-            removed = True
-    elif key in cfg:
-        del cfg[key]
-        removed = True
-    if not removed:
+    parts = key.split(".")
+    parents = [cfg]
+    node = cfg
+    for part in parts[:-1]:
+        if not isinstance(node.get(part), dict):
+            sys.exit(f"error: '{key}' is not set in config.json")
+        node = node[part]
+        parents.append(node)
+    if parts[-1] not in node:
         sys.exit(f"error: '{key}' is not set in config.json")
+    del node[parts[-1]]
+    # Prune now-empty parent dicts, from deepest to shallowest.
+    for i in range(len(parts) - 1, 0, -1):
+        if not parents[i]:
+            del parents[i - 1][parts[i - 1]]
+        else:
+            break
     save_raw(cfg)
     print(f"✓ unset {key} (now falls back to default '{get_path(effective(), key)}')")
 
@@ -236,13 +273,18 @@ def cmd_validate(_args):
         return
     raw = load_raw()
     errors, notes = [], []
-    flat = {}
-    for k, v in raw.items():
-        if k in NESTED_GROUPS and isinstance(v, dict):
-            for sk, sv in v.items():
-                flat[f"{k}.{sk}"] = sv
-        else:
-            flat[k] = v
+
+    def _flatten(d: dict, prefix: str = "") -> dict:
+        flat = {}
+        for k, v in d.items():
+            full = f"{prefix}{k}"
+            if isinstance(v, dict):
+                flat.update(_flatten(v, f"{full}."))
+            else:
+                flat[full] = v
+        return flat
+
+    flat = _flatten(raw)
     for k, v in flat.items():
         if k not in PERSISTENT_KEYS:
             errors.append(f"unknown key '{k}'")
