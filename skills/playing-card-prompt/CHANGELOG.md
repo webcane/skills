@@ -6,6 +6,13 @@ All notable changes to this skill. Released per skill as tag
 
 ## [Unreleased]
 
+### Fixed
+- Wizard steps now call the `AskUserQuestion` tool (tappable choices) instead of the
+  non-existent `ask_user_input_v0`, which was never callable and made every
+  fixed-choice step degrade to plain printed lists requiring the user to type an
+  answer. Also documents `AskUserQuestion`'s 4-option-per-question limit and how to
+  handle steps with more than 4 fixed choices (default + top ~3, "Other" for the rest)
+
 ### Added
 - Layer-based visual system replacing the old monolithic `[STYLE_BLOCK]`: every card
   is now composed of **Background**, **Decor** (background pattern/accents),

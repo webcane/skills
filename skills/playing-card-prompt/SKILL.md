@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 2.0.0
+  version: 2.1.0
 ---
 
 # Playing Card Prompt Wizard
@@ -103,9 +103,13 @@ Reference files under `references/`:
 ## Wizard steps
 
 Ask **one logical group at a time**, waiting for each answer. For fixed-choice questions
-use `ask_user_input_v0` (tappable options); for open-ended fields ask in plain prose.
-Always offer the default so the user can accept with one tap. Read each reference file
-as that step comes up — don't preload everything.
+use the `AskUserQuestion` tool (tappable options); for open-ended fields ask in plain
+prose. Always make the recommended/default choice the first option so the user can
+accept with one tap. `AskUserQuestion` allows at most 4 options per question (plus an
+automatic "Other" for free text) — if a step lists more than 4 fixed choices, surface
+the default plus the next ~3 most relevant as explicit options and let "Other" cover
+the remaining named choices and any custom value. Read each reference file as that step
+comes up — don't preload everything.
 
 ### Step 1 — Deck type (suit system) · _persistent_
 
