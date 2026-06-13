@@ -5,6 +5,7 @@
       "deck": "french",
       "lettering": "anglo-american",
       "style": "austrian",
+      "frame": "stepped-corners",
       "aspect_ratio": "9:14",
       "image_generator": "nanobanana",
       "index": {
@@ -55,6 +56,11 @@
         "ace": ""
       },
       "highlights_extra": {
+        "court": "",
+        "pip": "",
+        "ace": ""
+      },
+      "frame_extra": {
         "court": "",
         "pip": "",
         "ace": ""

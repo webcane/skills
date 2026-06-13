@@ -26,10 +26,11 @@ Usage:
   manage_config.py profile delete <name>
   manage_config.py profile reset <name> --yes         # clear a profile's overrides
 
-Keys (within a profile): deck, lettering, style, aspect_ratio, image_generator,
+Keys (within a profile): deck, lettering, style, frame, aspect_ratio, image_generator,
       index.size, index.count, index.layout,
       layers.<background|decor|ornaments|highlights|frame|figure|mood>.<court|pip|ace>,
       ornaments_extra.<court|pip|ace>, highlights_extra.<court|pip|ace>,
+      frame_extra.<court|pip|ace>,
       mood, theme
 """
 from __future__ import annotations
@@ -77,12 +78,14 @@ DEFAULTS = {
     "deck": "french",
     "lettering": "anglo-american",
     "style": "austrian",
+    "frame": "stepped-corners",
     "aspect_ratio": "9:14",
     "image_generator": "nanobanana",
     "index": {"size": "standard", "count": "4-index", "layout": "stacked"},
     "layers": {layer: dict(groups) for layer, groups in LAYER_DEFAULTS.items()},
     "ornaments_extra": {g: "" for g in GROUPS},
     "highlights_extra": {g: "" for g in GROUPS},
+    "frame_extra": {g: "" for g in GROUPS},
     "mood": "",
     "theme": "",
 }
@@ -96,11 +99,12 @@ BUILTIN_CONFIG = {
     "profiles": {DEFAULT_PROFILE_NAME: DEFAULTS},
 }
 
-PERSISTENT_KEYS = {"deck", "lettering", "style", "aspect_ratio", "image_generator",
+PERSISTENT_KEYS = {"deck", "lettering", "style", "frame", "aspect_ratio", "image_generator",
                    "index.size", "index.count", "index.layout", "mood", "theme"}
 PERSISTENT_KEYS |= {f"layers.{layer}.{g}" for layer in LAYERS for g in GROUPS}
 PERSISTENT_KEYS |= {f"ornaments_extra.{g}" for g in GROUPS}
 PERSISTENT_KEYS |= {f"highlights_extra.{g}" for g in GROUPS}
+PERSISTENT_KEYS |= {f"frame_extra.{g}" for g in GROUPS}
 
 # Top-level keys (within a profile) that hold nested dicts (any depth).
 NESTED_GROUPS = ("index", "layers", "ornaments_extra", "highlights_extra")
@@ -123,6 +127,11 @@ def allowed_styles() -> list[str]:
     return _discover("pattern") or ["austrian", "french", "english"]
 
 
+def allowed_frames() -> list[str]:
+    # Frames may be custom; this is the on-disk set used for suggestions.
+    return _discover("frame") or ["stepped-corners"]
+
+
 def allowed_engines() -> list[str]:
     # Engines may be custom; this is the on-disk set used for suggestions.
     return _discover("engines") or ["nanobanana", "stable-diffusion", "midjourney", "dalle", "kaze"]
@@ -133,6 +142,7 @@ def options_for(key: str):
         "deck": (allowed_decks(), True),
         "lettering": (LETTERING, True),
         "style": (allowed_styles(), False),          # custom allowed
+        "frame": (allowed_frames(), False),          # custom allowed
         "aspect_ratio": (ASPECT_PRESETS, False),     # custom N:M allowed
         "image_generator": (allowed_engines(), False),  # custom allowed
         "index.size": (INDEX_SIZE, True),
@@ -148,7 +158,8 @@ def options_for(key: str):
         if layer in LAYERS and group in GROUPS:
             return (BOOL_VALUES, True)
         return None
-    if key.startswith("ornaments_extra.") or key.startswith("highlights_extra."):
+    if (key.startswith("ornaments_extra.") or key.startswith("highlights_extra.")
+            or key.startswith("frame_extra.")):
         _, group = key.split(".", 1)
         if group in GROUPS:
             return (None, False)  # free text

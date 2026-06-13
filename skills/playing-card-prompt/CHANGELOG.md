@@ -7,6 +7,18 @@ All notable changes to this skill. Released per skill as tag
 ## [Unreleased]
 
 ### Added
+- New `assets/frame/` library of border/frame presets (Stepped Corners (default),
+  Double Rule, Ornate Scrollwork, Art Deco Geometric, Rope Twist), each providing a
+  "Frame line" for `[FRAME_LINE]`, plus `_adding-a-frame.md` for custom presets. New
+  persistent `frame` setting selects the preset (Step 6), and new per-group
+  `frame_extra.<group>` config field (config-only, like `ornaments_extra`/
+  `highlights_extra`) appends extra border text when `layers.frame.<group>` is on.
+  `[FRAME_LINE]` is now resolved from `assets/frame/<frame>.md` + `frame_extra.<group>`
+  instead of a single hardcoded line, with the same theme-derived fallback as
+  ornaments/highlights when `theme` is set and `frame_extra.<group>` is empty. Updated
+  `references/REFERENCE.md`, `references/CONFIG.md`, `references/STYLE-COMPONENTS.md`,
+  `references/WIZARD-STEP-MAP.md`, `config.json`, and `scripts/manage_config.py`
+  accordingly
 - New `assets/mood/` library of mood/atmosphere presets (Gothic & Brooding, Warm &
   Whimsical, Eerie Nocturnal, Regal & Opulent, Serene Pastoral, Noir & Mysterious),
   each providing a "Mood line" for `[MOOD_LINE]`, plus `_adding-a-mood.md` for custom

@@ -57,9 +57,9 @@ default); `--from <existing>` clones that profile's full *effective* settings, s
 new profile is a self-contained copy a user can then tweak independently.
 
 Dotted keys address nested groups: `index.size`, `index.count`, `index.layout`,
-`ornaments_extra.<group>`, `highlights_extra.<group>`, and the two-level
-`layers.<layer>.<group>` (e.g. `layers.frame.pip`, `layers.highlights.ace`,
-`layers.figure.pip`, `layers.mood.court`). `mood` and `theme` are flat free-text
+`ornaments_extra.<group>`, `highlights_extra.<group>`, `frame_extra.<group>`, and the
+two-level `layers.<layer>.<group>` (e.g. `layers.frame.pip`, `layers.highlights.ace`,
+`layers.figure.pip`, `layers.mood.court`). `mood`, `theme`, and `frame` are flat
 fields (no `<group>`).
 
 ## Lookup order
@@ -81,6 +81,7 @@ profile holds the fields below:
       "deck": "french",
       "lettering": "anglo-american",
       "style": "austrian",
+      "frame": "stepped-corners",
       "aspect_ratio": "9:14",
       "image_generator": "nanobanana",
       "index": {
@@ -99,6 +100,7 @@ profile holds the fields below:
       },
       "ornaments_extra": {"court": "", "pip": "", "ace": ""},
       "highlights_extra": {"court": "", "pip": "", "ace": ""},
+      "frame_extra": {"court": "", "pip": "", "ace": ""},
       "mood": "",
       "theme": ""
     }
@@ -117,6 +119,7 @@ below).
 | `deck`                      | `french`, `german`, `swiss`, `latin`                          | `french`           |
 | `lettering`                 | `anglo-american`, `french`, `german`, `russian`, `dutch`, `scandinavian` | per deck default   |
 | `style`                     | `austrian`, `french`, `english` (or any custom pattern name)  | `austrian`         |
+| `frame`                     | `stepped-corners`, `double-rule`, `ornate-scrollwork`, `art-deco-geometric`, `rope-twist` (or any custom frame name/description) | `stepped-corners` |
 | `aspect_ratio`              | `5:7`, `9:14`, `14:25`, `7:12`, or custom                    | `9:14`             |
 | `image_generator`           | `nanobanana`, `stable-diffusion`, `midjourney`, `dalle`, `kaze`, or custom | `nanobanana` |
 | `index.size`                | `standard`, `jumbo`, `magnum`                                 | `standard`         |
@@ -131,6 +134,7 @@ below).
 | `layers.mood.<group>`       | `true`, `false`                                               | all `true`         |
 | `ornaments_extra.<group>`   | free text                                                      | `""`               |
 | `highlights_extra.<group>`  | free text                                                      | `""`               |
+| `frame_extra.<group>`       | free text                                                      | `""`               |
 | `mood`                      | free text (deck-wide atmosphere, e.g. `gothic and brooding atmosphere,`); see `assets/mood/` for presets | `""` |
 | `theme`                     | free text (deck-wide concept/symbolism, e.g. `celestial mythology`) | `""` |
 
@@ -144,10 +148,13 @@ figure, mood) contribute to `[STYLE_BLOCK]` / `[FRAME_LINE]` / `[MOOD_LINE]` for
 card group — see "Layers and `[STYLE_BLOCK]` assembly" in `references/REFERENCE.md`.
 `ornaments_extra.<group>` and `highlights_extra.<group>` are free-text additions
 appended within those layers when enabled (and may be auto-derived from `theme` if
-left empty — see "Theme-derived ornaments/highlights"). `mood` is a deck-wide
-free-text atmosphere description, either picked from a preset in `assets/mood/` or
-typed as custom text in Step 7, which also sets `layers.mood.<group>` per card group.
-When `layers.figure.<group>` is on, the chosen
+left empty — see "Theme-derived ornaments/highlights"). `frame` picks the preset from
+`assets/frame/` whose "Frame line" supplies `[FRAME_LINE]` (any custom string is also
+accepted), and `frame_extra.<group>` is a free-text addition appended after it when
+`layers.frame.<group>` is on (same theme-derivation fallback as ornaments/highlights).
+`mood` is a deck-wide free-text atmosphere description, either picked from a preset in
+`assets/mood/` or typed as custom text in Step 7, which also sets `layers.mood.<group>`
+per card group. When `layers.figure.<group>` is on, the chosen
 pattern's own "Face Style" section is folded into `[STYLE_BLOCK]` automatically —
 how a figure's face reads is part of the `style` pattern, not a separate setting.
 Court cards default to every layer on except highlights (matching prior behavior) but,
@@ -156,8 +163,8 @@ like Pip/Ace, can be tuned per layer via `--config`.
 ### Which settings are "session" vs "persistent"
 
 **Persistent** (saved per profile — rarely change between cards):
-`deck`, `lettering`, `style`, `aspect_ratio`, `image_generator`, `index.*`,
-`layers.*`, `ornaments_extra.*`, `highlights_extra.*`, `mood`, `theme`
+`deck`, `lettering`, `style`, `frame`, `aspect_ratio`, `image_generator`, `index.*`,
+`layers.*`, `ornaments_extra.*`, `highlights_extra.*`, `frame_extra.*`, `mood`, `theme`
 
 **Per-card** (always asked in the wizard — never saved):
 `rank`, `suit`, `character_name`, `character_features`, `extra_attributes`,

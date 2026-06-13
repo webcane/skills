@@ -31,7 +31,8 @@ The rest are **configurable layers**, each controlled per card group (`court` / 
   frame itself.
 - **Highlights** — gilding, lacquer, glow, shine — accents that can sit over the
   figure/pips.
-- **Frame** — the border/architectural framing (`[FRAME_LINE]`).
+- **Frame** — the border/architectural framing (`[FRAME_LINE]`), its text drawn from
+  the chosen `frame` preset in `assets/frame/`, plus `frame_extra.<group>` if set.
 - **Figure** — whether this group's center motif carries a figure/portrait at all.
   Gates the Center motif style's figure-only line and the pattern's Face Style
   section. On for `court` by default (the portrait); off for `pip`/`ace` (no figure)
@@ -81,9 +82,14 @@ motif and finish):
    additional ornament beyond the pip symbols,` after Mood (a pip card with nothing
    else added should read as a plain number card).
 
-`[FRAME_LINE]` is the line `thin single black border with stepped corner cut-ins
-framing the index areas,`, included verbatim if `layers.frame.g` is `true` and dropped
-entirely otherwise — it sits in its own template slot, not inside `[STYLE_BLOCK]`.
+`[FRAME_LINE]` is built from the chosen `frame` preset's "Frame line" in
+`assets/frame/<frame>.md` (default `stepped-corners`: `thin single black border with
+stepped corner cut-ins framing the index areas,`), with `frame_extra.g` appended as its
+own comma phrase if set — see "Theme-derived ornaments/highlights" below if
+`frame_extra.g` is empty and `theme` is set. Included verbatim if `layers.frame.g` is
+`true` and dropped entirely otherwise — it sits in its own template slot, not inside
+`[STYLE_BLOCK]`. The same resolved `[FRAME_LINE]` is reused across all cards of the
+same group/deck, like `[STYLE_BLOCK]`.
 
 ### Figure & face style (within `[STYLE_BLOCK]`)
 
@@ -97,7 +103,7 @@ Step 8) so the two don't contradict each other.
 For `pip`/`ace`, the Face Style line only appears if `layers.figure.<group> = true`
 (transformation decks); otherwise it's part of step 6 and simply not appended.
 
-### Theme-derived ornaments/highlights
+### Theme-derived ornaments/highlights/frame
 
 If `theme` (a free-text deck-wide concept, e.g. "celestial mythology", "botanical
 garden") is set, and for group `g` a layer is enabled but its `_extra` field is empty:
@@ -108,11 +114,14 @@ garden") is set, and for group `g` a layer is enabled but its `_extra` field is 
   `ornaments_extra.g` for this generation.
 - `layers.highlights.g = true` and `highlights_extra.g == ""` → same derivation for
   highlights (e.g. → `faint star-glow highlights,`).
+- `layers.frame.g = true` and `frame_extra.g == ""` → same derivation for the frame
+  (e.g. → `star-and-comet motifs worked into the corner cut-ins,`), appended after the
+  chosen `frame` preset's "Frame line".
 
-An explicit `ornaments_extra.g` / `highlights_extra.g` (set by the user or saved in
-config) always wins — `theme` only fills empty slots. Reuse the same derived phrase
-across all cards of the same group/deck so the set stays consistent. For cards with
-a figure, `theme` may also inform the character concept and Step 9 attribute
+An explicit `ornaments_extra.g` / `highlights_extra.g` / `frame_extra.g` (set by the
+user or saved in config) always wins — `theme` only fills empty slots. Reuse the same
+derived phrase across all cards of the same group/deck so the set stays consistent. For
+cards with a figure, `theme` may also inform the character concept and Step 9 attribute
 suggestions (suggest, don't force).
 
 ### Defaults
