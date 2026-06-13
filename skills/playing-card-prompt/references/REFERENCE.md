@@ -159,7 +159,7 @@ suggestions (suggest, don't force).
 | decor        | true  | false | true  |
 | ornaments    | true  | false | true  |
 | highlights   | false | false | false |
-| frame        | true  | false | true  |
+| frame        | true  | true  | true  |
 | figure       | true  | false | false |
 | mood         | true  | true  | true  |
 
