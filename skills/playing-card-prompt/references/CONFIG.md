@@ -56,11 +56,12 @@ python3 scripts/manage_config.py profile reset <name> --yes    # clear one profi
 default); `--from <existing>` clones that profile's full *effective* settings, so the
 new profile is a self-contained copy a user can then tweak independently.
 
-Dotted keys address nested groups: `index.size`, `index.count`, `index.layout`,
-`ornaments_extra.<group>`, `highlights_extra.<group>`, `frame_extra.<group>`, and the
+Dotted keys address nested groups: `index.size`, `index.count`, `index.layout`, and the
 two-level `layers.<layer>.<group>` (e.g. `layers.frame.pip`, `layers.highlights.ace`,
-`layers.figure.pip`, `layers.mood.court`). `mood`, `theme`, and `frame` are flat
-fields (no `<group>`).
+`layers.figure.pip`, `layers.mood.court`) and `extras.<layer>.<group>` (e.g.
+`extras.ornaments.pip`, `extras.frame.court`, `extras.mood.ace`), where `<layer>` is
+one of `background`, `decor`, `ornaments`, `highlights`, `frame`, `mood`. `mood`,
+`theme`, and `frame` are flat fields (no `<group>`).
 
 ## Lookup order
 
@@ -98,9 +99,14 @@ profile holds the fields below:
         "figure":     {"court": "true",  "pip": "false", "ace": "false"},
         "mood":       {"court": "true",  "pip": "true",  "ace": "true"}
       },
-      "ornaments_extra": {"court": "", "pip": "", "ace": ""},
-      "highlights_extra": {"court": "", "pip": "", "ace": ""},
-      "frame_extra": {"court": "", "pip": "", "ace": ""},
+      "extras": {
+        "background": {"court": "", "pip": "", "ace": ""},
+        "decor":      {"court": "", "pip": "", "ace": ""},
+        "ornaments":  {"court": "", "pip": "", "ace": ""},
+        "highlights": {"court": "", "pip": "", "ace": ""},
+        "frame":      {"court": "", "pip": "", "ace": ""},
+        "mood":       {"court": "", "pip": "", "ace": ""}
+      },
       "mood": "",
       "theme": ""
     }
@@ -132,9 +138,12 @@ below).
 | `layers.frame.<group>`      | `true`, `false`                                               | court/ace `true`, pip `false` |
 | `layers.figure.<group>`     | `true`, `false`                                               | court `true`, pip/ace `false` |
 | `layers.mood.<group>`       | `true`, `false`                                               | all `true`         |
-| `ornaments_extra.<group>`   | free text                                                      | `""`               |
-| `highlights_extra.<group>`  | free text                                                      | `""`               |
-| `frame_extra.<group>`       | free text                                                      | `""`               |
+| `extras.background.<group>` | free text                                                     | `""`               |
+| `extras.decor.<group>`      | free text                                                      | `""`               |
+| `extras.ornaments.<group>`  | free text                                                      | `""`               |
+| `extras.highlights.<group>` | free text                                                      | `""`               |
+| `extras.frame.<group>`      | free text                                                      | `""`               |
+| `extras.mood.<group>`       | free text (per-group mood addition, on top of deck-wide `mood`) | `""`             |
 | `mood`                      | free text (deck-wide atmosphere, e.g. `gothic and brooding atmosphere,`); see `assets/mood/` for presets | `""` |
 | `theme`                     | free text (deck-wide concept/symbolism, e.g. `celestial mythology`) | `""` |
 
@@ -146,15 +155,17 @@ placement, aspect-ratio syntax, extra parameters) — see `assets/engines/`.
 `layers.*` controls which layers (background, decor, ornaments, highlights, frame,
 figure, mood) contribute to `[STYLE_BLOCK]` / `[FRAME_LINE]` / `[MOOD_LINE]` for each
 card group — see "Layers and `[STYLE_BLOCK]` assembly" in `references/REFERENCE.md`.
-`ornaments_extra.<group>` and `highlights_extra.<group>` are free-text additions
-appended within those layers when enabled (and may be auto-derived from `theme` if
-left empty — see "Theme-derived ornaments/highlights"). `frame` picks the preset from
+`extras.<layer>.<group>` is the free-text addition appended within that layer when
+`layers.<layer>.<group>` is enabled — `extras.background.<group>`,
+`extras.decor.<group>`, `extras.ornaments.<group>`, `extras.highlights.<group>`, and
+`extras.frame.<group>` are appended after the layer's own text (ornaments, highlights,
+and frame may also be auto-derived from `theme` if left empty — see "Theme-derived
+ornaments/highlights/frame"); `extras.mood.<group>` is appended after `[MOOD_LINE]`
+as a per-group addition on top of the deck-wide `mood`. `frame` picks the preset from
 `assets/frame/` whose "Frame line" supplies `[FRAME_LINE]` (any custom string is also
-accepted), and `frame_extra.<group>` is a free-text addition appended after it when
-`layers.frame.<group>` is on (same theme-derivation fallback as ornaments/highlights).
-`mood` is a deck-wide free-text atmosphere description, either picked from a preset in
-`assets/mood/` or typed as custom text in Step 7, which also sets `layers.mood.<group>`
-per card group. When `layers.figure.<group>` is on, the chosen
+accepted). `mood` is a deck-wide free-text atmosphere description, either picked from
+a preset in `assets/mood/` or typed as custom text in Step 7, which also sets
+`layers.mood.<group>` per card group. When `layers.figure.<group>` is on, the chosen
 pattern's own "Face Style" section is folded into `[STYLE_BLOCK]` automatically —
 how a figure's face reads is part of the `style` pattern, not a separate setting.
 Court cards default to every layer on except highlights (matching prior behavior) but,
@@ -164,7 +175,7 @@ like Pip/Ace, can be tuned per layer via `--config`.
 
 **Persistent** (saved per profile — rarely change between cards):
 `deck`, `lettering`, `style`, `frame`, `aspect_ratio`, `image_generator`, `index.*`,
-`layers.*`, `ornaments_extra.*`, `highlights_extra.*`, `frame_extra.*`, `mood`, `theme`
+`layers.*`, `extras.*`, `mood`, `theme`
 
 **Per-card** (always asked in the wizard — never saved):
 `rank`, `suit`, `character_name`, `character_features`, `extra_attributes`,

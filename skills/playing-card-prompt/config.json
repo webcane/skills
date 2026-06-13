@@ -50,20 +50,35 @@
           "ace": "true"
         }
       },
-      "ornaments_extra": {
-        "court": "",
-        "pip": "",
-        "ace": ""
-      },
-      "highlights_extra": {
-        "court": "",
-        "pip": "",
-        "ace": ""
-      },
-      "frame_extra": {
-        "court": "",
-        "pip": "",
-        "ace": ""
+      "extras": {
+        "background": {
+          "court": "",
+          "ace": ""
+        },
+        "decor": {
+          "court": "",
+          "pip": "",
+          "ace": ""
+        },
+        "ornaments": {
+          "court": "",
+          "pip": "",
+          "ace": ""
+        },
+        "highlights": {
+          "court": "",
+          "pip": "",
+          "ace": ""
+        },
+        "frame": {
+          "court": "",
+          "pip": "",
+          "ace": ""
+        },
+        "mood": {
+          "pip": "",
+          "ace": ""
+        }
       },
       "mood": "",
       "theme": ""

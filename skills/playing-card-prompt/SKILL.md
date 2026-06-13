@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.5.0
+  version: 3.6.0
 ---
 
 # Playing Card Prompt Wizard
@@ -31,8 +31,7 @@ The user may invoke the skill in four modes. Detect which one from their message
 
 Before asking any wizard questions, load the active profile's persistent settings
 (`deck`, `lettering`, `style`, `frame`, `aspect_ratio`, `image_generator`, `index.*`,
-`layers.*`, `ornaments_extra.*`, `highlights_extra.*`, `frame_extra.*`, `mood`,
-`theme`) via
+`layers.*`, `extras.*`, `mood`, `theme`) via
 `python3 scripts/manage_config.py show`. This also lists every saved profile and which
 one is active.
 Everything else — schema, profile concept, lookup order, field reference, and the
@@ -234,7 +233,7 @@ Ask these here:
      border. Sets `layers.decor.pip = true`, `layers.ornaments.pip = true`,
      `layers.frame.pip = true`, then ask, free text, what extra ornament to add (e.g.
      "small corner flourishes", "ornamental pip surrounds") and save it as
-     `ornaments_extra.pip`.
+     `extras.ornaments.pip`.
 
 2. **Frame / border style (optional, deck-wide)** — ask which border style the framed
    groups (`layers.frame.<group>` true — court/ace by default, plus pip if Decorated
@@ -251,23 +250,29 @@ Ask these here:
    comma-terminated phrase. If skipped, leave `frame` at its default
    (`stepped-corners`). Per-group additions on top of the chosen frame (e.g. "gold
    foil edging" only on court cards) are config-only, not asked here — set via
-   `python3 scripts/manage_config.py set frame_extra.<group> "<text>"`.
+   `python3 scripts/manage_config.py set extras.frame.<group> "<text>"`.
 
 3. **Highlights / overlays (optional, all cards)** — ask, free text, whether to add
    any gilding, lacquer, glow, or shine accents (e.g. "gold leaf highlights along the
    raised linework"). If the user gives a description, save it to
-   `highlights_extra.court`, `highlights_extra.pip`, and `highlights_extra.ace`, and
+   `extras.highlights.court`, `extras.highlights.pip`, and `extras.highlights.ace`, and
    set `layers.highlights.<group> = true` for all three groups. If skipped, leave the
    highlights layer off everywhere (the default).
+
+   Per-group additions to the background or background pattern/accents (e.g. "faint
+   marbling on the court cards only") are likewise config-only, not asked here — set
+   via `python3 scripts/manage_config.py set extras.background.<group> "<text>"` /
+   `extras.decor.<group> "<text>"`.
 
 4. **Theme / symbolism (optional, deck-wide)** — ask, free text, for an overarching
    concept tying the deck together (e.g. "celestial mythology", "botanical garden",
    "clockwork/steampunk"). If given, save it as the `theme` setting — when an
    ornaments/highlights/frame layer is on for a group but that group's
-   `ornaments_extra`/`highlights_extra`/`frame_extra` is empty, derive a short
-   thematic phrase from `theme` to fill it (see "Theme-derived ornaments/highlights"
-   in `references/REFERENCE.md`); explicit `ornaments_extra`/`highlights_extra`/
-   `frame_extra` values always win. If skipped, leave `theme` empty.
+   `extras.ornaments`/`extras.highlights`/`extras.frame` is empty, derive a short
+   thematic phrase from `theme` to fill it (see "Theme-derived ornaments/highlights/
+   frame" in `references/REFERENCE.md`); explicit `extras.ornaments`/
+   `extras.highlights`/`extras.frame` values always win. If skipped, leave `theme`
+   empty.
 
 Court cards keep every other layer on by default (`layers.<layer>.court` all `true`
 except highlights), and Ace keeps every layer on except `figure` and `highlights` —
@@ -309,6 +314,11 @@ If `mood` is non-empty, ask which card groups should carry it — multiSelect (C
 Pip, Ace; default: all three selected, matching the current `layers.mood.<group>`
 defaults). Set `layers.mood.<group>` to `true` for selected groups and `false` for any
 deselected ones.
+
+A per-group mood addition on top of the deck-wide `mood` (e.g. extra atmosphere only
+on the court cards) is config-only, not asked here — set via
+`python3 scripts/manage_config.py set extras.mood.<group> "<text>"`; it's appended
+after `[MOOD_LINE]` for that group whenever `layers.mood.<group>` is `true`.
 
 ---
 
@@ -423,15 +433,14 @@ Offer to save the choice to `config.json` like the other persistent settings.
    contradiction-free state — do not list "traditional" and "override" side by side).
 4. Resolve `[STYLE_BLOCK]` and `[FRAME_LINE]` for this card's group (court/pip/ace) per
    "Layers and `[STYLE_BLOCK]` assembly" and "Figure & face style" in
-   `references/REFERENCE.md`, using the `layers.*`, `ornaments_extra.*`,
-   `highlights_extra.*`, `frame`, `frame_extra.*`, `mood`, and `theme` settings
-   (deriving thematic ornaments/highlights/frame additions per "Theme-derived
-   ornaments/highlights/frame" where applicable, and including the chosen pattern's
-   Face Style line when `layers.figure.<group>` is on). `[FRAME_LINE]` is the chosen
-   `frame` preset's "Frame line" from `assets/frame/<frame>.md` plus `frame_extra.g` if
-   set, included only if `layers.frame.g` is `true`. Splice the result **in full** —
-   never summarize, reorder, or drop a line from an enabled layer. When generating
-   multiple cards for the same deck, reuse the exact same resolved
+   `references/REFERENCE.md`, using the `layers.*`, `extras.*`, `frame`, `mood`, and
+   `theme` settings (deriving thematic ornaments/highlights/frame additions per
+   "Theme-derived ornaments/highlights/frame" where applicable, and including the
+   chosen pattern's Face Style line when `layers.figure.<group>` is on). `[FRAME_LINE]`
+   is the chosen `frame` preset's "Frame line" from `assets/frame/<frame>.md` plus
+   `extras.frame.g` if set, included only if `layers.frame.g` is `true`. Splice the
+   result **in full** — never summarize, reorder, or drop a line from an enabled layer.
+   When generating multiple cards for the same deck, reuse the exact same resolved
    `[STYLE_BLOCK]`/`[FRAME_LINE]`/derived theme phrases for every card of the same
    group so the set stays visually consistent.
 5. **Drop any line whose placeholder is empty** — never output a literal `[PLACEHOLDER]`.
@@ -470,24 +479,26 @@ Before presenting the prompt, verify all of the following against the assembled 
 - [ ] **Style block integrity** — `[STYLE_BLOCK]` follows "Layers and `[STYLE_BLOCK]`
   assembly" in `references/REFERENCE.md` for this card's group: background/decor/
   ornaments/highlights lines appear only when `layers.<layer>.<group>` is `true` (with
-  `ornaments_extra`/`highlights_extra` appended when their layer is on), followed by
-  the center-motif style (figure-only line included only if `layers.figure.<group>` is
-  `true`), then the pattern's Face Style line (also only if `layers.figure.<group>` is
-  `true`), then finish lines, then `[MOOD_LINE]` if applicable, and the `plain card
-  face, no additional ornament beyond the pip symbols,` fallback is present for PIP
-  when decor, ornaments, and highlights are all off. Nothing from an enabled layer is
-  summarized, reordered, or dropped. The resolved text is identical across all cards
-  of the same group generated for the same deck/session.
+  `extras.background`/`extras.decor`/`extras.ornaments`/`extras.highlights` appended
+  when their layer is on), followed by the center-motif style (figure-only line
+  included only if `layers.figure.<group>` is `true`), then the pattern's Face Style
+  line (also only if `layers.figure.<group>` is `true`), then finish lines, then
+  `[MOOD_LINE]`/`extras.mood.<group>` if applicable, and the `plain card face, no
+  additional ornament beyond the pip symbols,` fallback is present for PIP when decor,
+  ornaments, and highlights are all off. Nothing from an enabled layer is summarized,
+  reordered, or dropped. The resolved text is identical across all cards of the same
+  group generated for the same deck/session.
 - [ ] **Frame line** — `[FRAME_LINE]` matches the chosen `frame` preset's "Frame line"
   in `assets/frame/<frame>.md` (default `stepped-corners`: `thin single black border
   with stepped corner cut-ins framing the index areas,`) verbatim, plus
-  `frame_extra.<group>` appended if set, and is present only if `layers.frame.<group>`
-  is `true` for this card's group; otherwise the line is absent entirely (not an empty
-  placeholder). The resolved text is identical across all cards of the same group
-  generated for the same deck/session.
-- [ ] **Mood line** — `[MOOD_LINE]` is present only if `layers.mood.<group>` is `true`
-  for this card's group AND `mood` is non-empty, and its text matches the `mood`
-  setting verbatim; otherwise the line is absent entirely.
+  `extras.frame.<group>` appended if set, and is present only if
+  `layers.frame.<group>` is `true` for this card's group; otherwise the line is absent
+  entirely (not an empty placeholder). The resolved text is identical across all cards
+  of the same group generated for the same deck/session.
+- [ ] **Mood line** — `[MOOD_LINE]` and any `extras.mood.<group>` addition are present
+  only if `layers.mood.<group>` is `true` for this card's group, and only if the
+  respective `mood`/`extras.mood.<group>` setting is non-empty; the text matches those
+  settings verbatim; otherwise the corresponding line is absent entirely.
 - [ ] **Face style line** — the chosen pattern's "Face Style" line appears within
   `[STYLE_BLOCK]` (right after the center-motif style) if and only if
   `layers.figure.<group>` is `true` for this card's group, and its text matches that
@@ -495,10 +506,11 @@ Before presenting the prompt, verify all of the following against the assembled 
   describes an obscured or mask-like treatment, `[CHARACTER_FEATURES]` contains no
   separate facial description. Otherwise (figure off) the line is absent entirely.
 - [ ] **Theme-derived ornaments/highlights/frame** — if `theme` is set and an
-  `ornaments_extra`/`highlights_extra`/`frame_extra` slot was empty for an enabled
+  `extras.ornaments`/`extras.highlights`/`extras.frame` slot was empty for an enabled
   layer, the derived phrase reflects `theme` and is reused identically across all
-  cards of the same group/deck; an explicit `ornaments_extra`/`highlights_extra`/
-  `frame_extra` value was never overridden by a derived one.
+  cards of the same group/deck; an explicit `extras.ornaments`/`extras.highlights`/
+  `extras.frame` value was never overridden by a derived one. `extras.background`/
+  `extras.decor`/`extras.mood` have no theme fallback — left empty if unset.
 - [ ] **Character description (figure cards)** — `[CHARACTER_NAME]` and
   `[CHARACTER_FEATURES]` are both present and non-empty; if derived from a reference
   image (Step 8-A), the description reflects what was actually returned, not a

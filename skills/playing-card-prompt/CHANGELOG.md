@@ -7,6 +7,11 @@ All notable changes to this skill. Released per skill as tag
 ## [Unreleased]
 
 ### Added
+- New `extras.<layer>.<group>` config namespace generalizes the per-group free-text
+  addition mechanism to every text layer: `extras.background.<group>` and
+  `extras.decor.<group>` are new (config-only) additions appended after the pattern's
+  Background/Decor lines, and `extras.mood.<group>` is a new (config-only) per-group
+  mood addition appended after `[MOOD_LINE]` on top of the deck-wide `mood`.
 - New `assets/frame/` library of border/frame presets (Stepped Corners (default),
   Double Rule, Ornate Scrollwork, Art Deco Geometric, Rope Twist), each providing a
   "Frame line" for `[FRAME_LINE]`, plus `_adding-a-frame.md` for custom presets. New

@@ -29,9 +29,13 @@ Usage:
 Keys (within a profile): deck, lettering, style, frame, aspect_ratio, image_generator,
       index.size, index.count, index.layout,
       layers.<background|decor|ornaments|highlights|frame|figure|mood>.<court|pip|ace>,
-      ornaments_extra.<court|pip|ace>, highlights_extra.<court|pip|ace>,
-      frame_extra.<court|pip|ace>,
+      extras.<background|decor|ornaments|highlights|frame|mood>.<court|pip|ace>,
       mood, theme
+
+A pre-3.6 config.json may still have the old per-layer `ornaments_extra.<group>`,
+`highlights_extra.<group>`, and `frame_extra.<group>` fields — these are migrated
+automatically into `extras.ornaments.<group>`, `extras.highlights.<group>`, and
+`extras.frame.<group>` the first time the file is loaded.
 """
 from __future__ import annotations
 
@@ -58,6 +62,17 @@ BOOL_VALUES = ["true", "false"]
 GROUPS = ("court", "pip", "ace")
 LAYERS = ("background", "decor", "ornaments", "highlights", "frame", "figure", "mood")
 
+# Layers that can carry a per-group free-text "extras" addition. `figure` has no
+# extras slot — it's a structural on/off toggle, not a text layer.
+EXTRA_LAYERS = ("background", "decor", "ornaments", "highlights", "frame", "mood")
+
+# Pre-3.6 field names that are migrated into extras.<layer>.<group> on load.
+LEGACY_EXTRA_KEYS = {
+    "ornaments_extra": "ornaments",
+    "highlights_extra": "highlights",
+    "frame_extra": "frame",
+}
+
 # Defaults reproduce the traditional look: courts get every layer including a
 # portrait, plain pips get only background + center motif + finish, aces keep their
 # ornamental flourish but no figure. `mood` is on everywhere (but inert until the
@@ -83,9 +98,7 @@ DEFAULTS = {
     "image_generator": "nanobanana",
     "index": {"size": "standard", "count": "4-index", "layout": "stacked"},
     "layers": {layer: dict(groups) for layer, groups in LAYER_DEFAULTS.items()},
-    "ornaments_extra": {g: "" for g in GROUPS},
-    "highlights_extra": {g: "" for g in GROUPS},
-    "frame_extra": {g: "" for g in GROUPS},
+    "extras": {layer: {g: "" for g in GROUPS} for layer in EXTRA_LAYERS},
     "mood": "",
     "theme": "",
 }
@@ -102,12 +115,7 @@ BUILTIN_CONFIG = {
 PERSISTENT_KEYS = {"deck", "lettering", "style", "frame", "aspect_ratio", "image_generator",
                    "index.size", "index.count", "index.layout", "mood", "theme"}
 PERSISTENT_KEYS |= {f"layers.{layer}.{g}" for layer in LAYERS for g in GROUPS}
-PERSISTENT_KEYS |= {f"ornaments_extra.{g}" for g in GROUPS}
-PERSISTENT_KEYS |= {f"highlights_extra.{g}" for g in GROUPS}
-PERSISTENT_KEYS |= {f"frame_extra.{g}" for g in GROUPS}
-
-# Top-level keys (within a profile) that hold nested dicts (any depth).
-NESTED_GROUPS = ("index", "layers", "ornaments_extra", "highlights_extra")
+PERSISTENT_KEYS |= {f"extras.{layer}.{g}" for layer in EXTRA_LAYERS for g in GROUPS}
 
 
 def _discover(subdir: str) -> list[str]:
@@ -158,10 +166,9 @@ def options_for(key: str):
         if layer in LAYERS and group in GROUPS:
             return (BOOL_VALUES, True)
         return None
-    if (key.startswith("ornaments_extra.") or key.startswith("highlights_extra.")
-            or key.startswith("frame_extra.")):
-        _, group = key.split(".", 1)
-        if group in GROUPS:
+    if key.startswith("extras.") and key.count(".") == 2:
+        _, layer, group = key.split(".")
+        if layer in EXTRA_LAYERS and group in GROUPS:
             return (None, False)  # free text
         return None
     return None
@@ -200,8 +207,26 @@ def _flatten(d: dict, prefix: str = "") -> dict:
 
 # --- config io ---------------------------------------------------------------
 
+def _migrate_extras(profile: dict) -> bool:
+    """Move pre-3.6 `*_extra.<group>` fields into `extras.<layer>.<group>`, in place.
+
+    Returns True if anything was migrated. An existing `extras.<layer>.<group>`
+    value (if already set) wins over the legacy value for the same slot.
+    """
+    migrated = False
+    for old_key, layer in LEGACY_EXTRA_KEYS.items():
+        old = profile.pop(old_key, None)
+        if not isinstance(old, dict):
+            continue
+        migrated = True
+        target = profile.setdefault("extras", {}).setdefault(layer, {})
+        for g, v in old.items():
+            target.setdefault(g, v)
+    return migrated
+
+
 def load_raw() -> dict:
-    """Load config.json, migrating a pre-3.0 flat file into a profile if needed."""
+    """Load config.json, migrating a pre-3.0 flat file and pre-3.6 *_extra fields."""
     if not CONFIG_PATH.exists():
         return json.loads(json.dumps(BUILTIN_CONFIG))
     try:
@@ -215,6 +240,9 @@ def load_raw() -> dict:
     cfg.setdefault("active_profile", DEFAULT_PROFILE_NAME)
     cfg.setdefault("profiles", {})
     cfg["profiles"].setdefault(DEFAULT_PROFILE_NAME, {})
+    if any([_migrate_extras(prof) for prof in cfg["profiles"].values()]):
+        save_raw(cfg)
+        print("note: migrated ornaments_extra/highlights_extra/frame_extra into extras.*", file=sys.stderr)
     return cfg
 
 

@@ -25,22 +25,25 @@ toggled off, because they're what makes the card that card:
 The rest are **configurable layers**, each controlled per card group (`court` / `pip`
 / `ace`) via `layers.<layer>.<group>` in `references/CONFIG.md`:
 
-- **Background** — base cardstock color/texture. On for every group by default.
-- **Decor** — background pattern / accent colors beyond the suit's own color.
+- **Background** — base cardstock color/texture, plus `extras.background.<group>` if
+  set. On for every group by default.
+- **Decor** — background pattern / accent colors beyond the suit's own color, plus
+  `extras.decor.<group>` if set.
 - **Ornaments** — vignettes, corner flourishes, decorative elements that aren't the
-  frame itself.
+  frame itself, plus `extras.ornaments.<group>` if set.
 - **Highlights** — gilding, lacquer, glow, shine — accents that can sit over the
-  figure/pips.
+  figure/pips, plus `extras.highlights.<group>` if set.
 - **Frame** — the border/architectural framing (`[FRAME_LINE]`), its text drawn from
-  the chosen `frame` preset in `assets/frame/`, plus `frame_extra.<group>` if set.
+  the chosen `frame` preset in `assets/frame/`, plus `extras.frame.<group>` if set.
 - **Figure** — whether this group's center motif carries a figure/portrait at all.
   Gates the Center motif style's figure-only line and the pattern's Face Style
   section. On for `court` by default (the portrait); off for `pip`/`ace` (no figure)
   — turn on for `pip`/`ace` only for transformation-style decks where number/ace
   cards carry small figures.
 - **Mood** — whether `[MOOD_LINE]` (the deck's overall atmosphere, from the `mood`
-  setting) applies to this group. On for every group by default; the line itself is
-  empty (and dropped) unless `mood` is set.
+  setting) and `extras.mood.<group>` (a per-group mood addition) apply to this group.
+  On for every group by default; both are empty (and dropped) unless `mood` and/or
+  `extras.mood.<group>` are set.
 
 Each `assets/pattern/<style>.md` provides the text for Background, Decor, Ornaments,
 Highlights, "Center motif style" (the linework/illustration descriptor applied to
@@ -54,12 +57,14 @@ stylization — also gated to portraits only).
 For the group `g` (`court`, `pip`, or `ace`), build `[STYLE_BLOCK]` by concatenating,
 in this order, only the layers where `layers.<layer>.g` is `true`:
 
-1. **Background** — the pattern's Background lines.
-2. **Decor** — the pattern's Decor lines.
-3. **Ornaments** — the pattern's Ornaments lines (if any), then `ornaments_extra.g`
-   (free text, own comma phrase) if set — see "Theme-derived ornaments/highlights"
-   below if `ornaments_extra.g` is empty and `theme` is set.
-4. **Highlights** — the pattern's Highlights lines (if any), then `highlights_extra.g`
+1. **Background** — the pattern's Background lines, then `extras.background.g` (free
+   text, own comma phrase) if set.
+2. **Decor** — the pattern's Decor lines, then `extras.decor.g` (free text, own comma
+   phrase) if set.
+3. **Ornaments** — the pattern's Ornaments lines (if any), then `extras.ornaments.g`
+   (free text, own comma phrase) if set — see "Theme-derived ornaments/highlights/frame"
+   below if `extras.ornaments.g` is empty and `theme` is set.
+4. **Highlights** — the pattern's Highlights lines (if any), then `extras.highlights.g`
    (free text, own comma phrase) if set — same theme fallback as Ornaments.
 
 Then, always (these aren't gated by layers — they're part of the structural center
@@ -73,9 +78,12 @@ motif and finish):
    `pip`/`ace`).
 7. **Finish** — the pattern's Finish lines.
 
-8. **Mood** — if `layers.mood.g` is `true` and `mood` is non-empty, append
+8. **Mood** — if `layers.mood.g` is `true`: if `mood` is non-empty, append
    `[MOOD_LINE]` — the `mood` text as its own comma phrase (e.g. `gothic and brooding
-   atmosphere,`). Empty `mood` → no line, regardless of `layers.mood.g`.
+   atmosphere,`); then, if `extras.mood.g` is non-empty, append it as its own comma
+   phrase too — a per-group mood addition layered on top of (or in place of) the
+   deck-wide `mood`. If both `mood` and `extras.mood.g` are empty, no mood line is
+   added for this group, regardless of `layers.mood.g`.
 
 9. **Plain fallback** — if `g` is `pip` and `layers.decor.pip`, `layers.ornaments.pip`,
    and `layers.highlights.pip` are all `false`, append the line `plain card face, no
@@ -84,9 +92,9 @@ motif and finish):
 
 `[FRAME_LINE]` is built from the chosen `frame` preset's "Frame line" in
 `assets/frame/<frame>.md` (default `stepped-corners`: `thin single black border with
-stepped corner cut-ins framing the index areas,`), with `frame_extra.g` appended as its
-own comma phrase if set — see "Theme-derived ornaments/highlights" below if
-`frame_extra.g` is empty and `theme` is set. Included verbatim if `layers.frame.g` is
+stepped corner cut-ins framing the index areas,`), with `extras.frame.g` appended as
+its own comma phrase if set — see "Theme-derived ornaments/highlights/frame" below if
+`extras.frame.g` is empty and `theme` is set. Included verbatim if `layers.frame.g` is
 `true` and dropped entirely otherwise — it sits in its own template slot, not inside
 `[STYLE_BLOCK]`. The same resolved `[FRAME_LINE]` is reused across all cards of the
 same group/deck, like `[STYLE_BLOCK]`.
@@ -95,10 +103,24 @@ same group/deck, like `[STYLE_BLOCK]`.
 
 There is no separate `[FACE_STYLE_LINE]` template slot and no `face_style` setting —
 how a figure's face reads is part of the pattern itself (step 6 above), so it stays
-consistent with that pattern's overall look without an extra per-deck choice. If a
-pattern's Face Style line describes an obscured or mask-like treatment, drop any
-facial description from `[CHARACTER_FEATURES]` (silhouette/costume only — see SKILL
-Step 8) so the two don't contradict each other.
+consistent with that pattern's overall look without an extra per-deck choice. The
+pattern's "Center motif style" and "Face Style" are deliberately kept as two separate
+sections in `assets/pattern/<style>.md`: "Center motif style" is the linework/rendering
+applied to whatever sits in the center (portrait, pips, or suit symbol — figure-only
+lines marked separately), while "Face Style" is only about typage/expression/degree of
+stylization for a face, and only ever applies when `layers.figure.<group>` is `true`.
+Keep them as separate sections when adding or editing a pattern — don't fold Face Style
+into Center motif style or vice versa.
+
+**Source resolution — pattern vs. reference image.** The Face Style line governs *how*
+a face is rendered (stylization, linework, expression register); `[CHARACTER_FEATURES]`
+and any Step 10 reference-image transfers govern *what* the face looks like (identity,
+specific features, hairstyle). These are complementary, not competing — both apply
+together by default. The only conflict is the one already called out: if a pattern's
+Face Style line describes an obscured or mask-like treatment, drop any facial
+description from `[CHARACTER_FEATURES]` (silhouette/costume only — see SKILL Step 8) so
+the two don't contradict each other. Otherwise, no source-resolution step is needed —
+the pattern's Face Style line and the character's own features simply stack.
 
 For `pip`/`ace`, the Face Style line only appears if `layers.figure.<group> = true`
 (transformation decks); otherwise it's part of step 6 and simply not appended.
@@ -106,19 +128,24 @@ For `pip`/`ace`, the Face Style line only appears if `layers.figure.<group> = tr
 ### Theme-derived ornaments/highlights/frame
 
 If `theme` (a free-text deck-wide concept, e.g. "celestial mythology", "botanical
-garden") is set, and for group `g` a layer is enabled but its `_extra` field is empty:
+garden") is set, and for group `g` a layer is enabled but its `extras.<layer>.g` field
+is empty:
 
-- `layers.ornaments.g = true` and `ornaments_extra.g == ""` → derive a short ornament
+- `layers.ornaments.g = true` and `extras.ornaments.g == ""` → derive a short ornament
   phrase expressing `theme` (e.g. theme "celestial mythology" → `star and
   constellation motifs in the corner ornaments,`) and use it as that card's
-  `ornaments_extra.g` for this generation.
-- `layers.highlights.g = true` and `highlights_extra.g == ""` → same derivation for
+  `extras.ornaments.g` for this generation.
+- `layers.highlights.g = true` and `extras.highlights.g == ""` → same derivation for
   highlights (e.g. → `faint star-glow highlights,`).
-- `layers.frame.g = true` and `frame_extra.g == ""` → same derivation for the frame
+- `layers.frame.g = true` and `extras.frame.g == ""` → same derivation for the frame
   (e.g. → `star-and-comet motifs worked into the corner cut-ins,`), appended after the
   chosen `frame` preset's "Frame line".
 
-An explicit `ornaments_extra.g` / `highlights_extra.g` / `frame_extra.g` (set by the
+This theme-derivation applies only to ornaments, highlights, and frame —
+`extras.background.g`, `extras.decor.g`, and `extras.mood.g` are plain free text with
+no `theme` fallback.
+
+An explicit `extras.ornaments.g` / `extras.highlights.g` / `extras.frame.g` (set by the
 user or saved in config) always wins — `theme` only fills empty slots. Reuse the same
 derived phrase across all cards of the same group/deck so the set stays consistent. For
 cards with a figure, `theme` may also inform the character concept and Step 9 attribute
