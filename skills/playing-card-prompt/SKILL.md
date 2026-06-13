@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.7.1
+  version: 3.8.0
   description_claudeai: Interactive wizard to build image-gen prompts for stylized playing cards. 4 deck patterns, 6 lettering systems, 3+ styles, court/pip/ace. Trigger on card design requests.
 ---
 
@@ -142,6 +142,8 @@ Reference files under `references/`:
   addresses each, and flags open gaps
 - `references/WIZARD-STEP-MAP.md` — maps each wizard step to the style components,
   `layers.*`, prompt placeholders, and `assets/` files it touches
+- `references/POST-VALIDATION.md` — final checklist run before presenting the
+  assembled prompt
 
 ---
 
@@ -218,13 +220,10 @@ reuse identical wording — every card of the same group should resolve to the S
 
 ### Step 6 — Card decoration and theme · _persistent_
 
-_Skipped if loaded from config._ Every card is built from layers — background, decor
-(background pattern/accents), ornaments, highlights/overlays, frame, figure, and mood,
-plus the structural index and center-motif layers that are always present (see "Layers
-and `[STYLE_BLOCK]` assembly" in `references/REFERENCE.md`). Defaults reproduce the
-traditional look: Court gets every layer including a figure; Ace gets every layer
-except figure; plain Pip cards get only background + center motif + finish, no figure.
-Ask these here:
+_Skipped if loaded from config._ Every card is built from layers — background, decor,
+ornaments, highlights, frame, figure, and mood — controlled per card group via
+`layers.<layer>.<group>` (defaults and full resolution rules are in "Layers and
+`[STYLE_BLOCK]` assembly" in `references/REFERENCE.md`). Ask these here:
 
 1. **Number cards (2–10)** — how should they look:
    - **Plain (default)** — large suit-color pip symbols only: no extra decor, no
@@ -267,21 +266,16 @@ Ask these here:
 
 4. **Theme / symbolism (optional, deck-wide)** — ask, free text, for an overarching
    concept tying the deck together (e.g. "celestial mythology", "botanical garden",
-   "clockwork/steampunk"). If given, save it as the `theme` setting — when an
-   ornaments/highlights/frame layer is on for a group but that group's
-   `extras.ornaments`/`extras.highlights`/`extras.frame` is empty, derive a short
-   thematic phrase from `theme` to fill it (see "Theme-derived ornaments/highlights/
-   frame" in `references/REFERENCE.md`); explicit `extras.ornaments`/
-   `extras.highlights`/`extras.frame` values always win. If skipped, leave `theme`
+   "clockwork/steampunk"). If given, save it as the `theme` setting; empty
+   `extras.ornaments`/`extras.highlights`/`extras.frame` slots then fall back to a
+   theme-derived phrase (see "Theme-derived ornaments/highlights/frame" in
+   `references/REFERENCE.md`) — explicit values always win. If skipped, leave `theme`
    empty.
 
-Court cards keep every other layer on by default (`layers.<layer>.court` all `true`
-except highlights), and Ace keeps every layer on except `figure` and `highlights` —
-not asked in the wizard (mood is asked separately in Step 7), but tunable per layer via
-`python3 scripts/manage_config.py set layers.<layer>.<group> false/true` (e.g.
-`layers.ornaments.ace false` for a plainer Ace, `layers.decor.court false` for a
-stripped-down court, or `layers.figure.pip true` for a transformation-style deck where
-number cards carry small figures).
+Court and Ace keep their other layers on by default (see the Defaults table in
+`references/REFERENCE.md`); tune any layer via `python3 scripts/manage_config.py set
+layers.<layer>.<group> false/true` (e.g. `layers.figure.pip true` for a
+transformation-style deck where number cards carry small figures).
 
 ---
 
@@ -318,8 +312,8 @@ deselected ones.
 
 A per-group mood addition on top of the deck-wide `mood` (e.g. extra atmosphere only
 on the court cards) is config-only, not asked here — set via
-`python3 scripts/manage_config.py set extras.mood.<group> "<text>"`; it's appended
-after `[MOOD_LINE]` for that group whenever `layers.mood.<group>` is `true`.
+`python3 scripts/manage_config.py set extras.mood.<group> "<text>"` (see "Resolving
+`[STYLE_BLOCK]`" step 8 in `references/REFERENCE.md` for how it's appended).
 
 ---
 
@@ -461,78 +455,9 @@ Offer to save the choice to `config.json` like the other persistent settings.
    - **Extra parameters** — append any engine-specific suffix flags (e.g.
      Midjourney's `--v 7 --style raw`).
    - For `nanobanana` (default), no changes apply — skip this step.
-8. Run the **Post-validation** checklist below. Fix and re-check until everything
-   passes — do not move on to "Presenting the result" with a failing check.
-
-## Post-validation
-
-Before presenting the prompt, verify all of the following against the assembled text:
-
-- [ ] **No raw placeholders** — no literal `[PLACEHOLDER]`-style token remains anywhere.
-- [ ] **Lettering consistency** — `RANK_LETTER` matches the lettering system from Step 2
-  (e.g. Russian → К/Д/В, not K/Q/J), and the rank/suit pairing matches Step 3–4.
-- [ ] **Suit consistency** — `SUIT_NAME`, `SUIT_SYMBOL`, `SUIT_COLOR` belong to the same
-  suit and to the deck chosen in Step 1 (no mixing, e.g. Spades symbol with Acorns name).
-- [ ] **Attribute resolution** — `[RESOLVED_ATTRIBUTES]` is deduplicated and
-  contradiction-free; replacements from Step 9/10 fully replace (not coexist with) the
-  traditional item they replace, and reference-transfer attributes (Step 10) outrank
-  Step 9, which outranks the traditional defaults.
-- [ ] **Style block integrity** — `[STYLE_BLOCK]` follows "Layers and `[STYLE_BLOCK]`
-  assembly" in `references/REFERENCE.md` for this card's group: background/decor/
-  ornaments/highlights lines appear only when `layers.<layer>.<group>` is `true` (with
-  `extras.background`/`extras.decor`/`extras.ornaments`/`extras.highlights` appended
-  when their layer is on), followed by the center-motif style (figure-only line
-  included only if `layers.figure.<group>` is `true`), then the pattern's Face Style
-  line (also only if `layers.figure.<group>` is `true`), then finish lines, then
-  `[MOOD_LINE]`/`extras.mood.<group>` if applicable, and the `plain card face, no
-  additional ornament beyond the pip symbols,` fallback is present for PIP when decor,
-  ornaments, and highlights are all off. Nothing from an enabled layer is summarized,
-  reordered, or dropped. The resolved text is identical across all cards of the same
-  group generated for the same deck/session.
-- [ ] **Frame line** — `[FRAME_LINE]` matches the chosen `frame` preset's "Frame line"
-  in `assets/frame/<frame>.md` (default `stepped-corners`: `thin single black border
-  with stepped corner cut-ins framing the index areas,`) verbatim, plus
-  `extras.frame.<group>` appended if set, and is present only if
-  `layers.frame.<group>` is `true` for this card's group; otherwise the line is absent
-  entirely (not an empty placeholder). The resolved text is identical across all cards
-  of the same group generated for the same deck/session.
-- [ ] **Mood line** — `[MOOD_LINE]` and any `extras.mood.<group>` addition are present
-  only if `layers.mood.<group>` is `true` for this card's group, and only if the
-  respective `mood`/`extras.mood.<group>` setting is non-empty; the text matches those
-  settings verbatim; otherwise the corresponding line is absent entirely.
-- [ ] **Face style line** — the chosen pattern's "Face Style" line appears within
-  `[STYLE_BLOCK]` (right after the center-motif style) if and only if
-  `layers.figure.<group>` is `true` for this card's group, and its text matches that
-  pattern's `assets/pattern/<style>.md` "Face Style" section verbatim. If that line
-  describes an obscured or mask-like treatment, `[CHARACTER_FEATURES]` contains no
-  separate facial description. Otherwise (figure off) the line is absent entirely.
-- [ ] **Theme-derived ornaments/highlights/frame** — if `theme` is set and an
-  `extras.ornaments`/`extras.highlights`/`extras.frame` slot was empty for an enabled
-  layer, the derived phrase reflects `theme` and is reused identically across all
-  cards of the same group/deck; an explicit `extras.ornaments`/`extras.highlights`/
-  `extras.frame` value was never overridden by a derived one. `extras.background`/
-  `extras.decor`/`extras.mood` have no theme fallback — left empty if unset.
-- [ ] **Character description (figure cards)** — `[CHARACTER_NAME]` and
-  `[CHARACTER_FEATURES]` are both present and non-empty; if derived from a reference
-  image (Step 8-A), the description reflects what was actually returned, not a
-  generic placeholder.
-- [ ] **Negative list** — the negative content (from Step 11) contains only "no …"
-  exclusion phrases (or the engine's equivalent), deduplicated, with no positive
-  attributes leaking in.
-- [ ] **Aspect ratio** — the aspect ratio is a concrete `W:H` ratio (from Step 12 or
-  the user's custom value) or its engine-specific equivalent (pixel size, `--ar`,
-  fixed size), not descriptive text.
-- [ ] **Template match** — the COURT/PIP/ACE template matches the resolved rank, and no
-  figure-only fields (character, attributes, negatives) appear in a PIP/ACE prompt
-  whose group has `layers.figure.<group>` set to `false`.
-- [ ] **Engine formatting** — the chosen `image_generator` (Step 13)'s negative
-  handling, aspect-ratio syntax, and extra parameters from
-  `assets/engines/<engine>.md` are all applied; for `nanobanana` the prompt matches
-  the base template unchanged.
-
-If any check fails, correct the relevant field in place and re-run the checklist —
-don't ask the user to fix it unless the failure stems from missing/ambiguous
-information only they can resolve (e.g. no character name given at all).
+8. Run the **Post-validation** checklist in `references/POST-VALIDATION.md` against
+   the assembled text. Fix and re-check until everything passes — do not move on to
+   "Presenting the result" with a failing check.
 
 ## Presenting the result
 

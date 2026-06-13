@@ -6,6 +6,15 @@ All notable changes to this skill. Released per skill as tag
 
 ## [Unreleased]
 
+### Changed
+- Reduced `SKILL.md`'s token footprint: moved the 16-item post-validation checklist
+  out to new `references/POST-VALIDATION.md` (linked from Step 8 of "Assembling the
+  prompt" and the file map), and trimmed duplicated layer-defaults/theme-derivation/
+  mood-resolution prose in Steps 6-7 that re-explained material already covered by
+  `references/REFERENCE.md`'s "Layers and `[STYLE_BLOCK]` assembly" and "Theme-derived
+  ornaments/highlights/frame" sections — those sections remain the single source of
+  truth, SKILL.md now just points to them.
+
 ### Added
 - New `metadata.description_claudeai` frontmatter field: a <= 200-char description used
   by `scripts/package-skill-claudeai.sh` when building the Claude.ai-compatible package
