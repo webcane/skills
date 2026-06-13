@@ -7,6 +7,13 @@ All notable changes to this skill. Released per skill as tag
 ## [Unreleased]
 
 ### Added
+- New `references/WIZARD-STEP-MAP.md` mapping each wizard step (1-9, including
+  5/5a/5b/5c) to the style components it touches (per `STYLE-COMPONENTS.md`), the
+  `layers.*` it configures, the prompt placeholders it feeds, and the `assets/`
+  files it loads; also notes silent/assembly-only mechanisms (e.g. `[INDEX_LINE]`)
+  not covered by any wizard step. Linked from SKILL.md's reference file map
+
+### Added
 - New `references/STYLE-COMPONENTS.md` documenting the deck's style component
   model and mapping each component (medium, palette, era, mood, composition,
   line character, stylization, figure proportions, poses, costume, typage,

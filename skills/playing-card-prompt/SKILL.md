@@ -133,6 +133,8 @@ Reference files under `references/`:
 - `references/STYLE-COMPONENTS.md` — maps the deck's style components (medium,
   palette, era, mood, composition, etc.) to the config field/layer/template that
   addresses each, and flags open gaps
+- `references/WIZARD-STEP-MAP.md` — maps each wizard step to the style components,
+  `layers.*`, prompt placeholders, and `assets/` files it touches
 
 ---
 
