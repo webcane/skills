@@ -2,3 +2,4 @@
 /.idea
 dist/*.skill
 dist/*.json
+dist/*.zip

@@ -52,6 +52,23 @@ This packages the skill (version read from `SKILL.md` frontmatter) and
 re-extracts it over any existing local copy — safe to re-run after every
 local change to pick up edits.
 
+## Packaging for Claude.ai
+
+Claude.ai's skill upload has different requirements than the `.skill`
+(tar.gz) format above: the definition file must be lowercase `skill.md`, its
+`description` must be <= 200 chars (vs. 1024), and the zip must contain a
+top-level folder named after the skill rather than loose files at the root.
+
+```bash
+bash scripts/package-skill-claudeai.sh <skillname>          # version read from frontmatter
+```
+
+This produces `dist/<skillname>-claudeai.zip` (and a versioned copy), with
+`SKILL.md` renamed to `skill.md` inside a `<skillname>/` folder. If the
+skill's frontmatter defines `metadata.description_claudeai` (<= 200 chars),
+that short description is used; otherwise the main `description` is
+truncated to fit, with a warning.
+
 ## Repository Structure
 
 ```
@@ -61,6 +78,8 @@ local change to pick up edits.
 │   └── README.md
 ├── scripts/
 │   ├── package-skill.sh              # skill dir → .skill file
+│   ├── package-skill-claudeai.sh     # skill dir → Claude.ai-compatible .zip
+│   ├── build_claudeai_skill_md.py    # SKILL.md → skill.md frontmatter rewrite
 │   └── install-skill.sh             # download & extract .skill
 ├── dist/                             # Generated, gitignored
 ├── .github/workflows/package-skills.yml

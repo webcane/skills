@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Repo Is
 
-A distribution system for Claude skills. Skills are Claude Code extensions defined by a `SKILL.md` file (with YAML frontmatter and markdown instructions). This repo stores skill source files and provides tooling to package and distribute them as `.skill` files (tar.gz archives).
+A distribution system for Claude skills. Skills are Claude Code extensions defined by a `SKILL.md` file (with YAML frontmatter and markdown instructions). This repo stores skill source files and provides tooling to package and distribute them as `.skill` files (tar.gz archives) for Claude Code/agentskills.io, and as `.zip` files for Claude.ai's skill upload (see `package-skill-claudeai.sh` below).
 
 ## Repo Structure
 
@@ -38,6 +38,20 @@ bash scripts/package-skill.sh <skill-name> [version]
 ```
 If `[version]` is omitted it is read from the skill's `SKILL.md` frontmatter (`metadata.version`).
 Outputs `dist/<skill-name>.skill` (latest), `dist/<skill-name>-<version>.skill` (versioned), and a JSON metadata file.
+
+**Package a skill for Claude.ai (separate format):**
+```bash
+bash scripts/package-skill-claudeai.sh <skill-name> [version]
+# e.g.: bash scripts/package-skill-claudeai.sh playing-card-prompt
+```
+Claude.ai's skill upload differs from the `.skill` format above: it requires
+a lowercase `skill.md` (not `SKILL.md`), a `description` <= 200 chars (not
+1024), and a zip with the skill files nested in a `<skill-name>/` folder
+(not at the zip root). This script handles all three, producing
+`dist/<skill-name>-claudeai.zip` (and a versioned copy). If the skill's
+frontmatter defines `metadata.description_claudeai` (<= 200 chars), that is
+used as the Claude.ai description; otherwise `description` is truncated to
+fit with a warning — add `description_claudeai` to avoid that.
 
 **Install a skill from a remote repo:**
 ```bash

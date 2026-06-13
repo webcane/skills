@@ -7,6 +7,10 @@ All notable changes to this skill. Released per skill as tag
 ## [Unreleased]
 
 ### Added
+- New `metadata.description_claudeai` frontmatter field: a <= 200-char description used
+  by `scripts/package-skill-claudeai.sh` when building the Claude.ai-compatible package
+  (Claude.ai enforces a 200-char limit vs. the 1024 chars allowed for Claude Code /
+  agentskills.io)
 - New `extras.<layer>.<group>` config namespace generalizes the per-group free-text
   addition mechanism to every text layer: `extras.background.<group>` and
   `extras.decor.<group>` are new (config-only) additions appended after the pattern's
