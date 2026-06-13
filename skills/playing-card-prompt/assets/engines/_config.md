@@ -14,7 +14,7 @@ during assembly ("Engine-aware prompt formatting").
 lead-in) already target it. Every other engine has a file in this folder describing
 the deltas to apply on top of the base assembled prompt.
 
-## Wizard behavior (Step 9)
+## Wizard behavior (Step 12)
 
 - Optional. Skipped entirely if `image_generator` is already saved in `config.json`
   — go straight to a one-line mention of which engine is in use.

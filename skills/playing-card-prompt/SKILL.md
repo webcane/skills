@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.2.0
+  version: 3.3.0
 ---
 
 # Playing Card Prompt Wizard
@@ -63,12 +63,14 @@ Steps to ask in config mode:
 1. Deck type
 2. Court lettering system
 3. Visual style / pattern
-4. Card decoration layers, mood, and theme (Step 5a)
+4. Card decoration layers, mood, and theme (Step 6)
 5. Aspect ratio
-6. Image generator (optional — see Step 9)
+6. Image generator (optional — see Step 12)
 7. (Optional, only if user asks) Index settings, or per-layer overrides via
    `layers.<layer>.<group>` for Court/Pip/Ace (e.g. `layers.ornaments.ace`,
-   `layers.figure.pip`, `layers.mood.court`)
+   `layers.figure.pip`, `layers.mood.court`). Turning on `layers.figure.pip` or
+   `layers.figure.ace` (transformation decks) makes Steps 7–10 apply to pip/ace
+   cards too, the same way they apply to court by default.
 
 ## Mode: Profile (`--profile <name>` or other profile commands)
 
@@ -95,8 +97,8 @@ Load the active profile. Then run the card wizard with this logic:
 - **Config exists** → skip persistent-setting steps; show a one-line summary of the
   loaded settings including the active profile's name (e.g. "Using profile 'default':
   French deck, Anglo-American letters, Austrian style, 9:14, NanoBanana") and go
-  straight to per-card steps (rank → suit → court details if applicable). Mention the
-  user can run `--config` to change settings or switch profiles.
+  straight to per-card steps (rank → suit → figure details if this card's group has a
+  figure). Mention the user can run `--config` to change settings or switch profiles.
 - **No config found** → run the full wizard (all steps), then offer to save the
   persistent settings to the active (`default`) profile in `config.json` for next time.
 
@@ -177,9 +179,13 @@ letter); for number cards it's unused, but ask it here to keep the flow consiste
 
 Always ask. Offer only the ranks listed in the chosen `assets/decks/<deck>.md`
 (standard set: A, 2–10, J, Q, K). Resolve via the rank table in `references/REFERENCE.md`:
-- **K / Q / J → COURT** → auto-load `assets/courts/<rank>.md` and continue the full flow.
-- **A → ACE** → skip court Steps 5b–7; go Suit → Style → Aspect ratio.
-- **2–10 → PIP** → same skip as Ace.
+- **K / Q / J → COURT** → auto-load `assets/courts/<rank>.md`; this card's group is
+  `court` (`layers.figure.court` defaults to `true`).
+- **A → ACE** → this card's group is `ace` (`layers.figure.ace` defaults to `false`).
+- **2–10 → PIP** → this card's group is `pip` (`layers.figure.pip` defaults to `false`).
+
+Whether Steps 7–10 apply to this card depends on `layers.figure.<group>` for the group
+just set — see the check after Step 6.
 
 Set `RANK_NAME` (English word) and `RANK_LETTER` (localized letter from Step 2 for
 courts; the numeral for pips; `A` for Ace unless the user wants `1`).
@@ -204,7 +210,7 @@ the improvised text (e.g. note it in the conversation) so later cards in the sam
 reuse identical wording — every card of the same group should resolve to the SAME
 `[STYLE_BLOCK]` text verbatim so the whole deck looks like one consistent set.
 
-### Step 5a — Card decoration, mood, and theme · _persistent_
+### Step 6 — Card decoration, mood, and theme · _persistent_
 
 _Skipped if loaded from config._ Every card is built from layers — background, decor
 (background pattern/accents), ornaments, highlights/overlays, frame, figure, and mood,
@@ -256,13 +262,17 @@ small figures).
 
 ---
 
-**If the rank is A or a number 2–10, jump to Step 8 (Aspect ratio). Steps 5b–7 are court-only.**
+**Check `layers.figure.<group>` for this card's group** (`court`/`pip`/`ace`, default
+`true` for court, `false` for pip/ace unless previously configured via `--config`). If
+it's `false`, this card has no figure — skip straight to Step 11 (Aspect ratio). Steps
+7–10 only apply to cards with a figure: court cards by default, plus any pip/ace card
+whose `layers.figure.<group>` was turned on for a transformation-style deck.
 
 ---
 
-### Step 5b — Character (court only, REQUIRED) · _per-card_
+### Step 7 — Character / figure description (REQUIRED for cards with a figure) · _per-card_
 
-Every court card must have a character description — **at minimum a name**. Two paths:
+Every card with a figure must have a figure description — **at minimum a name**. Two paths:
 
 **A) A reference image is attached.** Derive the description from it. If subagents are
 available, spawn one with this exact English prompt; otherwise do it yourself by looking
@@ -291,21 +301,24 @@ There's no separate question for this. If that line describes an obscured or
 mask-like treatment, drop any facial description from `[CHARACTER_FEATURES]` so the
 two don't contradict each other.
 
-### Step 5c — Additional / replaced attributes (court only) · _per-card_
+### Step 8 — Additional / replaced attributes (figure cards) · _per-card_
 
-Show the auto-loaded traditional attributes from `assets/courts/<rank>.md` and ask, free text,
-for any **additions or replacements** beyond the traditional set (e.g. "replace scepter
-with a telescope", "add a laurel wreath"). Note each as an addition or a replacement —
-a replacement will remove the traditional item it replaces when attributes are merged
-during assembly (see "Assembling the prompt"). If none, skip this.
+For court cards, show the auto-loaded traditional attributes from `assets/courts/<rank>.md`
+and ask, free text, for any **additions or replacements** beyond the traditional set
+(e.g. "replace scepter with a telescope", "add a laurel wreath"). Note each as an
+addition or a replacement — a replacement will remove the traditional item it replaces
+when attributes are merged during assembly (see "Assembling the prompt"). For pip/ace
+cards with `layers.figure.<group>` on (transformation decks), there's no traditional
+attribute set to load — just ask, free text, for any attributes or props the figure
+should carry. If none, skip this.
 
-### Step 6 — Transfer from reference image (court only) · _per-card_
+### Step 9 — Transfer from reference image (figure cards) · _per-card_
 
 Ask what to carry over from the user's reference image (face, hairstyle, a specific
 weapon, an order/medal, etc.). These **take priority over traditional attributes and
-over Step 5c** when merged during assembly. If the user has no reference image, skip this.
+over Step 8** when merged during assembly. If the user has no reference image, skip this.
 
-### Step 7 — Exclude from reference image (court only) · _per-card_
+### Step 10 — Exclude from reference image (figure cards) · _per-card_
 
 Ask what must NOT carry over (background, decorative elements, props, landscape). Phrase
 each as "no <thing>" — these get merged into the single `[NEGATIVE_LIST]` at the end of
@@ -313,7 +326,7 @@ the prompt during assembly. If nothing, no extra exclusions are added.
 
 ---
 
-### Step 8 — Card type / aspect ratio · _persistent_
+### Step 11 — Card type / aspect ratio · _persistent_
 
 _Skipped if loaded from config._ Ask the card type (see the aspect-ratio table in
 `references/REFERENCE.md`):
@@ -328,7 +341,7 @@ Fill `[ASPECT_RATIO]` with the ratio only.
 
 ---
 
-### Step 9 — Image generator (optional) · _persistent_
+### Step 12 — Image generator (optional) · _persistent_
 
 _Skipped if loaded from config — just mention which engine is in use (e.g. "Using:
 Midjourney") and that `--config` can change it._ Otherwise ask, optional, with
@@ -354,7 +367,7 @@ Offer to save the choice to `config.json` like the other persistent settings.
 2. Build `[INDEX_LINE]` from `assets/index/options.md` using the silent defaults (Standard size,
    4-Index, rank stacked above suit) — unless the user explicitly asked for a different
    index, in which case combine the chosen fragments.
-3. For courts, fill `[CHARACTER_NAME]`/`[CHARACTER_FEATURES]` (required), then build
+3. For cards with a figure, fill `[CHARACTER_NAME]`/`[CHARACTER_FEATURES]` (required), then build
    `[RESOLVED_ATTRIBUTES]` and `[NEGATIVE_LIST]` by following the merge rules in
    `references/REFERENCE.md` (resolve conflicts down to one final, deduplicated,
    contradiction-free state — do not list "traditional" and "override" side by side).
@@ -373,7 +386,7 @@ Offer to save the choice to `config.json` like the other persistent settings.
    type/style, then layout, then the portrait, then technical finish, then negatives
    last) — avoid full sentences, section headers, or restating the same detail twice.
 7. **Engine-aware prompt formatting** — apply the deltas from the
-   `assets/engines/<engine>.md` chosen in Step 9 to the otherwise-finished prompt:
+   `assets/engines/<engine>.md` chosen in Step 12 to the otherwise-finished prompt:
    - **Negative handling** — if the engine moves negatives out of the main body
      (Stable Diffusion, Midjourney, kaze.ai, DALL·E), remove the trailing
      `[NEGATIVE_LIST]` line from the main prompt and reformat it per that engine's
@@ -398,9 +411,9 @@ Before presenting the prompt, verify all of the following against the assembled 
 - [ ] **Suit consistency** — `SUIT_NAME`, `SUIT_SYMBOL`, `SUIT_COLOR` belong to the same
   suit and to the deck chosen in Step 1 (no mixing, e.g. Spades symbol with Acorns name).
 - [ ] **Attribute resolution** — `[RESOLVED_ATTRIBUTES]` is deduplicated and
-  contradiction-free; replacements from Step 5c/6 fully replace (not coexist with) the
-  traditional item they replace, and reference-transfer attributes (Step 6) outrank
-  Step 5c, which outranks the traditional defaults.
+  contradiction-free; replacements from Step 8/9 fully replace (not coexist with) the
+  traditional item they replace, and reference-transfer attributes (Step 9) outrank
+  Step 8, which outranks the traditional defaults.
 - [ ] **Style block integrity** — `[STYLE_BLOCK]` follows "Layers and `[STYLE_BLOCK]`
   assembly" in `references/REFERENCE.md` for this card's group: background/decor/
   ornaments/highlights lines appear only when `layers.<layer>.<group>` is `true` (with
@@ -430,19 +443,20 @@ Before presenting the prompt, verify all of the following against the assembled 
   phrase reflects `theme` and is reused identically across all cards of the same
   group/deck; an explicit `ornaments_extra`/`highlights_extra` value was never
   overridden by a derived one.
-- [ ] **Character description (court only)** — `[CHARACTER_NAME]` and
+- [ ] **Character description (figure cards)** — `[CHARACTER_NAME]` and
   `[CHARACTER_FEATURES]` are both present and non-empty; if derived from a reference
-  image (Step 5b-A), the description reflects what was actually returned, not a
+  image (Step 7-A), the description reflects what was actually returned, not a
   generic placeholder.
-- [ ] **Negative list** — the negative content (from Step 7) contains only "no …"
+- [ ] **Negative list** — the negative content (from Step 10) contains only "no …"
   exclusion phrases (or the engine's equivalent), deduplicated, with no positive
   attributes leaking in.
-- [ ] **Aspect ratio** — the aspect ratio is a concrete `W:H` ratio (from Step 8 or
+- [ ] **Aspect ratio** — the aspect ratio is a concrete `W:H` ratio (from Step 11 or
   the user's custom value) or its engine-specific equivalent (pixel size, `--ar`,
   fixed size), not descriptive text.
 - [ ] **Template match** — the COURT/PIP/ACE template matches the resolved rank, and no
-  court-only fields (character, attributes, negatives) appear in a PIP/ACE prompt.
-- [ ] **Engine formatting** — the chosen `image_generator` (Step 9)'s negative
+  figure-only fields (character, attributes, negatives) appear in a PIP/ACE prompt
+  whose group has `layers.figure.<group>` set to `false`.
+- [ ] **Engine formatting** — the chosen `image_generator` (Step 12)'s negative
   handling, aspect-ratio syntax, and extra parameters from
   `assets/engines/<engine>.md` are all applied; for `nanobanana` the prompt matches
   the base template unchanged.
@@ -454,8 +468,8 @@ information only they can resolve (e.g. no character name given at all).
 ## Presenting the result
 
 Output the finished prompt in a single fenced code block, with a one-line lead-in
-naming the target engine (e.g. "For Midjourney:"), already adapted per Step 7's
-engine-aware formatting — don't make the user manually move the negative list or
+naming the target engine (e.g. "For Midjourney:"), already adapted per the
+engine-aware formatting step above — don't make the user manually move the negative list or
 swap in `--ar` themselves. If the assembled prompt feels long or cluttered,
 offer a shortened ~50–80 token version that keeps only: card type, character name,
 the 3–4 most important resolved attributes, style descriptor, and aspect ratio —

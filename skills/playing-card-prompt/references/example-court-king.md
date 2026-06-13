@@ -7,12 +7,12 @@ spacing of a finished court-card prompt — and as a sanity check after assembly
 Note how the attributes are resolved into ONE list with no contradictions or labels:
 - `full beard` (traditional) is dropped — it conflicts with the character's own
   "neat prominent mustache".
-- `royal mantle / robe with ermine trim` (traditional) is replaced by the Step 5c
+- `royal mantle / robe with ermine trim` (traditional) is replaced by the Step 8
   "dark green military caftan with gold buttons" — only the replacement appears.
 - `scepter or orb` (traditional secondary hand) is replaced by "rolled map".
-- `sword held upright` (traditional primary hand) is overridden by the Step 6
+- `sword held upright` (traditional primary hand) is overridden by the Step 9
   reference transfer "rapier", which also supplies the sash/medallion.
-- All Step 7 exclusions are merged into one trailing `no …` list together with
+- All Step 10 exclusions are merged into one trailing `no …` list together with
   `no watermark` — nothing is repeated or labeled "exclusions".
 
 `[STYLE_BLOCK]` for the `court` group with all default layers on (background, decor,

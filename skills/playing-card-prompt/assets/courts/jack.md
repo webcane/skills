@@ -1,7 +1,7 @@
 # Traditional JACK (Knave) attributes
 
 Auto-loaded when the chosen rank is Jack. Fill `[TRADITIONAL_ATTRIBUTES]`. Defaults;
-overridden by Step 5 additions/replacements and Step 6 reference transfers.
+overridden by Step 8 additions/replacements and Step 9 reference transfers.
 
 ```
 - feathered cap or soft hat (NO crown)

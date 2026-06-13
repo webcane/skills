@@ -7,6 +7,16 @@ All notable changes to this skill. Released per skill as tag
 ## [Unreleased]
 
 ### Changed
+- **Wizard steps renumbered 1-12, sequential (no more 5/5a/5b/5c).** The
+  decoration/mood/theme step is now Step 6, and the figure block (character,
+  attributes, reference transfer, exclusions) is Steps 7-10, followed by aspect
+  ratio (11) and image generator (12). The branch after Step 6 now checks
+  `layers.figure.<group>` (true by default for `court`, configurable for `pip`/`ace`
+  on transformation decks) instead of "is this a court card" — so Steps 7-10 apply
+  to any card with a figure, not just court. Updated all cross-references in
+  `references/REFERENCE.md`, `references/STYLE-COMPONENTS.md`,
+  `references/WIZARD-STEP-MAP.md`, `references/example-court-king.md`,
+  `assets/courts/*.md`, and `assets/engines/_config.md`
 - **Face style is now per-pattern, not a config setting.** Each
   `assets/pattern/<style>.md` gains a "Face Style" section (placed after "Center
   motif style") describing how a figure's face reads in that pattern's aesthetic —
@@ -19,8 +29,8 @@ All notable changes to this skill. Released per skill as tag
   and `scripts/manage_config.py` accordingly
 
 ### Added
-- New `references/WIZARD-STEP-MAP.md` mapping each wizard step (1-9, including
-  5/5a/5b/5c) to the style components it touches (per `STYLE-COMPONENTS.md`), the
+- New `references/WIZARD-STEP-MAP.md` mapping each wizard step (1-12) to the
+  style components it touches (per `STYLE-COMPONENTS.md`), the
   `layers.*` it configures, the prompt placeholders it feeds, and the `assets/`
   files it loads; also notes silent/assembly-only mechanisms (e.g. `[INDEX_LINE]`)
   not covered by any wizard step. Linked from SKILL.md's reference file map

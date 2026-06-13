@@ -1,7 +1,7 @@
 # Traditional QUEEN attributes
 
 Auto-loaded when the chosen rank is Queen. Fill `[TRADITIONAL_ATTRIBUTES]`. Defaults;
-overridden by Step 5 additions/replacements and Step 6 reference transfers.
+overridden by Step 8 additions/replacements and Step 9 reference transfers.
 
 ```
 - crown or jeweled diadem, sometimes a veil

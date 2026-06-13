@@ -2,7 +2,7 @@
 
 Auto-loaded when the chosen rank is King. These fill the `[TRADITIONAL_ATTRIBUTES]`
 block of the COURT template. They are the *defaults*; the user's additions/replacements
-(Step 5) and reference-image transfers (Step 6) override any of them.
+(Step 8) and reference-image transfers (Step 9) override any of them.
 
 ```
 - royal crown (jeweled, closed imperial or open royal arch)
