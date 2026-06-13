@@ -28,8 +28,9 @@ unless the failure stems from missing/ambiguous information only they can resolv
   reordered, or dropped. The resolved text is identical across all cards of the same
   group generated for the same deck/session.
 - [ ] **Frame line** — `[FRAME_LINE]` matches the chosen `frame` preset's "Frame line"
-  in `assets/frame/<frame>.md` (default `stepped-corners`: `thin single black border
-  with stepped corner cut-ins framing the index areas,`) verbatim, plus
+  in `assets/frame/<frame>.md` (default `boxed-index`: `thin single black border around
+  the card perimeter, plus a separate thin black border individually framing each of the
+  four corner index areas,`) verbatim, plus
   `extras.frame.<group>` appended if set, and is present only if
   `layers.frame.<group>` is `true` for this card's group; otherwise the line is absent
   entirely (not an empty placeholder). The resolved text is identical across all cards

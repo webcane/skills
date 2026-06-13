@@ -82,7 +82,7 @@ profile holds the fields below:
       "deck": "french",
       "lettering": "anglo-american",
       "style": "austrian",
-      "frame": "stepped-corners",
+      "frame": "boxed-index",
       "aspect_ratio": "9:14",
       "image_generator": "nanobanana",
       "index": {
@@ -125,7 +125,7 @@ below).
 | `deck`                      | `french`, `german`, `swiss`, `latin`                          | `french`           |
 | `lettering`                 | `anglo-american`, `french`, `german`, `russian`, `dutch`, `scandinavian` | per deck default   |
 | `style`                     | `austrian`, `french`, `english` (or any custom pattern name)  | `austrian`         |
-| `frame`                     | `stepped-corners`, `double-rule`, `ornate-scrollwork`, `art-deco-geometric`, `rope-twist` (or any custom frame name/description) | `stepped-corners` |
+| `frame`                     | `boxed-index`, `stepped-corners`, `double-rule`, `ornate-scrollwork`, `art-deco-geometric`, `rope-twist` (or any custom frame name/description) | `boxed-index` |
 | `aspect_ratio`              | `5:7`, `9:14`, `14:25`, `7:12`, or custom                    | `9:14`             |
 | `image_generator`           | `nanobanana`, `stable-diffusion`, `midjourney`, `dalle`, `kaze`, or custom | `nanobanana` |
 | `index.size`                | `standard`, `jumbo`, `magnum`                                 | `standard`         |

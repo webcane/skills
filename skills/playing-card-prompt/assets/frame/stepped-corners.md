@@ -1,4 +1,4 @@
-# Frame: Stepped Corners (default)
+# Frame: Stepped Corners
 
 The classic look — a thin single-rule border with notched corner cut-ins around the index areas.
 

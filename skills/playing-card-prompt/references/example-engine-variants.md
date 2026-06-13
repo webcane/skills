@@ -19,7 +19,7 @@ individualized, characterful portrait faces with period-appropriate composed exp
 matte finish,
 slight vintage printing imperfections,
 highly detailed Austrian-style playing card,
-thin single black border with stepped corner cut-ins framing the index areas,
+thin single black border around the card perimeter, plus a separate thin black border individually framing each of the four corner index areas,
 four corner indices, each with rank K stacked above suit symbol ♠, standard small index size, upper indices upright, lower indices rotated 180 degrees,
 large black spade suit symbols centered in upper and lower card fields,
 thin black horizontal dividing line through the exact center of the card,

@@ -91,8 +91,9 @@ motif and finish):
    else added should read as a plain number card).
 
 `[FRAME_LINE]` is built from the chosen `frame` preset's "Frame line" in
-`assets/frame/<frame>.md` (default `stepped-corners`: `thin single black border with
-stepped corner cut-ins framing the index areas,`), with `extras.frame.g` appended as
+`assets/frame/<frame>.md` (default `boxed-index`: `thin single black border around the
+card perimeter, plus a separate thin black border individually framing each of the four
+corner index areas,`), with `extras.frame.g` appended as
 its own comma phrase if set — see "Theme-derived ornaments/highlights/frame" below if
 `extras.frame.g` is empty and `theme` is set. Included verbatim if `layers.frame.g` is
 `true` and dropped entirely otherwise — it sits in its own template slot, not inside

@@ -5,7 +5,7 @@
       "deck": "french",
       "lettering": "anglo-american",
       "style": "austrian",
-      "frame": "stepped-corners",
+      "frame": "boxed-index",
       "aspect_ratio": "9:14",
       "image_generator": "nanobanana",
       "index": {

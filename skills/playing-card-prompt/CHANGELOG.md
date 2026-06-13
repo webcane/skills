@@ -6,6 +6,15 @@ All notable changes to this skill. Released per skill as tag
 
 ## [Unreleased]
 
+### Added
+- New `assets/frame/boxed-index.md` frame preset — a thin perimeter border plus a
+  separate thin border individually boxing each corner index, leaving a cross-shaped
+  central field, with no stepped cut-ins. Now the default `frame` (replacing
+  `stepped-corners`, which remains available as a preset). Updated `config.json`,
+  `scripts/manage_config.py` (`DEFAULTS["frame"]`), `SKILL.md` Step 6's frame option
+  list, and the default-frame references in `references/REFERENCE.md`,
+  `references/POST-VALIDATION.md`, and `references/CONFIG.md`
+
 ### Changed
 - Reduced `SKILL.md`'s token footprint: moved the 16-item post-validation checklist
   out to new `references/POST-VALIDATION.md` (linked from Step 8 of "Assembling the

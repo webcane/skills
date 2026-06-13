@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.8.0
+  version: 3.9.0
   description_claudeai: Interactive wizard to build image-gen prompts for stylized playing cards. 4 deck patterns, 6 lettering systems, 3+ styles, court/pip/ace. Trigger on card design requests.
 ---
 
@@ -239,16 +239,16 @@ ornaments, highlights, frame, figure, and mood — controlled per card group via
    groups (`layers.frame.<group>` true — court/ace by default, plus pip if Decorated
    above) should use. List the `*.md` files in `assets/frame/` (ignore names starting
    with `_`) as options, e.g.:
-   - **Stepped Corners (Classic, default)**
+   - **Boxed Index (default)**
+   - **Stepped Corners (Classic)**
    - **Double Rule**
    - **Ornate Scrollwork**
-   - **Art Deco Geometric**
 
-   "Other" covers Rope Twist and any custom border description. If a preset is named,
+   "Other" covers Art Deco Geometric, Rope Twist, and any custom border description. If a preset is named,
    load `assets/frame/<name>.md` and use its "Frame line" verbatim as `frame`. If the
    user gives custom text instead, save it as `frame`, phrased as its own
    comma-terminated phrase. If skipped, leave `frame` at its default
-   (`stepped-corners`). Per-group additions on top of the chosen frame (e.g. "gold
+   (`boxed-index`). Per-group additions on top of the chosen frame (e.g. "gold
    foil edging" only on court cards) are config-only, not asked here — set via
    `python3 scripts/manage_config.py set extras.frame.<group> "<text>"`.
 

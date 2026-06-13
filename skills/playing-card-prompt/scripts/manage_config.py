@@ -93,7 +93,7 @@ DEFAULTS = {
     "deck": "french",
     "lettering": "anglo-american",
     "style": "austrian",
-    "frame": "stepped-corners",
+    "frame": "boxed-index",
     "aspect_ratio": "9:14",
     "image_generator": "nanobanana",
     "index": {"size": "standard", "count": "4-index", "layout": "stacked"},
@@ -137,7 +137,7 @@ def allowed_styles() -> list[str]:
 
 def allowed_frames() -> list[str]:
     # Frames may be custom; this is the on-disk set used for suggestions.
-    return _discover("frame") or ["stepped-corners"]
+    return _discover("frame") or ["boxed-index"]
 
 
 def allowed_engines() -> list[str]:
