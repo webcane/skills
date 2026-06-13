@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.3.0
+  version: 3.4.0
 ---
 
 # Playing Card Prompt Wizard
@@ -63,10 +63,11 @@ Steps to ask in config mode:
 1. Deck type
 2. Court lettering system
 3. Visual style / pattern
-4. Card decoration layers, mood, and theme (Step 6)
-5. Aspect ratio
-6. Image generator (optional — see Step 12)
-7. (Optional, only if user asks) Index settings, or per-layer overrides via
+4. Card decoration layers and theme (Step 6)
+5. Mood / atmosphere (Step 7)
+6. Aspect ratio (Step 12)
+7. Image generator (optional — see Step 13)
+8. (Optional, only if user asks) Index settings, or per-layer overrides via
    `layers.<layer>.<group>` for Court/Pip/Ace (e.g. `layers.ornaments.ace`,
    `layers.figure.pip`, `layers.mood.court`). Turning on `layers.figure.pip` or
    `layers.figure.ace` (transformation decks) makes Steps 7–10 apply to pip/ace
@@ -112,6 +113,8 @@ Folders under `assets/`:
 - `assets/courts/` — `king.md` / `queen.md` / `jack.md`, auto-loaded by chosen rank
 - `assets/pattern/` — one file per visual style; each holds a `[STYLE_BLOCK]` and marks
   its accent/figure-only lines for PIP/ACE resolution (see `references/REFERENCE.md`)
+- `assets/mood/` — one file per mood/atmosphere preset, each holding a "Mood line"
+  used to fill `[MOOD_LINE]` (see Step 7 and `assets/mood/_adding-a-mood.md`)
 - `assets/index/options.md` — corner-index settings (advanced; NOT asked in the wizard)
 - `assets/engines/` — one file per image-generation engine, describing how to adapt
   the assembled prompt (negative-list placement, aspect-ratio syntax, extra
@@ -184,8 +187,8 @@ Always ask. Offer only the ranks listed in the chosen `assets/decks/<deck>.md`
 - **A → ACE** → this card's group is `ace` (`layers.figure.ace` defaults to `false`).
 - **2–10 → PIP** → this card's group is `pip` (`layers.figure.pip` defaults to `false`).
 
-Whether Steps 7–10 apply to this card depends on `layers.figure.<group>` for the group
-just set — see the check after Step 6.
+Whether Steps 8–11 apply to this card depends on `layers.figure.<group>` for the group
+just set — see the check after Step 7.
 
 Set `RANK_NAME` (English word) and `RANK_LETTER` (localized letter from Step 2 for
 courts; the numeral for pips; `A` for Ace unless the user wants `1`).
@@ -210,7 +213,7 @@ the improvised text (e.g. note it in the conversation) so later cards in the sam
 reuse identical wording — every card of the same group should resolve to the SAME
 `[STYLE_BLOCK]` text verbatim so the whole deck looks like one consistent set.
 
-### Step 6 — Card decoration, mood, and theme · _persistent_
+### Step 6 — Card decoration and theme · _persistent_
 
 _Skipped if loaded from config._ Every card is built from layers — background, decor
 (background pattern/accents), ornaments, highlights/overlays, frame, figure, and mood,
@@ -237,13 +240,7 @@ Ask these here:
    set `layers.highlights.<group> = true` for all three groups. If skipped, leave the
    highlights layer off everywhere (the default).
 
-3. **Mood / atmosphere (optional, deck-wide)** — ask, free text, for the deck's
-   overall atmosphere (e.g. "gothic and brooding", "warm and whimsical", "eerie
-   nocturnal"). If given, save it verbatim as the `mood` setting — it becomes
-   `[MOOD_LINE]`, appended on every card group where `layers.mood.<group>` is true
-   (all groups, by default). If skipped, leave `mood` empty (no line is added).
-
-4. **Theme / symbolism (optional, deck-wide)** — ask, free text, for an overarching
+3. **Theme / symbolism (optional, deck-wide)** — ask, free text, for an overarching
    concept tying the deck together (e.g. "celestial mythology", "botanical garden",
    "clockwork/steampunk"). If given, save it as the `theme` setting — when an
    ornaments/highlights layer is on for a group but that group's
@@ -254,23 +251,56 @@ Ask these here:
 
 Court cards keep every other layer on by default (`layers.<layer>.court` all `true`
 except highlights), and Ace keeps every layer on except `figure` and `highlights` —
-not asked in the wizard, but tunable per layer via `python3 scripts/manage_config.py
-set layers.<layer>.<group> false/true` (e.g. `layers.ornaments.ace false` for a
-plainer Ace, `layers.decor.court false` for a stripped-down court, or
-`layers.figure.pip true` for a transformation-style deck where number cards carry
-small figures).
+not asked in the wizard (mood is asked separately in Step 7), but tunable per layer via
+`python3 scripts/manage_config.py set layers.<layer>.<group> false/true` (e.g.
+`layers.ornaments.ace false` for a plainer Ace, `layers.decor.court false` for a
+stripped-down court, or `layers.figure.pip true` for a transformation-style deck where
+number cards carry small figures).
+
+---
+
+### Step 7 — Mood / atmosphere · _persistent_
+
+_Skipped if loaded from config._ Ask for the deck's overall atmosphere — this becomes
+`[MOOD_LINE]`, appended within `[STYLE_BLOCK]` for every card group where
+`layers.mood.<group>` is `true` (see "Layers and `[STYLE_BLOCK]` assembly" in
+`references/REFERENCE.md`).
+
+List the `*.md` files in `assets/mood/` (ignore names starting with `_`) as options.
+Offer **None** as the default, plus the 3 most evocative presets as explicit choices —
+e.g.:
+- **None (default)** — no mood line; `mood` stays empty.
+- **Gothic & Brooding**
+- **Warm & Whimsical**
+- **Eerie Nocturnal**
+
+"Other" covers the remaining presets (Regal & Opulent, Serene Pastoral, Noir &
+Mysterious — name one to use it) and any custom free-text atmosphere (e.g. "celestial
+and dreamlike, soft starlight glow,").
+
+- If a preset is named, load `assets/mood/<name>.md` and use its "Mood line" text
+  verbatim as `mood`.
+- If the user gives custom text instead, save it as `mood`, phrased as its own
+  comma-separated phrase (ending in a comma) to match `[MOOD_LINE]`'s format.
+- If "None" or skipped, leave `mood` empty — `[MOOD_LINE]` is then dropped everywhere
+  regardless of `layers.mood.<group>`, so skip the group question below.
+
+If `mood` is non-empty, ask which card groups should carry it — multiSelect (Court,
+Pip, Ace; default: all three selected, matching the current `layers.mood.<group>`
+defaults). Set `layers.mood.<group>` to `true` for selected groups and `false` for any
+deselected ones.
 
 ---
 
 **Check `layers.figure.<group>` for this card's group** (`court`/`pip`/`ace`, default
 `true` for court, `false` for pip/ace unless previously configured via `--config`). If
-it's `false`, this card has no figure — skip straight to Step 11 (Aspect ratio). Steps
-7–10 only apply to cards with a figure: court cards by default, plus any pip/ace card
+it's `false`, this card has no figure — skip straight to Step 12 (Aspect ratio). Steps
+8–11 only apply to cards with a figure: court cards by default, plus any pip/ace card
 whose `layers.figure.<group>` was turned on for a transformation-style deck.
 
 ---
 
-### Step 7 — Character / figure description (REQUIRED for cards with a figure) · _per-card_
+### Step 8 — Character / figure description (REQUIRED for cards with a figure) · _per-card_
 
 Every card with a figure must have a figure description — **at minimum a name**. Two paths:
 
@@ -301,7 +331,7 @@ There's no separate question for this. If that line describes an obscured or
 mask-like treatment, drop any facial description from `[CHARACTER_FEATURES]` so the
 two don't contradict each other.
 
-### Step 8 — Additional / replaced attributes (figure cards) · _per-card_
+### Step 9 — Additional / replaced attributes (figure cards) · _per-card_
 
 For court cards, show the auto-loaded traditional attributes from `assets/courts/<rank>.md`
 and ask, free text, for any **additions or replacements** beyond the traditional set
@@ -312,13 +342,13 @@ cards with `layers.figure.<group>` on (transformation decks), there's no traditi
 attribute set to load — just ask, free text, for any attributes or props the figure
 should carry. If none, skip this.
 
-### Step 9 — Transfer from reference image (figure cards) · _per-card_
+### Step 10 — Transfer from reference image (figure cards) · _per-card_
 
 Ask what to carry over from the user's reference image (face, hairstyle, a specific
 weapon, an order/medal, etc.). These **take priority over traditional attributes and
-over Step 8** when merged during assembly. If the user has no reference image, skip this.
+over Step 9** when merged during assembly. If the user has no reference image, skip this.
 
-### Step 10 — Exclude from reference image (figure cards) · _per-card_
+### Step 11 — Exclude from reference image (figure cards) · _per-card_
 
 Ask what must NOT carry over (background, decorative elements, props, landscape). Phrase
 each as "no <thing>" — these get merged into the single `[NEGATIVE_LIST]` at the end of
@@ -326,7 +356,7 @@ the prompt during assembly. If nothing, no extra exclusions are added.
 
 ---
 
-### Step 11 — Card type / aspect ratio · _persistent_
+### Step 12 — Card type / aspect ratio · _persistent_
 
 _Skipped if loaded from config._ Ask the card type (see the aspect-ratio table in
 `references/REFERENCE.md`):
@@ -341,7 +371,7 @@ Fill `[ASPECT_RATIO]` with the ratio only.
 
 ---
 
-### Step 12 — Image generator (optional) · _persistent_
+### Step 13 — Image generator (optional) · _persistent_
 
 _Skipped if loaded from config — just mention which engine is in use (e.g. "Using:
 Midjourney") and that `--config` can change it._ Otherwise ask, optional, with
@@ -386,7 +416,7 @@ Offer to save the choice to `config.json` like the other persistent settings.
    type/style, then layout, then the portrait, then technical finish, then negatives
    last) — avoid full sentences, section headers, or restating the same detail twice.
 7. **Engine-aware prompt formatting** — apply the deltas from the
-   `assets/engines/<engine>.md` chosen in Step 12 to the otherwise-finished prompt:
+   `assets/engines/<engine>.md` chosen in Step 13 to the otherwise-finished prompt:
    - **Negative handling** — if the engine moves negatives out of the main body
      (Stable Diffusion, Midjourney, kaze.ai, DALL·E), remove the trailing
      `[NEGATIVE_LIST]` line from the main prompt and reformat it per that engine's
@@ -411,9 +441,9 @@ Before presenting the prompt, verify all of the following against the assembled 
 - [ ] **Suit consistency** — `SUIT_NAME`, `SUIT_SYMBOL`, `SUIT_COLOR` belong to the same
   suit and to the deck chosen in Step 1 (no mixing, e.g. Spades symbol with Acorns name).
 - [ ] **Attribute resolution** — `[RESOLVED_ATTRIBUTES]` is deduplicated and
-  contradiction-free; replacements from Step 8/9 fully replace (not coexist with) the
-  traditional item they replace, and reference-transfer attributes (Step 9) outrank
-  Step 8, which outranks the traditional defaults.
+  contradiction-free; replacements from Step 9/10 fully replace (not coexist with) the
+  traditional item they replace, and reference-transfer attributes (Step 10) outrank
+  Step 9, which outranks the traditional defaults.
 - [ ] **Style block integrity** — `[STYLE_BLOCK]` follows "Layers and `[STYLE_BLOCK]`
   assembly" in `references/REFERENCE.md` for this card's group: background/decor/
   ornaments/highlights lines appear only when `layers.<layer>.<group>` is `true` (with
@@ -445,18 +475,18 @@ Before presenting the prompt, verify all of the following against the assembled 
   overridden by a derived one.
 - [ ] **Character description (figure cards)** — `[CHARACTER_NAME]` and
   `[CHARACTER_FEATURES]` are both present and non-empty; if derived from a reference
-  image (Step 7-A), the description reflects what was actually returned, not a
+  image (Step 8-A), the description reflects what was actually returned, not a
   generic placeholder.
-- [ ] **Negative list** — the negative content (from Step 10) contains only "no …"
+- [ ] **Negative list** — the negative content (from Step 11) contains only "no …"
   exclusion phrases (or the engine's equivalent), deduplicated, with no positive
   attributes leaking in.
-- [ ] **Aspect ratio** — the aspect ratio is a concrete `W:H` ratio (from Step 11 or
+- [ ] **Aspect ratio** — the aspect ratio is a concrete `W:H` ratio (from Step 12 or
   the user's custom value) or its engine-specific equivalent (pixel size, `--ar`,
   fixed size), not descriptive text.
 - [ ] **Template match** — the COURT/PIP/ACE template matches the resolved rank, and no
   figure-only fields (character, attributes, negatives) appear in a PIP/ACE prompt
   whose group has `layers.figure.<group>` set to `false`.
-- [ ] **Engine formatting** — the chosen `image_generator` (Step 12)'s negative
+- [ ] **Engine formatting** — the chosen `image_generator` (Step 13)'s negative
   handling, aspect-ratio syntax, and extra parameters from
   `assets/engines/<engine>.md` are all applied; for `nanobanana` the prompt matches
   the base template unchanged.

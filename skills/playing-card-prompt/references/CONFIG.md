@@ -131,7 +131,7 @@ below).
 | `layers.mood.<group>`       | `true`, `false`                                               | all `true`         |
 | `ornaments_extra.<group>`   | free text                                                      | `""`               |
 | `highlights_extra.<group>`  | free text                                                      | `""`               |
-| `mood`                      | free text (deck-wide atmosphere, e.g. `gothic and brooding atmosphere,`) | `""` |
+| `mood`                      | free text (deck-wide atmosphere, e.g. `gothic and brooding atmosphere,`); see `assets/mood/` for presets | `""` |
 | `theme`                     | free text (deck-wide concept/symbolism, e.g. `celestial mythology`) | `""` |
 
 `<group>` is one of `court`, `pip`, `ace`.
@@ -145,7 +145,9 @@ card group — see "Layers and `[STYLE_BLOCK]` assembly" in `references/REFERENC
 `ornaments_extra.<group>` and `highlights_extra.<group>` are free-text additions
 appended within those layers when enabled (and may be auto-derived from `theme` if
 left empty — see "Theme-derived ornaments/highlights"). `mood` is a deck-wide
-free-text atmosphere description. When `layers.figure.<group>` is on, the chosen
+free-text atmosphere description, either picked from a preset in `assets/mood/` or
+typed as custom text in Step 7, which also sets `layers.mood.<group>` per card group.
+When `layers.figure.<group>` is on, the chosen
 pattern's own "Face Style" section is folded into `[STYLE_BLOCK]` automatically —
 how a figure's face reads is part of the `style` pattern, not a separate setting.
 Court cards default to every layer on except highlights (matching prior behavior) but,

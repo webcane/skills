@@ -92,7 +92,7 @@ how a figure's face reads is part of the pattern itself (step 6 above), so it st
 consistent with that pattern's overall look without an extra per-deck choice. If a
 pattern's Face Style line describes an obscured or mask-like treatment, drop any
 facial description from `[CHARACTER_FEATURES]` (silhouette/costume only — see SKILL
-Step 7) so the two don't contradict each other.
+Step 8) so the two don't contradict each other.
 
 For `pip`/`ace`, the Face Style line only appears if `layers.figure.<group> = true`
 (transformation decks); otherwise it's part of step 6 and simply not appended.
@@ -112,7 +112,7 @@ garden") is set, and for group `g` a layer is enabled but its `_extra` field is 
 An explicit `ornaments_extra.g` / `highlights_extra.g` (set by the user or saved in
 config) always wins — `theme` only fills empty slots. Reuse the same derived phrase
 across all cards of the same group/deck so the set stays consistent. For cards with
-a figure, `theme` may also inform the character concept and Step 8 attribute
+a figure, `theme` may also inform the character concept and Step 9 attribute
 suggestions (suggest, don't force).
 
 ### Defaults
@@ -145,16 +145,16 @@ visually consistent.
 ## COURT template (King / Queen / Jack)
 
 `[CHARACTER_NAME]` and `[CHARACTER_FEATURES]` are REQUIRED (at minimum a name). The
-features may be typed by the user or derived from a reference image (see SKILL Step 7).
+features may be typed by the user or derived from a reference image (see SKILL Step 8).
 
 Before filling the template, resolve all attribute sources into ONE flowing,
 contradiction-free `[RESOLVED_ATTRIBUTES]` list — short comma-separated phrases, no
 bullet points, no section labels, no duplicated details:
 
 1. Start from `[TRADITIONAL_ATTRIBUTES]` (auto-loaded from `assets/courts/<rank>.md`).
-2. Apply the Step 8 additions/replacements — a replacement REMOVES the traditional
+2. Apply the Step 9 additions/replacements — a replacement REMOVES the traditional
    item it replaces rather than sitting next to it.
-3. Apply the Step 9 reference transfers — these win over anything from steps 1–2 that
+3. Apply the Step 10 reference transfers — these win over anything from steps 1–2 that
    describes the same feature (face, pose, hand, prop, etc.).
 4. Drop any remaining traditional item that conflicts with `[CHARACTER_FEATURES]` or
    the user's stated intent (e.g. a weapon or full-body pose attribute when the user
@@ -163,7 +163,7 @@ bullet points, no section labels, no duplicated details:
    exactly once, in whichever phrase describes the character.
 
 Build `[NEGATIVE_LIST]` as a single comma-separated "no …" sequence: start with
-`no watermark`, then append the Step 10 exclusions, each phrased as `no <thing>`.
+`no watermark`, then append the Step 11 exclusions, each phrased as `no <thing>`.
 Never repeat a negative elsewhere in the prompt and never add a separate "exclusions"
 label — engines that support a negative-prompt field can take this list verbatim.
 
@@ -249,7 +249,7 @@ RANK_NAME is always the English word; RANK_LETTER is the localized printed index
 
 ---
 
-## Aspect ratios / card types (Step 11)
+## Aspect ratios / card types (Step 12)
 
 | Card type                    | Aspect ratio (ASPECT_RATIO) | Physical size   |
 |------------------------------|-----------------------------|-----------------|

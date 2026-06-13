@@ -6,6 +6,22 @@ All notable changes to this skill. Released per skill as tag
 
 ## [Unreleased]
 
+### Added
+- New `assets/mood/` library of mood/atmosphere presets (Gothic & Brooding, Warm &
+  Whimsical, Eerie Nocturnal, Regal & Opulent, Serene Pastoral, Noir & Mysterious),
+  each providing a "Mood line" for `[MOOD_LINE]`, plus `_adding-a-mood.md` for custom
+  presets
+- **Mood is now its own wizard step (Step 7), inserted after Step 6** and always
+  asked regardless of whether the card has a figure. Offers preset moods from
+  `assets/mood/` (or any other preset by name via "Other") as well as custom free
+  text, and additionally asks which card groups (`court`/`pip`/`ace`) carry the mood,
+  setting `layers.mood.<group>` directly — previously this was buried inside Step 6
+  and the per-group `layers.mood.*` toggle was config-only. Renumbered the figure
+  block to Steps 8-11, aspect ratio to Step 12, and image generator to Step 13;
+  updated all cross-references in `references/REFERENCE.md`,
+  `references/STYLE-COMPONENTS.md`, `references/WIZARD-STEP-MAP.md`, and
+  `references/example-court-king.md`
+
 ### Changed
 - **Wizard steps renumbered 1-12, sequential (no more 5/5a/5b/5c).** The
   decoration/mood/theme step is now Step 6, and the figure block (character,
