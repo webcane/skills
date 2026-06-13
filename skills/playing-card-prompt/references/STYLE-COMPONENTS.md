@@ -1,0 +1,34 @@
+# Style Component Coverage
+
+A stylized playing-card deck is defined by a set of style components — medium,
+palette, era, mood, and so on. This table maps each component to the config
+field / layer / template mechanism that addresses it, so coverage is as explicit
+as the layer matrix in `references/REFERENCE.md`.
+
+**Card-back design is intentionally excluded** — it will be implemented as a
+separate card type alongside `court` / `pip` / `ace`, not as a style component of
+the front-facing cards covered here.
+
+| #  | Component | Status | Mechanism |
+|----|-----------|--------|-----------|
+| 1  | Medium / technique | Covered | `style` pattern choice → "Center motif style" + Finish sections of `assets/pattern/<style>.md` |
+| 2  | Color palette | Covered | `style` pattern choice → Background/Decor sections, gated by `layers.background.<group>` / `layers.decor.<group>` |
+| 3  | Era / cultural context | Covered | `style` pattern presets (austrian, french, english, art-nouveau, japanese), each grounded in an era/culture per `assets/pattern/_adding-a-pattern.md` |
+| 4  | Mood / atmosphere | Covered | `mood` (deck-wide free text) → `[MOOD_LINE]`, gated by `layers.mood.<group>` |
+| 5  | Composition / rhythm | Partial | Indirect, via `layers.<layer>.<group>` on/off toggles (decor/ornaments/frame density) and `index.layout`; no dedicated "rhythm" control independent of the chosen pattern |
+| 6  | Line character / rendering | Covered | `style` pattern choice → "Center motif style" linework descriptors |
+| 7  | Degree of stylization | Partial | Fixed by the `style` choice (e.g. chromolithographic vs. ukiyo-e) plus `face_style.<group>` for figures; no standalone realistic↔abstract dial |
+| 8  | Figure proportions / plasticity | Not covered | No field or template slot addresses body proportions/anatomical exaggeration; open gap, not prioritized in this round |
+| 9  | Poses / gestures | Covered (court) / Partial (pip, ace) | COURT: traditional attributes (`assets/courts/<rank>.md`) + Step 5c + Step 6, merged into `[RESOLVED_ATTRIBUTES]`. PIP/ACE figures (`layers.figure.<group> = true`) have no templated pose slot |
+| 10 | Costume / accessories | Covered (court) / N/A (pip, ace) | Same merge pipeline as #9, court-only |
+| 11 | Typage / facial expression | Covered | `face_style.<group>` → `[FACE_STYLE_LINE]`, gated by `layers.figure.<group>` |
+| 12 | Pip / suit symbol design | Partial | Symbol/color/shape fixed per `assets/decks/<deck>.md`; pip layout fixed in the PIP template; rendering follows the pattern's Center motif style but there's no field for alternative pip iconography |
+| 13 | Typography / indices | Covered | `index.*` (`assets/index/options.md`) → `[INDEX_LINE]`; `lettering` system for rank letters |
+| 14 | Decoration / ornamentation | Covered | `layers.ornaments.<group>` / `layers.highlights.<group>` + `ornaments_extra.<group>` / `highlights_extra.<group>`, with theme-derived fallback |
+| 15 | Deck-wide theme / symbolism | Covered | `theme` (deck-wide free text) → theme-derived ornaments/highlights; also informs Step 5c character concept suggestions for COURT |
+
+## Open gaps
+
+- **#8 Figure proportions / plasticity** and the **partial** items above (#5, #7,
+  #9 for pip/ace, #12) are known gaps, not yet addressed. They're recorded here so
+  future work can pick them up without re-auditing the whole skill.

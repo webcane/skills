@@ -7,6 +7,16 @@ All notable changes to this skill. Released per skill as tag
 ## [Unreleased]
 
 ### Added
+- New `references/STYLE-COMPONENTS.md` documenting the deck's style component
+  model and mapping each component (medium, palette, era, mood, composition,
+  line character, stylization, figure proportions, poses, costume, typage,
+  pip/suit design, typography, decoration, theme) to the config field/layer/
+  template that addresses it, flagging open gaps (figure proportions/plasticity,
+  composition/rhythm, degree of stylization, pip/suit symbol design, pip/ace
+  poses). Card-back design is excluded — planned as a separate card type
+  alongside court/pip/ace. Linked from SKILL.md's reference file map
+
+### Added
 - **Profiles**: `config.json` now wraps settings in named profiles plus an
   `active_profile` pointer (`{"active_profile": "default", "profiles": {"default":
   {...}}}`), so users can save multiple "looks" (e.g. an Austrian gothic deck and a

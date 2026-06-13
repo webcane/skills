@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.0.0
+  version: 3.1.0
 ---
 
 # Playing Card Prompt Wizard
@@ -130,6 +130,9 @@ Reference files under `references/`:
 - `references/CONFIG.md` — config schema, profiles, lookup order, field reference
 - `references/example-court-king.md` — a fully assembled COURT example prompt for reference
 - `references/example-pip-two.md` — a fully assembled PIP example prompt (plain default and decorated variant)
+- `references/STYLE-COMPONENTS.md` — maps the deck's style components (medium,
+  palette, era, mood, composition, etc.) to the config field/layer/template that
+  addresses each, and flags open gaps
 
 ---
 
