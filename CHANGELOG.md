@@ -11,7 +11,7 @@ and each skill is versioned and released independently.
 - Documented local build/install/reinstall workflow in `README.md`
 
 ### Changed
-- Bumped CI actions to Node.js 24-compatible versions: `actions/checkout@v4`, `actions/upload-artifact@v4`, `softprops/action-gh-release@v2`
+- Bumped CI actions to Node.js 24-compatible versions: `actions/checkout@v5`, `actions/upload-artifact@v6`
 - Switched to **per-skill versioning**: each skill carries its version in `SKILL.md` frontmatter (`metadata.version`), keeps its own `CHANGELOG.md`, and is released under a namespaced tag `<skill>/v<version>`
 - `package-skill.sh` now reads the version from `SKILL.md` frontmatter when no version argument is passed
 - CI (`package-skills.yml`) parses the release tag, packages and uploads only the tagged skill, and promotes that skill's `[Unreleased]` CHANGELOG section to a versioned one
