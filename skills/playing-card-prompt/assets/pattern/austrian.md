@@ -29,6 +29,12 @@ warm ochre skin tones,
 ```
 - Figure-only line (drop unless `layers.figure.<group>` is on): `warm ochre skin tones,`
 
+## Face Style
+Applies only if `layers.figure.<group>` is on.
+```
+individualized, characterful portrait faces with period-appropriate composed expressions,
+```
+
 ## Finish
 ```
 matte finish,

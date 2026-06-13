@@ -6,6 +6,18 @@ All notable changes to this skill. Released per skill as tag
 
 ## [Unreleased]
 
+### Changed
+- **Face style is now per-pattern, not a config setting.** Each
+  `assets/pattern/<style>.md` gains a "Face Style" section (placed after "Center
+  motif style") describing how a figure's face reads in that pattern's aesthetic —
+  folded into `[STYLE_BLOCK]` whenever `layers.figure.<group>` is true. Removed the
+  generic `face_style.<group>` config field (`individual`/`archetypal`/`expressive`/
+  `faceless`), its wizard question (formerly part of Step 5b), and the `[FACE_STYLE_LINE]`
+  template slot in COURT/PIP/ACE — there's no longer a separate per-deck choice to
+  make. Updated `references/REFERENCE.md`, `references/CONFIG.md`,
+  `references/STYLE-COMPONENTS.md`, `references/WIZARD-STEP-MAP.md`, `config.json`,
+  and `scripts/manage_config.py` accordingly
+
 ### Added
 - New `references/WIZARD-STEP-MAP.md` mapping each wizard step (1-9, including
   5/5a/5b/5c) to the style components it touches (per `STYLE-COMPONENTS.md`), the

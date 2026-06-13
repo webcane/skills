@@ -29,6 +29,12 @@ flat stylized illustration with simple linework,
 ```
 - Figure-only line: none
 
+## Face Style
+Applies only if `layers.figure.<group>` is on.
+```
+bold simplified facial features in the iconic stylized French court-card tradition, calm direct expression,
+```
+
 ## Finish
 ```
 even matte finish,

@@ -60,12 +60,7 @@
         "ace": ""
       },
       "mood": "",
-      "theme": "",
-      "face_style": {
-        "court": "individual",
-        "pip": "individual",
-        "ace": "individual"
-      }
+      "theme": ""
     }
   }
 }

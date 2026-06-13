@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.1.0
+  version: 3.2.0
 ---
 
 # Playing Card Prompt Wizard
@@ -31,9 +31,9 @@ The user may invoke the skill in four modes. Detect which one from their message
 
 Before asking any wizard questions, load the active profile's persistent settings
 (`deck`, `lettering`, `style`, `aspect_ratio`, `image_generator`, `index.*`,
-`layers.*`, `ornaments_extra.*`, `highlights_extra.*`, `mood`, `theme`,
-`face_style.*`) via `python3 scripts/manage_config.py show`. This also lists every
-saved profile and which one is active.
+`layers.*`, `ornaments_extra.*`, `highlights_extra.*`, `mood`, `theme`) via
+`python3 scripts/manage_config.py show`. This also lists every saved profile and which
+one is active.
 Everything else — schema, profile concept, lookup order, field reference, and the
 full CLI — is in `references/CONFIG.md`; read it whenever you need to inspect,
 change, or validate `config.json`. Per-card fields (`rank`, `suit`,
@@ -64,10 +64,9 @@ Steps to ask in config mode:
 2. Court lettering system
 3. Visual style / pattern
 4. Card decoration layers, mood, and theme (Step 5a)
-5. Face style for the court figure (Step 5b's `face_style.court` question)
-6. Aspect ratio
-7. Image generator (optional — see Step 9)
-8. (Optional, only if user asks) Index settings, or per-layer overrides via
+5. Aspect ratio
+6. Image generator (optional — see Step 9)
+7. (Optional, only if user asks) Index settings, or per-layer overrides via
    `layers.<layer>.<group>` for Court/Pip/Ace (e.g. `layers.ornaments.ace`,
    `layers.figure.pip`, `layers.mood.court`)
 
@@ -284,18 +283,13 @@ description from it and let them edit.
 > If the figure is a real, identifiable public figure: keep it a neutral descriptive
 > depiction (appearance, costume, pose). Don't fabricate quotes or claims.
 
-**Face style (persistent, asked once).** _Skipped if loaded from config._ Ask how the
-court figure's face should read:
-- **Individual (default)** — a normal individualized portrait; no extra line added.
-- **Archetypal** — symmetrical, mask-like, idealized — no individual expression.
-- **Expressive** — naturalistic, emotionally expressive features.
-- **Faceless** — face obscured or abstracted entirely; drop facial description from
-  `[CHARACTER_FEATURES]` too.
-
-Save as `face_style.court`. This becomes `[FACE_STYLE_LINE]` (see "Figure & face style
-resolution" in `references/REFERENCE.md`); `individual` adds no line. (`face_style.pip`
-/ `face_style.ace` only matter if `layers.figure.pip`/`.ace` is turned on for a
-transformation-style deck — set those via `--config` if needed, not asked here.)
+How the figure's face should read (typage, expression, degree of stylization) comes
+from the chosen pattern's own "Face Style" section — folded into `[STYLE_BLOCK]`
+automatically whenever `layers.figure.<group>` is on, so it stays consistent with the
+rest of that pattern's look (see "Figure & face style" in `references/REFERENCE.md`).
+There's no separate question for this. If that line describes an obscured or
+mask-like treatment, drop any facial description from `[CHARACTER_FEATURES]` so the
+two don't contradict each other.
 
 ### Step 5c — Additional / replaced attributes (court only) · _per-card_
 
@@ -364,16 +358,16 @@ Offer to save the choice to `config.json` like the other persistent settings.
    `[RESOLVED_ATTRIBUTES]` and `[NEGATIVE_LIST]` by following the merge rules in
    `references/REFERENCE.md` (resolve conflicts down to one final, deduplicated,
    contradiction-free state — do not list "traditional" and "override" side by side).
-4. Resolve `[STYLE_BLOCK]`, `[FRAME_LINE]`, and `[FACE_STYLE_LINE]` for this card's
-   group (court/pip/ace) per "Layers and `[STYLE_BLOCK]` assembly" and "Figure & face
-   style resolution" in `references/REFERENCE.md`, using the `layers.*`,
-   `ornaments_extra.*`, `highlights_extra.*`, `mood`, `theme`, and `face_style.*`
-   settings (deriving thematic ornaments/highlights per "Theme-derived
-   ornaments/highlights" where applicable). Splice the result **in full** — never
-   summarize, reorder, or drop a line from an enabled layer. When generating multiple
-   cards for the same deck, reuse the exact same resolved `[STYLE_BLOCK]`/
-   `[FRAME_LINE]`/`[FACE_STYLE_LINE]`/derived theme phrases for every card of the same
-   group so the set stays visually consistent.
+4. Resolve `[STYLE_BLOCK]` and `[FRAME_LINE]` for this card's group (court/pip/ace) per
+   "Layers and `[STYLE_BLOCK]` assembly" and "Figure & face style" in
+   `references/REFERENCE.md`, using the `layers.*`, `ornaments_extra.*`,
+   `highlights_extra.*`, `mood`, and `theme` settings (deriving thematic
+   ornaments/highlights per "Theme-derived ornaments/highlights" where applicable, and
+   including the chosen pattern's Face Style line when `layers.figure.<group>` is on).
+   Splice the result **in full** — never summarize, reorder, or drop a line from an
+   enabled layer. When generating multiple cards for the same deck, reuse the exact
+   same resolved `[STYLE_BLOCK]`/`[FRAME_LINE]`/derived theme phrases for every card of
+   the same group so the set stays visually consistent.
 5. **Drop any line whose placeholder is empty** — never output a literal `[PLACEHOLDER]`.
 6. Keep phrasing as short, comma-separated visual phrases (general → specific: card
    type/style, then layout, then the portrait, then technical finish, then negatives
@@ -412,9 +406,10 @@ Before presenting the prompt, verify all of the following against the assembled 
   ornaments/highlights lines appear only when `layers.<layer>.<group>` is `true` (with
   `ornaments_extra`/`highlights_extra` appended when their layer is on), followed by
   the center-motif style (figure-only line included only if `layers.figure.<group>` is
-  `true`) and finish lines, then `[MOOD_LINE]` if applicable, and the `plain card face,
-  no additional ornament beyond the pip symbols,` fallback is present for PIP when
-  decor, ornaments, and highlights are all off. Nothing from an enabled layer is
+  `true`), then the pattern's Face Style line (also only if `layers.figure.<group>` is
+  `true`), then finish lines, then `[MOOD_LINE]` if applicable, and the `plain card
+  face, no additional ornament beyond the pip symbols,` fallback is present for PIP
+  when decor, ornaments, and highlights are all off. Nothing from an enabled layer is
   summarized, reordered, or dropped. The resolved text is identical across all cards
   of the same group generated for the same deck/session.
 - [ ] **Frame line** — `[FRAME_LINE]` (`thin single black border with stepped corner
@@ -424,12 +419,12 @@ Before presenting the prompt, verify all of the following against the assembled 
 - [ ] **Mood line** — `[MOOD_LINE]` is present only if `layers.mood.<group>` is `true`
   for this card's group AND `mood` is non-empty, and its text matches the `mood`
   setting verbatim; otherwise the line is absent entirely.
-- [ ] **Face style line** — `[FACE_STYLE_LINE]` is present only if
-  `layers.figure.<group>` is `true` AND `face_style.<group>` is not `individual`, and
-  its text matches the table in "Figure & face style resolution"
-  (`references/REFERENCE.md`); for `face_style.court = faceless`,
-  `[CHARACTER_FEATURES]` contains no facial description. Otherwise the line is absent
-  entirely.
+- [ ] **Face style line** — the chosen pattern's "Face Style" line appears within
+  `[STYLE_BLOCK]` (right after the center-motif style) if and only if
+  `layers.figure.<group>` is `true` for this card's group, and its text matches that
+  pattern's `assets/pattern/<style>.md` "Face Style" section verbatim. If that line
+  describes an obscured or mask-like treatment, `[CHARACTER_FEATURES]` contains no
+  separate facial description. Otherwise (figure off) the line is absent entirely.
 - [ ] **Theme-derived ornaments/highlights** — if `theme` is set and an
   `ornaments_extra`/`highlights_extra` slot was empty for an enabled layer, the derived
   phrase reflects `theme` and is reused identically across all cards of the same

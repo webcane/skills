@@ -34,6 +34,12 @@ soft pearlescent skin tones,
 ```
 - Figure-only line (drop unless `layers.figure.<group>` is on): `soft pearlescent skin tones,`
 
+## Face Style
+Applies only if `layers.figure.<group>` is on.
+```
+idealized serene facial features with a dreamlike, elegant expression in the Mucha tradition,
+```
+
 ## Finish
 ```
 smooth matte finish,

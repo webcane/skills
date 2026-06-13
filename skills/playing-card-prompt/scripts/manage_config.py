@@ -30,7 +30,7 @@ Keys (within a profile): deck, lettering, style, aspect_ratio, image_generator,
       index.size, index.count, index.layout,
       layers.<background|decor|ornaments|highlights|frame|figure|mood>.<court|pip|ace>,
       ornaments_extra.<court|pip|ace>, highlights_extra.<court|pip|ace>,
-      mood, theme, face_style.<court|pip|ace>
+      mood, theme
 """
 from __future__ import annotations
 
@@ -53,7 +53,6 @@ INDEX_COUNT = ["2-index", "4-index"]
 INDEX_LAYOUT = ["stacked", "side-by-side", "peek", "none"]
 ASPECT_PRESETS = ["5:7", "9:14", "14:25", "7:12"]
 BOOL_VALUES = ["true", "false"]
-FACE_STYLES = ["individual", "archetypal", "expressive", "faceless"]
 
 GROUPS = ("court", "pip", "ace")
 LAYERS = ("background", "decor", "ornaments", "highlights", "frame", "figure", "mood")
@@ -86,7 +85,6 @@ DEFAULTS = {
     "highlights_extra": {g: "" for g in GROUPS},
     "mood": "",
     "theme": "",
-    "face_style": {g: "individual" for g in GROUPS},
 }
 
 # Top-level field names of a profile — used to detect a pre-3.0 flat config.json
@@ -103,10 +101,9 @@ PERSISTENT_KEYS = {"deck", "lettering", "style", "aspect_ratio", "image_generato
 PERSISTENT_KEYS |= {f"layers.{layer}.{g}" for layer in LAYERS for g in GROUPS}
 PERSISTENT_KEYS |= {f"ornaments_extra.{g}" for g in GROUPS}
 PERSISTENT_KEYS |= {f"highlights_extra.{g}" for g in GROUPS}
-PERSISTENT_KEYS |= {f"face_style.{g}" for g in GROUPS}
 
 # Top-level keys (within a profile) that hold nested dicts (any depth).
-NESTED_GROUPS = ("index", "layers", "ornaments_extra", "highlights_extra", "face_style")
+NESTED_GROUPS = ("index", "layers", "ornaments_extra", "highlights_extra")
 
 
 def _discover(subdir: str) -> list[str]:
@@ -155,11 +152,6 @@ def options_for(key: str):
         _, group = key.split(".", 1)
         if group in GROUPS:
             return (None, False)  # free text
-        return None
-    if key.startswith("face_style.") and key.count(".") == 1:
-        _, group = key.split(".")
-        if group in GROUPS:
-            return (FACE_STYLES, True)
         return None
     return None
 

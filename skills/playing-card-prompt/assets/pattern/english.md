@@ -29,6 +29,12 @@ naturalistic but stylized illustration style,
 ```
 - Figure-only line: none
 
+## Face Style
+Applies only if `layers.figure.<group>` is on.
+```
+naturalistic individualized facial features with a composed, dignified expression,
+```
+
 ## Finish
 ```
 smooth matte finish,

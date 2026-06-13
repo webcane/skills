@@ -42,6 +42,14 @@ explicitly below — it's included only if `layers.figure.<group>` is on for tha
 (default: on for court, off for pip/ace):
 - Figure-only line (drop unless `layers.figure.<group>` is on): `<line text>` (or "none")
 
+## Face Style
+One comma-phrase describing how this pattern renders a figure's face — typage,
+expression, degree of stylization (e.g. idealized/archetypal vs. naturalistic vs.
+obscured). Like the figure-only line above, this section is included only if
+`layers.figure.<group>` is on for that group (default: on for court, off for pip/ace).
+Ground it in the same era/culture as the rest of the pattern so a court figure's face
+reads consistently with the pattern's overall aesthetic.
+
 ## Finish
 Print-quality / final descriptor lines, ending with
 `highly detailed <Name>-style playing card,`.

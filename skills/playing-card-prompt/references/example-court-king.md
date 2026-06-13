@@ -17,7 +17,8 @@ Note how the attributes are resolved into ONE list with no contradictions or lab
 
 `[STYLE_BLOCK]` for the `court` group with all default layers on (background, decor,
 ornaments — empty for Austrian, highlights — off by default, center motif style with
-its figure-only line, finish):
+its figure-only line, the pattern's Face Style line since `layers.figure.court` is
+on, finish):
 
 ```
 9:14 aspect ratio, full card visible, transparent background outside the card,
@@ -27,6 +28,7 @@ rich crimson red, royal cobalt blue, burnished gold accents,
 sharp crisp black outlines, fine engraved linework with dense cross-hatching on all illustrated elements and ornamental details,
 vintage chromolithographic playing-card illustration,
 warm ochre skin tones,
+individualized, characterful portrait faces with period-appropriate composed expressions,
 matte finish,
 slight vintage printing imperfections,
 highly detailed Austrian-style playing card,
