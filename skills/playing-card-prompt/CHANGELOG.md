@@ -6,6 +6,14 @@ All notable changes to this skill. Released per skill as tag
 
 ## [Unreleased]
 
+### Fixed
+- `SKILL.md` now defines `<SKILL_DIR>` (this file's own parent directory) and
+  instructs all `scripts/manage_config.py` invocations to use
+  `python3 <SKILL_DIR>/scripts/manage_config.py ...`. Previously the bare
+  relative path `scripts/manage_config.py` resolved against the shell's
+  current working directory, which fails whenever the agent isn't running
+  from the skill's own install directory.
+
 ### Added
 - New `assets/frame/boxed-index.md` frame preset — a thin perimeter border plus a
   separate thin border individually boxing each corner index, leaving a cross-shaped

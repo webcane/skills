@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.9.0
+  version: 3.10.0
   description_claudeai: Interactive wizard to build image-gen prompts for stylized playing cards. 4 deck patterns, 6 lettering systems, 3+ styles, court/pip/ace. Trigger on card design requests.
 ---
 
@@ -25,6 +25,16 @@ The user may invoke the skill in four modes. Detect which one from their message
 | `--profile <name>`, "switch/use the `<name>` profile", "list my profiles", "create/rename/delete profile `<name>`" | **Profile** | Manage profiles directly via `python3 scripts/manage_config.py profile ...`; report the result; stop. |
 | `--reset`                                             | **Reset**   | Delete `config.json` (all profiles); confirm; stop. |
 | _(anything else, or no flag)_                         | **Generate**| Load active profile → run card wizard → output prompt. |
+
+---
+
+## Locating this skill's files
+
+Every `scripts/manage_config.py` command in this document is relative to this
+`SKILL.md` file's own directory — call it `<SKILL_DIR>`. Determine `<SKILL_DIR>`
+from the path you read this file from (its parent directory), and always invoke
+the script as `python3 <SKILL_DIR>/scripts/manage_config.py ...`, regardless of
+the shell's current working directory.
 
 ---
 
