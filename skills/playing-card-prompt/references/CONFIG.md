@@ -59,9 +59,9 @@ new profile is a self-contained copy a user can then tweak independently.
 Dotted keys address nested groups: `index.size`, `index.count`, `index.layout`, and the
 two-level `layers.<layer>.<group>` (e.g. `layers.frame.pip`, `layers.highlights.ace`,
 `layers.figure.pip`, `layers.mood.court`) and `extras.<layer>.<group>` (e.g.
-`extras.ornaments.pip`, `extras.frame.court`, `extras.mood.ace`), where `<layer>` is
-one of `background`, `decor`, `ornaments`, `highlights`, `frame`, `mood`. `mood`,
-`theme`, and `frame` are flat fields (no `<group>`).
+`extras.ornaments.pip`, `extras.frame.court`, `extras.mood.ace`, `extras.figure.court`),
+where `<layer>` is one of `background`, `decor`, `ornaments`, `highlights`, `frame`,
+`figure`, `mood`. `mood`, `theme`, and `frame` are flat fields (no `<group>`).
 
 ## Lookup order
 
@@ -105,6 +105,7 @@ profile holds the fields below:
         "ornaments":  {"court": "", "pip": "", "ace": ""},
         "highlights": {"court": "", "pip": "", "ace": ""},
         "frame":      {"court": "", "pip": "", "ace": ""},
+        "figure":     {"court": "", "pip": "", "ace": ""},
         "mood":       {"court": "", "pip": "", "ace": ""}
       },
       "mood": "",
@@ -143,6 +144,7 @@ below).
 | `extras.ornaments.<group>`  | free text                                                      | `""`               |
 | `extras.highlights.<group>` | free text                                                      | `""`               |
 | `extras.frame.<group>`      | free text                                                      | `""`               |
+| `extras.figure.<group>`     | free text (group-wide figure trait, layered on top of the pattern's Face Style; applies only if `layers.figure.<group>` is `true`) | `""` |
 | `extras.mood.<group>`       | free text (per-group mood addition, on top of deck-wide `mood`) | `""`             |
 | `mood`                      | free text (deck-wide atmosphere, e.g. `gothic and brooding atmosphere,`); see `assets/mood/` for presets | `""` |
 | `theme`                     | free text (deck-wide concept/symbolism, e.g. `celestial mythology`) | `""` |
@@ -168,6 +170,21 @@ a preset in `assets/mood/` or typed as custom text in Step 7, which also sets
 `layers.mood.<group>` per card group. When `layers.figure.<group>` is on, the chosen
 pattern's own "Face Style" section is folded into `[STYLE_BLOCK]` automatically —
 how a figure's face reads is part of the `style` pattern, not a separate setting.
+`extras.figure.<group>` is appended after the pattern's Face Style line, also only
+when `layers.figure.<group>` is `true` — a group-wide figure trait (e.g. "all court
+figures shown with a slight hunch") layered on top of the pattern's Face Style for
+every card in that group, distinct from the per-card `[CHARACTER_FEATURES]` (Steps
+8-11).
+
+**Three scopes of figure content**, from broadest to narrowest:
+- **Deck-wide** — the pattern's Face Style line (from `style`): how ANY figure's
+  face reads in this pattern (typage, expression, degree of stylization).
+- **Group-wide** — `extras.figure.<group>`: an optional trait shared by every
+  figure in one group (`court`/`pip`/`ace`), layered on top of the pattern's Face
+  Style for that group.
+- **Per-card** — `[CHARACTER_NAME]`/`[CHARACTER_FEATURES]` and the Step 9-11
+  attributes/transfers/exclusions: who this specific card's figure is, always
+  supplied per card (from the user or a reference image).
 Court cards default to every layer on except highlights (matching prior behavior) but,
 like Pip/Ace, can be tuned per layer via `--config`.
 

@@ -6,6 +6,16 @@ All notable changes to this skill. Released per skill as tag
 
 ## [Unreleased]
 
+### Added
+- New `extras.figure.<group>` config field — a group-wide figure trait (e.g. "all
+  court figures shown with a slight hunch") layered on top of the chosen pattern's
+  Face Style line, applied only while `layers.figure.<group>` is `true`. Distinct
+  from the pattern's Face Style (deck-wide) and `[CHARACTER_FEATURES]`/Steps 9-11
+  (per-card). Updated `references/REFERENCE.md` ("Layers and `[STYLE_BLOCK]`
+  assembly" step 6 and "Figure & face style"), `references/CONFIG.md` (schema,
+  field reference, dotted-key list), `SKILL.md` Step 6, `config.json`, and
+  `scripts/manage_config.py` (`EXTRA_LAYERS`)
+
 ### Fixed
 - `SKILL.md` now defines `<SKILL_DIR>` (this file's own parent directory) and
   instructs all `scripts/manage_config.py` invocations to use

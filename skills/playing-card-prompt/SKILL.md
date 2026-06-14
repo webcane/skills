@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.10.0
+  version: 3.11.0
   description_claudeai: Interactive wizard to build image-gen prompts for stylized playing cards. 4 deck patterns, 6 lettering systems, 3+ styles, court/pip/ace. Trigger on card design requests.
 ---
 
@@ -286,6 +286,12 @@ Court and Ace keep their other layers on by default (see the Defaults table in
 `references/REFERENCE.md`); tune any layer via `python3 scripts/manage_config.py set
 layers.<layer>.<group> false/true` (e.g. `layers.figure.pip true` for a
 transformation-style deck where number cards carry small figures).
+
+A group-wide figure trait shared by every figure in a group (e.g. "all court figures
+shown with a slight hunch"), layered on top of the chosen pattern's Face Style, is
+config-only — not asked here — set via `python3 scripts/manage_config.py set
+extras.figure.<group> "<text>"` (applies only while `layers.figure.<group>` is `true`;
+see "Figure & face style" in `references/REFERENCE.md`).
 
 ---
 

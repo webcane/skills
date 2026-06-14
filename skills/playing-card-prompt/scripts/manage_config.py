@@ -29,7 +29,7 @@ Usage:
 Keys (within a profile): deck, lettering, style, frame, aspect_ratio, image_generator,
       index.size, index.count, index.layout,
       layers.<background|decor|ornaments|highlights|frame|figure|mood>.<court|pip|ace>,
-      extras.<background|decor|ornaments|highlights|frame|mood>.<court|pip|ace>,
+      extras.<background|decor|ornaments|highlights|frame|figure|mood>.<court|pip|ace>,
       mood, theme
 
 A pre-3.6 config.json may still have the old per-layer `ornaments_extra.<group>`,
@@ -62,9 +62,11 @@ BOOL_VALUES = ["true", "false"]
 GROUPS = ("court", "pip", "ace")
 LAYERS = ("background", "decor", "ornaments", "highlights", "frame", "figure", "mood")
 
-# Layers that can carry a per-group free-text "extras" addition. `figure` has no
-# extras slot — it's a structural on/off toggle, not a text layer.
-EXTRA_LAYERS = ("background", "decor", "ornaments", "highlights", "frame", "mood")
+# Layers that can carry a per-group free-text "extras" addition. `extras.figure.<group>`
+# is a group-wide figure trait (e.g. "all court figures shown with a slight hunch"),
+# layered on top of the pattern's Face Style; it only applies if `layers.figure.<group>`
+# is true.
+EXTRA_LAYERS = ("background", "decor", "ornaments", "highlights", "frame", "figure", "mood")
 
 # Pre-3.6 field names that are migrated into extras.<layer>.<group> on load.
 LEGACY_EXTRA_KEYS = {

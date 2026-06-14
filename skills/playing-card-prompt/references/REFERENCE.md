@@ -36,10 +36,10 @@ The rest are **configurable layers**, each controlled per card group (`court` / 
 - **Frame** — the border/architectural framing (`[FRAME_LINE]`), its text drawn from
   the chosen `frame` preset in `assets/frame/`, plus `extras.frame.<group>` if set.
 - **Figure** — whether this group's center motif carries a figure/portrait at all.
-  Gates the Center motif style's figure-only line and the pattern's Face Style
-  section. On for `court` by default (the portrait); off for `pip`/`ace` (no figure)
-  — turn on for `pip`/`ace` only for transformation-style decks where number/ace
-  cards carry small figures.
+  Gates the Center motif style's figure-only line, the pattern's Face Style section,
+  and `extras.figure.<group>` if set. On for `court` by default (the portrait); off
+  for `pip`/`ace` (no figure) — turn on for `pip`/`ace` only for transformation-style
+  decks where number/ace cards carry small figures.
 - **Mood** — whether `[MOOD_LINE]` (the deck's overall atmosphere, from the `mood`
   setting) and `extras.mood.<group>` (a per-group mood addition) apply to this group.
   On for every group by default; both are empty (and dropped) unless `mood` and/or
@@ -74,8 +74,10 @@ motif and finish):
    if `layers.figure.g` is `true` (default: on for `court`, off for `pip`/`ace`).
 6. **Face Style** — if `layers.figure.g` is `true`, append the pattern's "Face Style"
    line (how a figure's face reads in this pattern — typage, expression, degree of
-   stylization). Dropped entirely if `layers.figure.g` is `false` (the default for
-   `pip`/`ace`).
+   stylization), then `extras.figure.g` (free text, own comma phrase) if set — a
+   group-wide figure trait layered on top of the pattern's Face Style for every card
+   in this group (e.g. "all court figures shown with a slight hunch"). Both dropped
+   entirely if `layers.figure.g` is `false` (the default for `pip`/`ace`).
 7. **Finish** — the pattern's Finish lines.
 
 8. **Mood** — if `layers.mood.g` is `true`: if `mood` is non-empty, append
@@ -113,6 +115,22 @@ stylization for a face, and only ever applies when `layers.figure.<group>` is `t
 Keep them as separate sections when adding or editing a pattern — don't fold Face Style
 into Center motif style or vice versa.
 
+**Three scopes of figure content**, broadest to narrowest:
+- **Deck-wide** — the pattern's Face Style line (from `style`): how ANY figure's
+  face reads in this pattern (typage, expression, degree of stylization). No separate
+  setting; baked into the chosen pattern.
+- **Group-wide** — `extras.figure.<group>` (free text, config-only): an optional
+  trait shared by every figure in one group (`court`/`pip`/`ace`) — e.g. "all court
+  figures shown with a slight hunch" — appended right after the pattern's Face Style
+  line for that group.
+- **Per-card** — `[CHARACTER_NAME]`/`[CHARACTER_FEATURES]` plus the Steps 9-11
+  attributes/reference-transfers/exclusions: who this specific card's figure is,
+  always supplied per card (from the user or a reference image).
+
+These three stack together rather than compete — each addresses a different question
+("how do faces render in this pattern" / "what's true of every figure in this group"
+/ "who is this card's figure").
+
 **Source resolution — pattern vs. reference image.** The Face Style line governs *how*
 a face is rendered (stylization, linework, expression register); `[CHARACTER_FEATURES]`
 and any Step 10 reference-image transfers govern *what* the face looks like (identity,
@@ -123,8 +141,9 @@ description from `[CHARACTER_FEATURES]` (silhouette/costume only — see SKILL S
 the two don't contradict each other. Otherwise, no source-resolution step is needed —
 the pattern's Face Style line and the character's own features simply stack.
 
-For `pip`/`ace`, the Face Style line only appears if `layers.figure.<group> = true`
-(transformation decks); otherwise it's part of step 6 and simply not appended.
+For `pip`/`ace`, the Face Style line and `extras.figure.<group>` only appear if
+`layers.figure.<group> = true` (transformation decks); otherwise they're part of step 6
+and simply not appended.
 
 ### Theme-derived ornaments/highlights/frame
 
