@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.11.0
+  version: 3.12.0
   description_claudeai: Interactive wizard to build image-gen prompts for stylized playing cards. 4 deck patterns, 6 lettering systems, 3+ styles, court/pip/ace. Trigger on card design requests.
 ---
 
@@ -42,7 +42,7 @@ the shell's current working directory.
 
 Before asking any wizard questions, load the active profile's persistent settings
 (`deck`, `lettering`, `style`, `frame`, `aspect_ratio`, `image_generator`, `index.*`,
-`layers.*`, `extras.*`, `mood`, `theme`) via
+`layers.*`, `extras.*`, `mood`, `theme`, `figure_proportion`) via
 `python3 scripts/manage_config.py show`. This also lists every saved profile and which
 one is active.
 Everything else — schema, profile concept, lookup order, field reference, and the
@@ -63,9 +63,9 @@ profile, switch to an existing one (`profile switch <name>`), or create a new on
 profile's settings as a starting point). Otherwise skip straight to Step 1 and edit
 the active profile.
 
-Then walk the user through **only the persistent settings** (Steps 1, 2, 5, 8, 9 and
-optionally index). Show current values for the target profile (from `profile show`)
-so the user can accept or change each one. At the end, persist each value with
+Then walk the user through **only the persistent settings** (items 1–8 below, plus
+index settings if asked). Show current values for the target profile (from `profile
+show`) so the user can accept or change each one. At the end, persist each value with
 `python3 scripts/manage_config.py set <key> <value>` (it validates and writes to the
 active profile in `config.json`; pass `--profile <name>` if editing a non-active
 profile), then confirm. Do **not** proceed to card generation.
@@ -76,12 +76,13 @@ Steps to ask in config mode:
 3. Visual style / pattern
 4. Card decoration layers and theme (Step 6)
 5. Mood / atmosphere (Step 7)
-6. Aspect ratio (Step 12)
-7. Image generator (optional — see Step 13)
-8. (Optional, only if user asks) Index settings, or per-layer overrides via
+6. Figure proportion / framing (Step 8)
+7. Aspect ratio (Step 13)
+8. Image generator (optional — see Step 14)
+9. (Optional, only if user asks) Index settings, or per-layer overrides via
    `layers.<layer>.<group>` for Court/Pip/Ace (e.g. `layers.ornaments.ace`,
    `layers.figure.pip`, `layers.mood.court`). Turning on `layers.figure.pip` or
-   `layers.figure.ace` (transformation decks) makes Steps 7–10 apply to pip/ace
+   `layers.figure.ace` (transformation decks) makes Steps 8–12 apply to pip/ace
    cards too, the same way they apply to court by default.
 
 ## Mode: Profile (`--profile <name>` or other profile commands)
@@ -128,6 +129,9 @@ Folders under `assets/`:
   used to fill `[MOOD_LINE]` (see Step 7 and `assets/mood/_adding-a-mood.md`)
 - `assets/frame/` — one file per border/frame preset, each holding a "Frame line"
   used to fill `[FRAME_LINE]` (see Step 6 and `assets/frame/_adding-a-frame.md`)
+- `assets/figure-proportion/` — one file per figure framing/cropping preset, each
+  holding a "Figure proportion line" folded into `[STYLE_BLOCK]` (see Step 8 and
+  `assets/figure-proportion/_adding-a-figure-proportion.md`)
 - `assets/index/options.md` — corner-index settings (advanced; NOT asked in the wizard)
 - `assets/engines/` — one file per image-generation engine, describing how to adapt
   the assembled prompt (negative-list placement, aspect-ratio syntax, extra
@@ -202,7 +206,7 @@ Always ask. Offer only the ranks listed in the chosen `assets/decks/<deck>.md`
 - **A → ACE** → this card's group is `ace` (`layers.figure.ace` defaults to `false`).
 - **2–10 → PIP** → this card's group is `pip` (`layers.figure.pip` defaults to `false`).
 
-Whether Steps 8–11 apply to this card depends on `layers.figure.<group>` for the group
+Whether Steps 9–12 apply to this card depends on `layers.figure.<group>` for the group
 just set — see the check after Step 7.
 
 Set `RANK_NAME` (English word) and `RANK_LETTER` (localized letter from Step 2 for
@@ -291,7 +295,7 @@ A group-wide figure trait shared by every figure in a group (e.g. "all court fig
 shown with a slight hunch"), layered on top of the chosen pattern's Face Style, is
 config-only — not asked here — set via `python3 scripts/manage_config.py set
 extras.figure.<group> "<text>"` (applies only while `layers.figure.<group>` is `true`;
-see "Figure & face style" in `references/REFERENCE.md`).
+see "Figure, face style & proportion" in `references/REFERENCE.md`).
 
 ---
 
@@ -335,13 +339,47 @@ on the court cards) is config-only, not asked here — set via
 
 **Check `layers.figure.<group>` for this card's group** (`court`/`pip`/`ace`, default
 `true` for court, `false` for pip/ace unless previously configured via `--config`). If
-it's `false`, this card has no figure — skip straight to Step 12 (Aspect ratio). Steps
-8–11 only apply to cards with a figure: court cards by default, plus any pip/ace card
-whose `layers.figure.<group>` was turned on for a transformation-style deck.
+it's `false`, this card has no figure — skip straight to Step 13 (Aspect ratio).
+Otherwise, Steps 8–12 apply: court cards by default, plus any pip/ace card whose
+`layers.figure.<group>` was turned on for a transformation-style deck. Step 8 (figure
+proportion) is persistent — skipped if already set or loaded from config; Steps 9–12
+are per-card.
 
 ---
 
-### Step 8 — Character / figure description (REQUIRED for cards with a figure) · _per-card_
+### Step 8 — Figure proportion / framing · _persistent_
+
+_Skipped if loaded from config, or if `layers.figure.<group>` is `false` for this
+card's group (see the check above)._ Ask how much of the figure should be shown
+across the deck — this becomes `figure_proportion`, folded into `[STYLE_BLOCK]` after
+the chosen pattern's Face Style line and `extras.figure.<group>` (see "Figure, face
+style & proportion" in `references/REFERENCE.md`), for every card whose group has
+`layers.figure.<group>` set to `true`.
+
+List the `*.md` files in `assets/figure-proportion/` (ignore names starting with `_`)
+as options. Offer **None** as the default, plus the most common framings as explicit
+choices, e.g.:
+- **None (default)** — no framing line; `figure_proportion` stays empty (the
+  pattern/template's own framing applies, unconstrained).
+- **Waist-up**
+- **Three-quarter**
+- **Full body**
+
+"Other" covers the remaining presets (Bust, Seven-eighths) and any custom framing/crop
+description (e.g. "tightly cropped headshot, shoulders only,").
+
+- If a preset is named, load `assets/figure-proportion/<name>.md` and use its "Figure
+  proportion line" text verbatim as `figure_proportion`.
+- If the user gives custom text instead, save it as `figure_proportion`, phrased as
+  its own comma-separated phrase (ending in a comma).
+- If "None" or skipped, leave `figure_proportion` empty — no framing line is added for
+  any card.
+
+This is a single deck-wide setting (no per-group `extras.figure_proportion.<group>`) —
+the same resolved framing phrase is reused across every card with a figure so the set
+reads as consistently framed.
+
+### Step 9 — Character / figure description (REQUIRED for cards with a figure) · _per-card_
 
 Every card with a figure must have a figure description — **at minimum a name**. Two paths:
 
@@ -367,12 +405,12 @@ description from it and let them edit.
 How the figure's face should read (typage, expression, degree of stylization) comes
 from the chosen pattern's own "Face Style" section — folded into `[STYLE_BLOCK]`
 automatically whenever `layers.figure.<group>` is on, so it stays consistent with the
-rest of that pattern's look (see "Figure & face style" in `references/REFERENCE.md`).
-There's no separate question for this. If that line describes an obscured or
-mask-like treatment, drop any facial description from `[CHARACTER_FEATURES]` so the
-two don't contradict each other.
+rest of that pattern's look (see "Figure, face style & proportion" in
+`references/REFERENCE.md`). There's no separate question for this. If that line
+describes an obscured or mask-like treatment, drop any facial description from
+`[CHARACTER_FEATURES]` so the two don't contradict each other.
 
-### Step 9 — Additional / replaced attributes (figure cards) · _per-card_
+### Step 10 — Additional / replaced attributes (figure cards) · _per-card_
 
 For court cards, show the auto-loaded traditional attributes from `assets/courts/<rank>.md`
 and ask, free text, for any **additions or replacements** beyond the traditional set
@@ -383,13 +421,13 @@ cards with `layers.figure.<group>` on (transformation decks), there's no traditi
 attribute set to load — just ask, free text, for any attributes or props the figure
 should carry. If none, skip this.
 
-### Step 10 — Transfer from reference image (figure cards) · _per-card_
+### Step 11 — Transfer from reference image (figure cards) · _per-card_
 
 Ask what to carry over from the user's reference image (face, hairstyle, a specific
 weapon, an order/medal, etc.). These **take priority over traditional attributes and
-over Step 9** when merged during assembly. If the user has no reference image, skip this.
+over Step 10** when merged during assembly. If the user has no reference image, skip this.
 
-### Step 11 — Exclude from reference image (figure cards) · _per-card_
+### Step 12 — Exclude from reference image (figure cards) · _per-card_
 
 Ask what must NOT carry over (background, decorative elements, props, landscape). Phrase
 each as "no <thing>" — these get merged into the single `[NEGATIVE_LIST]` at the end of
@@ -397,7 +435,7 @@ the prompt during assembly. If nothing, no extra exclusions are added.
 
 ---
 
-### Step 12 — Card type / aspect ratio · _persistent_
+### Step 13 — Card type / aspect ratio · _persistent_
 
 _Skipped if loaded from config._ Ask the card type (see the aspect-ratio table in
 `references/REFERENCE.md`):
@@ -412,7 +450,7 @@ Fill `[ASPECT_RATIO]` with the ratio only.
 
 ---
 
-### Step 13 — Image generator (optional) · _persistent_
+### Step 14 — Image generator (optional) · _persistent_
 
 _Skipped if loaded from config — just mention which engine is in use (e.g. "Using:
 Midjourney") and that `--config` can change it._ Otherwise ask, optional, with
@@ -443,7 +481,7 @@ Offer to save the choice to `config.json` like the other persistent settings.
    `references/REFERENCE.md` (resolve conflicts down to one final, deduplicated,
    contradiction-free state — do not list "traditional" and "override" side by side).
 4. Resolve `[STYLE_BLOCK]` and `[FRAME_LINE]` for this card's group (court/pip/ace) per
-   "Layers and `[STYLE_BLOCK]` assembly" and "Figure & face style" in
+   "Layers and `[STYLE_BLOCK]` assembly" and "Figure, face style & proportion" in
    `references/REFERENCE.md`, using the `layers.*`, `extras.*`, `frame`, `mood`, and
    `theme` settings (deriving thematic ornaments/highlights/frame additions per
    "Theme-derived ornaments/highlights/frame" where applicable, and including the
@@ -459,7 +497,7 @@ Offer to save the choice to `config.json` like the other persistent settings.
    type/style, then layout, then the portrait, then technical finish, then negatives
    last) — avoid full sentences, section headers, or restating the same detail twice.
 7. **Engine-aware prompt formatting** — apply the deltas from the
-   `assets/engines/<engine>.md` chosen in Step 13 to the otherwise-finished prompt:
+   `assets/engines/<engine>.md` chosen in Step 14 to the otherwise-finished prompt:
    - **Negative handling** — if the engine moves negatives out of the main body
      (Stable Diffusion, Midjourney, kaze.ai, DALL·E), remove the trailing
      `[NEGATIVE_LIST]` line from the main prompt and reformat it per that engine's

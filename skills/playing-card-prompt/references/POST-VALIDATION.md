@@ -12,9 +12,9 @@ unless the failure stems from missing/ambiguous information only they can resolv
 - [ ] **Suit consistency** — `SUIT_NAME`, `SUIT_SYMBOL`, `SUIT_COLOR` belong to the same
   suit and to the deck chosen in Step 1 (no mixing, e.g. Spades symbol with Acorns name).
 - [ ] **Attribute resolution** — `[RESOLVED_ATTRIBUTES]` is deduplicated and
-  contradiction-free; replacements from Step 9/10 fully replace (not coexist with) the
-  traditional item they replace, and reference-transfer attributes (Step 10) outrank
-  Step 9, which outranks the traditional defaults.
+  contradiction-free; replacements from Step 10/11 fully replace (not coexist with) the
+  traditional item they replace, and reference-transfer attributes (Step 11) outrank
+  Step 10, which outranks the traditional defaults.
 - [ ] **Style block integrity** — `[STYLE_BLOCK]` follows "Layers and `[STYLE_BLOCK]`
   assembly" in `references/REFERENCE.md` for this card's group: background/decor/
   ornaments/highlights lines appear only when `layers.<layer>.<group>` is `true` (with
@@ -45,6 +45,12 @@ unless the failure stems from missing/ambiguous information only they can resolv
   pattern's `assets/pattern/<style>.md` "Face Style" section verbatim. If that line
   describes an obscured or mask-like treatment, `[CHARACTER_FEATURES]` contains no
   separate facial description. Otherwise (figure off) the line is absent entirely.
+- [ ] **Figure proportion line** — if `figure_proportion` is non-empty and
+  `layers.figure.<group>` is `true` for this card's group, its text (from
+  `assets/figure-proportion/<name>.md` or custom) appears within `[STYLE_BLOCK]`
+  immediately after the Face Style line / `extras.figure.<group>`, identical across
+  all cards of the same group/deck. If `figure_proportion` is empty or
+  `layers.figure.<group>` is `false`, no such line appears.
 - [ ] **Theme-derived ornaments/highlights/frame** — if `theme` is set and an
   `extras.ornaments`/`extras.highlights`/`extras.frame` slot was empty for an enabled
   layer, the derived phrase reflects `theme` and is reused identically across all
@@ -53,7 +59,7 @@ unless the failure stems from missing/ambiguous information only they can resolv
   `extras.decor`/`extras.mood` have no theme fallback — left empty if unset.
 - [ ] **Character description (figure cards)** — `[CHARACTER_NAME]` and
   `[CHARACTER_FEATURES]` are both present and non-empty; if derived from a reference
-  image (Step 8-A), the description reflects what was actually returned, not a
+  image (Step 9-A), the description reflects what was actually returned, not a
   generic placeholder.
 - [ ] **Negative list** — the negative content (from Step 11) contains only "no …"
   exclusion phrases (or the engine's equivalent), deduplicated, with no positive

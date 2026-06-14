@@ -10,11 +10,23 @@ All notable changes to this skill. Released per skill as tag
 - New `extras.figure.<group>` config field — a group-wide figure trait (e.g. "all
   court figures shown with a slight hunch") layered on top of the chosen pattern's
   Face Style line, applied only while `layers.figure.<group>` is `true`. Distinct
-  from the pattern's Face Style (deck-wide) and `[CHARACTER_FEATURES]`/Steps 9-11
+  from the pattern's Face Style (deck-wide) and `[CHARACTER_FEATURES]`/Steps 10-12
   (per-card). Updated `references/REFERENCE.md` ("Layers and `[STYLE_BLOCK]`
-  assembly" step 6 and "Figure & face style"), `references/CONFIG.md` (schema,
-  field reference, dotted-key list), `SKILL.md` Step 6, `config.json`, and
+  assembly" step 6 and "Figure, face style & proportion"), `references/CONFIG.md`
+  (schema, field reference, dotted-key list), `SKILL.md` Step 6, `config.json`, and
   `scripts/manage_config.py` (`EXTRA_LAYERS`)
+- New `figure_proportion` config field and `assets/figure-proportion/` presets
+  (`bust`, `waist-up`, `three-quarter`, `seven-eighths`, `full-body`, or custom
+  text) — a deck-wide figure framing/cropping description, folded into
+  `[STYLE_BLOCK]` right after the pattern's Face Style line and
+  `extras.figure.<group>`, applied only while `layers.figure.<group>` is `true`.
+  Asked once via a new persistent wizard Step 8 ("Figure proportion / framing"),
+  gated by the figure check after Step 7; old Steps 8-13 are renumbered to 9-14
+  throughout `SKILL.md` and the reference docs. Updated `references/REFERENCE.md`,
+  `references/CONFIG.md`, `references/WIZARD-STEP-MAP.md`,
+  `references/STYLE-COMPONENTS.md`, `references/POST-VALIDATION.md`,
+  `references/example-court-king.md`, `config.json`, and `scripts/manage_config.py`
+  (`DEFAULTS`, `PERSISTENT_KEYS`, `allowed_figure_proportions`, `options_for`)
 
 ### Fixed
 - `SKILL.md` now defines `<SKILL_DIR>` (this file's own parent directory) and

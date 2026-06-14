@@ -30,7 +30,7 @@ Keys (within a profile): deck, lettering, style, frame, aspect_ratio, image_gene
       index.size, index.count, index.layout,
       layers.<background|decor|ornaments|highlights|frame|figure|mood>.<court|pip|ace>,
       extras.<background|decor|ornaments|highlights|frame|figure|mood>.<court|pip|ace>,
-      mood, theme
+      mood, theme, figure_proportion
 
 A pre-3.6 config.json may still have the old per-layer `ornaments_extra.<group>`,
 `highlights_extra.<group>`, and `frame_extra.<group>` fields — these are migrated
@@ -103,6 +103,7 @@ DEFAULTS = {
     "extras": {layer: {g: "" for g in GROUPS} for layer in EXTRA_LAYERS},
     "mood": "",
     "theme": "",
+    "figure_proportion": "",
 }
 
 # Top-level field names of a profile — used to detect a pre-3.0 flat config.json
@@ -115,7 +116,8 @@ BUILTIN_CONFIG = {
 }
 
 PERSISTENT_KEYS = {"deck", "lettering", "style", "frame", "aspect_ratio", "image_generator",
-                   "index.size", "index.count", "index.layout", "mood", "theme"}
+                   "index.size", "index.count", "index.layout", "mood", "theme",
+                   "figure_proportion"}
 PERSISTENT_KEYS |= {f"layers.{layer}.{g}" for layer in LAYERS for g in GROUPS}
 PERSISTENT_KEYS |= {f"extras.{layer}.{g}" for layer in EXTRA_LAYERS for g in GROUPS}
 
@@ -142,6 +144,11 @@ def allowed_frames() -> list[str]:
     return _discover("frame") or ["boxed-index"]
 
 
+def allowed_figure_proportions() -> list[str]:
+    # Figure proportions may be custom; this is the on-disk set used for suggestions.
+    return _discover("figure-proportion") or ["waist-up"]
+
+
 def allowed_engines() -> list[str]:
     # Engines may be custom; this is the on-disk set used for suggestions.
     return _discover("engines") or ["nanobanana", "stable-diffusion", "midjourney", "dalle", "kaze"]
@@ -160,6 +167,7 @@ def options_for(key: str):
         "index.layout": (INDEX_LAYOUT, True),
         "mood": (None, False),    # free text deck-wide atmosphere
         "theme": (None, False),   # free text deck-wide theme/symbolism
+        "figure_proportion": (allowed_figure_proportions(), False),  # custom allowed
     }.get(key)
     if fixed is not None:
         return fixed

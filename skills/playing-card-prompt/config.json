@@ -85,7 +85,8 @@
         }
       },
       "mood": "",
-      "theme": ""
+      "theme": "",
+      "figure_proportion": ""
     }
   }
 }

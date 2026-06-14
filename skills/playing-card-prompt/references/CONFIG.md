@@ -109,7 +109,8 @@ profile holds the fields below:
         "mood":       {"court": "", "pip": "", "ace": ""}
       },
       "mood": "",
-      "theme": ""
+      "theme": "",
+      "figure_proportion": ""
     }
   }
 }
@@ -148,6 +149,7 @@ below).
 | `extras.mood.<group>`       | free text (per-group mood addition, on top of deck-wide `mood`) | `""`             |
 | `mood`                      | free text (deck-wide atmosphere, e.g. `gothic and brooding atmosphere,`); see `assets/mood/` for presets | `""` |
 | `theme`                     | free text (deck-wide concept/symbolism, e.g. `celestial mythology`) | `""` |
+| `figure_proportion`         | `bust`, `waist-up`, `three-quarter`, `seven-eighths`, `full-body` (or any custom framing/crop description); see `assets/figure-proportion/` for presets | `""` |
 
 `<group>` is one of `court`, `pip`, `ace`.
 
@@ -174,15 +176,25 @@ how a figure's face reads is part of the `style` pattern, not a separate setting
 when `layers.figure.<group>` is `true` — a group-wide figure trait (e.g. "all court
 figures shown with a slight hunch") layered on top of the pattern's Face Style for
 every card in that group, distinct from the per-card `[CHARACTER_FEATURES]` (Steps
-8-11).
+9-12).
+
+`figure_proportion` is folded into `[STYLE_BLOCK]` right after `extras.figure.<group>`
+(i.e. after the pattern's Face Style line and its group-wide addition), also only when
+`layers.figure.<group>` is `true` — a deck-wide framing/crop description (e.g.
+`waist-up portrait, torso and arms visible, hands free to hold attributes,`) reused
+across every card with a figure so the set reads as consistently framed. Picked from a
+preset in `assets/figure-proportion/` or typed as custom text in Step 8. There is no
+per-group `extras.figure_proportion.<group>` — it's a single deck-wide phrase, gated
+entirely by `layers.figure.<group>` like Face Style.
 
 **Three scopes of figure content**, from broadest to narrowest:
-- **Deck-wide** — the pattern's Face Style line (from `style`): how ANY figure's
-  face reads in this pattern (typage, expression, degree of stylization).
+- **Deck-wide** — the pattern's Face Style line (from `style`) plus `figure_proportion`:
+  how ANY figure's face reads in this pattern (typage, expression, degree of
+  stylization), and how much of the figure is shown/cropped.
 - **Group-wide** — `extras.figure.<group>`: an optional trait shared by every
   figure in one group (`court`/`pip`/`ace`), layered on top of the pattern's Face
   Style for that group.
-- **Per-card** — `[CHARACTER_NAME]`/`[CHARACTER_FEATURES]` and the Step 9-11
+- **Per-card** — `[CHARACTER_NAME]`/`[CHARACTER_FEATURES]` and the Step 10-12
   attributes/transfers/exclusions: who this specific card's figure is, always
   supplied per card (from the user or a reference image).
 Court cards default to every layer on except highlights (matching prior behavior) but,
@@ -192,7 +204,7 @@ like Pip/Ace, can be tuned per layer via `--config`.
 
 **Persistent** (saved per profile — rarely change between cards):
 `deck`, `lettering`, `style`, `frame`, `aspect_ratio`, `image_generator`, `index.*`,
-`layers.*`, `extras.*`, `mood`, `theme`
+`layers.*`, `extras.*`, `mood`, `theme`, `figure_proportion`
 
 **Per-card** (always asked in the wizard — never saved):
 `rank`, `suit`, `character_name`, `character_features`, `extra_attributes`,

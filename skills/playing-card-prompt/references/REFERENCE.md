@@ -37,9 +37,10 @@ The rest are **configurable layers**, each controlled per card group (`court` / 
   the chosen `frame` preset in `assets/frame/`, plus `extras.frame.<group>` if set.
 - **Figure** — whether this group's center motif carries a figure/portrait at all.
   Gates the Center motif style's figure-only line, the pattern's Face Style section,
-  and `extras.figure.<group>` if set. On for `court` by default (the portrait); off
-  for `pip`/`ace` (no figure) — turn on for `pip`/`ace` only for transformation-style
-  decks where number/ace cards carry small figures.
+  `extras.figure.<group>` if set, and the deck-wide `figure_proportion` if set. On for
+  `court` by default (the portrait); off for `pip`/`ace` (no figure) — turn on for
+  `pip`/`ace` only for transformation-style decks where number/ace cards carry small
+  figures.
 - **Mood** — whether `[MOOD_LINE]` (the deck's overall atmosphere, from the `mood`
   setting) and `extras.mood.<group>` (a per-group mood addition) apply to this group.
   On for every group by default; both are empty (and dropped) unless `mood` and/or
@@ -76,8 +77,11 @@ motif and finish):
    line (how a figure's face reads in this pattern — typage, expression, degree of
    stylization), then `extras.figure.g` (free text, own comma phrase) if set — a
    group-wide figure trait layered on top of the pattern's Face Style for every card
-   in this group (e.g. "all court figures shown with a slight hunch"). Both dropped
-   entirely if `layers.figure.g` is `false` (the default for `pip`/`ace`).
+   in this group (e.g. "all court figures shown with a slight hunch"). Then, if
+   `figure_proportion` is non-empty, append it as its own comma phrase — a deck-wide
+   framing/crop description (e.g. `waist-up portrait, torso and arms visible, hands
+   free to hold attributes,`), reused across every card with a figure. All three are
+   dropped entirely if `layers.figure.g` is `false` (the default for `pip`/`ace`).
 7. **Finish** — the pattern's Finish lines.
 
 8. **Mood** — if `layers.mood.g` is `true`: if `mood` is non-empty, append
@@ -102,7 +106,7 @@ its own comma phrase if set — see "Theme-derived ornaments/highlights/frame" b
 `[STYLE_BLOCK]`. The same resolved `[FRAME_LINE]` is reused across all cards of the
 same group/deck, like `[STYLE_BLOCK]`.
 
-### Figure & face style (within `[STYLE_BLOCK]`)
+### Figure, face style & proportion (within `[STYLE_BLOCK]`)
 
 There is no separate `[FACE_STYLE_LINE]` template slot and no `face_style` setting —
 how a figure's face reads is part of the pattern itself (step 6 above), so it stays
@@ -115,35 +119,39 @@ stylization for a face, and only ever applies when `layers.figure.<group>` is `t
 Keep them as separate sections when adding or editing a pattern — don't fold Face Style
 into Center motif style or vice versa.
 
-**Three scopes of figure content**, broadest to narrowest:
-- **Deck-wide** — the pattern's Face Style line (from `style`): how ANY figure's
-  face reads in this pattern (typage, expression, degree of stylization). No separate
-  setting; baked into the chosen pattern.
+**Four scopes of figure content**, broadest to narrowest:
+- **Deck-wide (pattern)** — the pattern's Face Style line (from `style`): how ANY
+  figure's face reads in this pattern (typage, expression, degree of stylization). No
+  separate setting; baked into the chosen pattern.
+- **Deck-wide (framing)** — `figure_proportion` (free text, picked from
+  `assets/figure-proportion/` or typed in Step 8): how much of the figure is shown and
+  how it's cropped (e.g. "bust", "waist-up", "full body"), reused across every card
+  with a figure. Appended right after `extras.figure.<group>`.
 - **Group-wide** — `extras.figure.<group>` (free text, config-only): an optional
   trait shared by every figure in one group (`court`/`pip`/`ace`) — e.g. "all court
   figures shown with a slight hunch" — appended right after the pattern's Face Style
   line for that group.
-- **Per-card** — `[CHARACTER_NAME]`/`[CHARACTER_FEATURES]` plus the Steps 9-11
+- **Per-card** — `[CHARACTER_NAME]`/`[CHARACTER_FEATURES]` plus the Steps 10-12
   attributes/reference-transfers/exclusions: who this specific card's figure is,
   always supplied per card (from the user or a reference image).
 
-These three stack together rather than compete — each addresses a different question
-("how do faces render in this pattern" / "what's true of every figure in this group"
-/ "who is this card's figure").
+These four stack together rather than compete — each addresses a different question
+("how do faces render in this pattern" / "how is the figure framed in this deck" /
+"what's true of every figure in this group" / "who is this card's figure").
 
 **Source resolution — pattern vs. reference image.** The Face Style line governs *how*
 a face is rendered (stylization, linework, expression register); `[CHARACTER_FEATURES]`
-and any Step 10 reference-image transfers govern *what* the face looks like (identity,
+and any Step 11 reference-image transfers govern *what* the face looks like (identity,
 specific features, hairstyle). These are complementary, not competing — both apply
 together by default. The only conflict is the one already called out: if a pattern's
 Face Style line describes an obscured or mask-like treatment, drop any facial
-description from `[CHARACTER_FEATURES]` (silhouette/costume only — see SKILL Step 8) so
+description from `[CHARACTER_FEATURES]` (silhouette/costume only — see SKILL Step 9) so
 the two don't contradict each other. Otherwise, no source-resolution step is needed —
 the pattern's Face Style line and the character's own features simply stack.
 
-For `pip`/`ace`, the Face Style line and `extras.figure.<group>` only appear if
-`layers.figure.<group> = true` (transformation decks); otherwise they're part of step 6
-and simply not appended.
+For `pip`/`ace`, the Face Style line, `extras.figure.<group>`, and `figure_proportion`
+only appear if `layers.figure.<group> = true` (transformation decks); otherwise they're
+part of step 6 and simply not appended.
 
 ### Theme-derived ornaments/highlights/frame
 
@@ -168,7 +176,7 @@ no `theme` fallback.
 An explicit `extras.ornaments.g` / `extras.highlights.g` / `extras.frame.g` (set by the
 user or saved in config) always wins — `theme` only fills empty slots. Reuse the same
 derived phrase across all cards of the same group/deck so the set stays consistent. For
-cards with a figure, `theme` may also inform the character concept and Step 9 attribute
+cards with a figure, `theme` may also inform the character concept and Step 10 attribute
 suggestions (suggest, don't force).
 
 ### Defaults
@@ -201,16 +209,16 @@ visually consistent.
 ## COURT template (King / Queen / Jack)
 
 `[CHARACTER_NAME]` and `[CHARACTER_FEATURES]` are REQUIRED (at minimum a name). The
-features may be typed by the user or derived from a reference image (see SKILL Step 8).
+features may be typed by the user or derived from a reference image (see SKILL Step 9).
 
 Before filling the template, resolve all attribute sources into ONE flowing,
 contradiction-free `[RESOLVED_ATTRIBUTES]` list — short comma-separated phrases, no
 bullet points, no section labels, no duplicated details:
 
 1. Start from `[TRADITIONAL_ATTRIBUTES]` (auto-loaded from `assets/courts/<rank>.md`).
-2. Apply the Step 9 additions/replacements — a replacement REMOVES the traditional
+2. Apply the Step 10 additions/replacements — a replacement REMOVES the traditional
    item it replaces rather than sitting next to it.
-3. Apply the Step 10 reference transfers — these win over anything from steps 1–2 that
+3. Apply the Step 11 reference transfers — these win over anything from steps 1–2 that
    describes the same feature (face, pose, hand, prop, etc.).
 4. Drop any remaining traditional item that conflicts with `[CHARACTER_FEATURES]` or
    the user's stated intent (e.g. a weapon or full-body pose attribute when the user
@@ -219,7 +227,7 @@ bullet points, no section labels, no duplicated details:
    exactly once, in whichever phrase describes the character.
 
 Build `[NEGATIVE_LIST]` as a single comma-separated "no …" sequence: start with
-`no watermark`, then append the Step 11 exclusions, each phrased as `no <thing>`.
+`no watermark`, then append the Step 12 exclusions, each phrased as `no <thing>`.
 Never repeat a negative elsewhere in the prompt and never add a separate "exclusions"
 label — engines that support a negative-prompt field can take this list verbatim.
 
@@ -305,7 +313,7 @@ RANK_NAME is always the English word; RANK_LETTER is the localized printed index
 
 ---
 
-## Aspect ratios / card types (Step 12)
+## Aspect ratios / card types (Step 13)
 
 | Card type                    | Aspect ratio (ASPECT_RATIO) | Physical size   |
 |------------------------------|-----------------------------|-----------------|
