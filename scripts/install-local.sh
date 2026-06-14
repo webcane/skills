@@ -14,10 +14,15 @@ INSTALL_DIR="${INSTALL_DIR:-$HOME/.claude/skills}"
 SKILL_NAME="${1:-}"
 
 if [ -z "$SKILL_NAME" ]; then
-  echo "Available skills:"
-  select choice in "$SKILLS_DIR"/*/; do
+  SKILL_NAMES=()
+  for dir in "$SKILLS_DIR"/*/; do
+    SKILL_NAMES+=("$(basename "$dir")")
+  done
+
+  echo "Choose available skills:"
+  select choice in "${SKILL_NAMES[@]}"; do
     if [ -n "$choice" ]; then
-      SKILL_NAME="$(basename "$choice")"
+      SKILL_NAME="$choice"
       break
     fi
     echo "Invalid choice."

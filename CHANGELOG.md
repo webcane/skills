@@ -14,6 +14,7 @@ and each skill is versioned and released independently.
 - `dist/*.zip` added to `.gitignore`
 
 ### Changed
+- `scripts/install-local.sh`: interactive picker now lists skill names (e.g. `playing-card-prompt`) instead of full directory paths
 - Bumped CI actions to Node.js 24-compatible versions: `actions/checkout@v5`, `actions/upload-artifact@v6`
 - Fixed `package-skills.yml` referencing a non-existent `main` branch (repo's branch is `master`), which caused `actions/checkout` to fail fetching `refs/heads/main*` on every release run
 - Switched to **per-skill versioning**: each skill carries its version in `SKILL.md` frontmatter (`metadata.version`), keeps its own `CHANGELOG.md`, and is released under a namespaced tag `<skill>/v<version>`
