@@ -4,7 +4,7 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
-## [Unreleased]
+## [3.7.1] - 2026-06-13
 
 ### Added
 - New `extras.figure.<group>` config field — a group-wide figure trait (e.g. "all
