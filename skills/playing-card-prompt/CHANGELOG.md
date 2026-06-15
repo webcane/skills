@@ -4,6 +4,27 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
+## [Unreleased]
+
+### Changed
+- Restructured `assets/pattern/<style>.md` so pattern files contain no
+  config/assembly logic: the figure-only "skin tones" line that used to be
+  duplicated inside "Center motif style" and re-referenced via a
+  `layers.figure.<group>`-aware "Figure-only line" annotation is now its own
+  plain "Figure detail" section (or `(none)`), and "Face Style" no longer
+  carries an "Applies only if `layers.figure.<group>` is on" sentence.
+  Whether "Figure detail"/"Face Style" are folded into `[STYLE_BLOCK]` for a
+  group is now decided entirely by `references/REFERENCE.md` via
+  `layers.figure.<group>` — pattern files never mention `layers.*`. Updated
+  all five `assets/pattern/*.md` files, `assets/pattern/_adding-a-pattern.md`,
+  `references/REFERENCE.md` (layer descriptions, `[STYLE_BLOCK]` resolution
+  steps 5-6, "Figure, face style & proportion", Defaults, PIP/ACE templates),
+  `references/POST-VALIDATION.md` (added a dedicated "Figure detail line"
+  check and updated "Style block integrity"/"Face style line"),
+  `references/CONFIG.md`, `references/STYLE-COMPONENTS.md`,
+  `references/WIZARD-STEP-MAP.md`, the example prompts, and `SKILL.md`'s file
+  map / Step 5.
+
 ## [3.7.1] - 2026-06-13
 
 ### Changed

@@ -27,10 +27,11 @@ clean precise black outlines, light controlled cross-hatching for shading,
 classic Anglo-American standard playing-card illustration,
 naturalistic but stylized illustration style,
 ```
-- Figure-only line: none
+
+## Figure detail
+(none)
 
 ## Face Style
-Applies only if `layers.figure.<group>` is on.
 ```
 naturalistic individualized facial features with a composed, dignified expression,
 ```

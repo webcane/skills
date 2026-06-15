@@ -25,12 +25,14 @@ rich crimson red, royal cobalt blue, burnished gold accents,
 ```
 sharp crisp black outlines, fine engraved linework with dense cross-hatching on all illustrated elements and ornamental details,
 vintage chromolithographic playing-card illustration,
+```
+
+## Figure detail
+```
 warm ochre skin tones,
 ```
-- Figure-only line (drop unless `layers.figure.<group>` is on): `warm ochre skin tones,`
 
 ## Face Style
-Applies only if `layers.figure.<group>` is on.
 ```
 individualized, characterful portrait faces with period-appropriate composed expressions,
 ```

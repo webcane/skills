@@ -30,12 +30,14 @@ delicate gold-leaf outlining along major contours,
 ```
 flowing curvilinear outlines, elegant elongated linework,
 Art Nouveau illustration in the style of Mucha-era poster art,
+```
+
+## Figure detail
+```
 soft pearlescent skin tones,
 ```
-- Figure-only line (drop unless `layers.figure.<group>` is on): `soft pearlescent skin tones,`
 
 ## Face Style
-Applies only if `layers.figure.<group>` is on.
 ```
 idealized serene facial features with a dreamlike, elegant expression in the Mucha tradition,
 ```

@@ -163,9 +163,11 @@ deck-wide `mood`. `frame` picks the preset from `assets/frame/` whose "Frame lin
 supplies `[FRAME_LINE]` (any custom string is also accepted). `mood` is a deck-wide
 free-text atmosphere description, either picked from a preset in `assets/mood/` or
 typed as custom text in Step 7, which also sets `layers.mood.<group>` per card group.
-When `layers.figure.<group>` is on, the chosen pattern's own "Face Style" section is
-folded into `[STYLE_BLOCK]` automatically — how a figure's face reads is part of the
-`style` pattern, not a separate setting. `layers.figure.<group>`'s addition (when the
+When `layers.figure.<group>` is on, the chosen pattern's own "Figure detail" and "Face
+Style" sections are folded into `[STYLE_BLOCK]` automatically — additional
+portrait-only rendering detail (e.g. skin tones) and how a figure's face reads are
+part of the `style` pattern, not a separate setting. `layers.figure.<group>`'s
+addition (when the
 cell is neither `"false"` nor `"true"`) is appended after the pattern's Face Style
 line — a group-wide figure trait (e.g. "all court figures shown with a slight hunch")
 layered on top of the pattern's Face Style for every card in that group, distinct from

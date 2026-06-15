@@ -16,9 +16,9 @@ Note how the attributes are resolved into ONE list with no contradictions or lab
   `no watermark` — nothing is repeated or labeled "exclusions".
 
 `[STYLE_BLOCK]` for the `court` group with all default layers on (background, decor,
-ornaments — empty for Austrian, highlights — off by default, center motif style with
-its figure-only line, the pattern's Face Style line since `layers.figure.court` is
-on, finish):
+ornaments — empty for Austrian, highlights — off by default, center motif style, then
+the pattern's Figure detail and Face Style lines since `layers.figure.court` is on,
+finish):
 
 ```
 9:14 aspect ratio, full card visible, transparent background outside the card,

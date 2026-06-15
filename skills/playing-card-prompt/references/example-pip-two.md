@@ -14,8 +14,8 @@ Compared to the Austrian `[STYLE_BLOCK]` used on COURT cards:
   the suit's own color.
 - **Ornaments** and **Highlights** are off and empty for Austrian anyway, so nothing
   to drop.
-- **Center motif style** keeps its linework/illustration lines but drops the
-  figure-only line (`warm ochre skin tones,`) — there's no portrait.
+- **Center motif style** keeps its linework/illustration lines; **Figure detail**
+  (`warm ochre skin tones,`) and **Face Style** are dropped — there's no portrait.
 - **Finish** stays, followed by the plain fallback line
   `plain card face, no additional ornament beyond the pip symbols,` (appended because
   both `layers.decor.pip` and `layers.ornaments.pip` are false).
@@ -48,8 +48,9 @@ Same card, with the wizard's "Decorated" option chosen and
 - **Ornaments** is on: Austrian's Ornaments section is empty, so only
   `layers.ornaments.pip`'s addition contributes, as its own phrase.
 - **Highlights** stays off (not set).
-- **Center motif style** drops the figure-only line as always; **Finish** stays. No
-  "plain card face..." line in this branch — decor and ornaments are both on.
+- **Figure detail** and **Face Style** are dropped as always (no portrait); **Center
+  motif style** and **Finish** stay. No "plain card face..." line in this branch —
+  decor and ornaments are both on.
 - `[FRAME_LINE]` is included (`layers.frame.pip = true`).
 
 ```

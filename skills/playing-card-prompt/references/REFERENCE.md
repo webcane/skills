@@ -40,9 +40,9 @@ text):
   the chosen `frame` preset in `assets/frame/`, plus this group's addition if the cell
   is custom text.
 - **Figure** — whether this group's center motif carries a figure/portrait at all.
-  Gates the Center motif style's figure-only line, the pattern's Face Style section,
-  this group's addition if the cell is custom text, and the deck-wide
-  `figure_proportion` if set. On for `court` by default (the portrait); off for
+  Gates the pattern's Figure detail section, its Face Style section, this group's
+  addition if the cell is custom text, and the deck-wide `figure_proportion` if set.
+  On for `court` by default (the portrait); off for
   `pip`/`ace` (no figure) — turn on for `pip`/`ace` only for transformation-style
   decks where number/ace cards carry small figures.
 - **Mood** — whether `[MOOD_LINE]` (the deck's overall atmosphere, from the `mood`
@@ -52,10 +52,13 @@ text):
 
 Each `assets/pattern/<style>.md` provides the text for Background, Decor, Ornaments,
 Highlights, "Center motif style" (the linework/illustration descriptor applied to
-whatever sits in the center — see that file's "Center motif style" section, which also
-marks any figure-only line that only makes sense with a portrait), and "Face Style"
-(how a figure's face reads in this pattern — typage, expression, degree of
-stylization — also gated to portraits only).
+whatever sits in the center — portrait, pip layout, or suit symbol alike, always
+included), "Figure detail" (additional rendering detail that only makes sense for a
+portrait, e.g. skin tones — or `(none)`), and "Face Style" (how a figure's face reads
+in this pattern — typage, expression, degree of stylization). The pattern file itself
+never references `layers.*` or any other config; whether "Figure detail" and "Face
+Style" are folded into `[STYLE_BLOCK]` for a given group is decided entirely here, via
+`layers.figure.<group>`.
 
 ### Resolving `[STYLE_BLOCK]` for a card group
 
@@ -79,18 +82,21 @@ by concatenating, in this order, only the layers that are on:
 Then, always (these aren't gated by layers — they're part of the structural center
 motif and finish):
 
-5. **Center motif style** — the pattern's lines, including the figure-only line only
-   if `layers.figure.g` is on (default: on for `court`, off for `pip`/`ace`).
-6. **Face Style** — if `layers.figure.g` is on, append the pattern's "Face Style"
-   line (how a figure's face reads in this pattern — typage, expression, degree of
-   stylization), then `layers.figure.g`'s addition (free text, own comma phrase) if
-   the cell is custom text — a group-wide figure trait layered on top of the pattern's
-   Face Style for every card in this group (e.g. "all court figures shown with a
-   slight hunch"). Then, if `figure_proportion` is non-empty, append it as its own
-   comma phrase — a deck-wide framing/crop description (e.g. `waist-up portrait, torso
-   and arms visible, hands free to hold attributes,`), reused across every card with a
-   figure. All three are dropped entirely if `layers.figure.g` is `"false"` (the
-   default for `pip`/`ace`).
+5. **Center motif style** — the pattern's "Center motif style" lines, always. These
+   apply to whatever sits in the center (portrait, pip layout, or suit symbol alike)
+   and don't depend on `layers.figure.g`.
+6. **Figure detail & Face Style** — only if `layers.figure.g` is on (default: on for
+   `court`, off for `pip`/`ace`): append the pattern's "Figure detail" lines (skip
+   entirely if that section is `(none)`), then the pattern's "Face Style" line (how a
+   figure's face reads in this pattern — typage, expression, degree of stylization),
+   then `layers.figure.g`'s addition (free text, own comma phrase) if the cell is
+   custom text — a group-wide figure trait layered on top of the pattern's Face Style
+   for every card in this group (e.g. "all court figures shown with a slight hunch").
+   Then, if `figure_proportion` is non-empty, append it as its own comma phrase — a
+   deck-wide framing/crop description (e.g. `waist-up portrait, torso and arms
+   visible, hands free to hold attributes,`), reused across every card with a figure.
+   Figure detail, Face Style, the group-wide addition, and `figure_proportion` are all
+   dropped entirely if `layers.figure.g` is `"false"` (the default for `pip`/`ace`).
 7. **Finish** — the pattern's Finish lines.
 
 8. **Mood** — if `layers.mood.g` is on: if `mood` is non-empty, append `[MOOD_LINE]`
@@ -119,19 +125,22 @@ cards of the same group/deck, like `[STYLE_BLOCK]`.
 
 There is no separate `[FACE_STYLE_LINE]` template slot and no `face_style` setting —
 how a figure's face reads is part of the pattern itself (step 6 above), so it stays
-consistent with that pattern's overall look without an extra per-deck choice. The
-pattern's "Center motif style" and "Face Style" are deliberately kept as two separate
-sections in `assets/pattern/<style>.md`: "Center motif style" is the linework/rendering
-applied to whatever sits in the center (portrait, pips, or suit symbol — figure-only
-lines marked separately), while "Face Style" is only about typage/expression/degree of
-stylization for a face, and only ever applies when `layers.figure.<group>` is `true`.
-Keep them as separate sections when adding or editing a pattern — don't fold Face Style
-into Center motif style or vice versa.
+consistent with that pattern's overall look without an extra per-deck choice. Each
+`assets/pattern/<style>.md` keeps three sections distinct: "Center motif style" (the
+linework/rendering applied to whatever sits in the center — portrait, pips, or suit
+symbol alike — always included), "Figure detail" (additional rendering detail that
+only makes sense for a portrait, e.g. skin tones, or `(none)`), and "Face Style"
+(typage/expression/degree of stylization for a face). The pattern file never says when
+"Figure detail" or "Face Style" apply — `references/REFERENCE.md` alone decides that,
+via `layers.figure.<group>`. Keep these three as separate sections when adding or
+editing a pattern — don't fold Figure detail or Face Style into Center motif style or
+vice versa.
 
 **Four scopes of figure content**, broadest to narrowest:
-- **Deck-wide (pattern)** — the pattern's Face Style line (from `style`): how ANY
-  figure's face reads in this pattern (typage, expression, degree of stylization). No
-  separate setting; baked into the chosen pattern.
+- **Deck-wide (pattern)** — the pattern's "Figure detail" lines (if not `(none)`) plus
+  its Face Style line (from `style`): additional portrait-only rendering detail (e.g.
+  skin tones) and how ANY figure's face reads in this pattern (typage, expression,
+  degree of stylization). No separate setting; baked into the chosen pattern.
 - **Deck-wide (framing)** — `figure_proportion` (free text, picked from
   `assets/figure-proportion/` or typed in Step 8): how much of the figure is shown and
   how it's cropped (e.g. "bust", "waist-up", "full body"), reused across every card
@@ -158,9 +167,10 @@ description from `[CHARACTER_FEATURES]` (silhouette/costume only — see SKILL S
 the two don't contradict each other. Otherwise, no source-resolution step is needed —
 the pattern's Face Style line and the character's own features simply stack.
 
-For `pip`/`ace`, the Face Style line, `layers.figure.<group>`'s addition, and
-`figure_proportion` only appear if `layers.figure.<group>` is on (transformation
-decks); otherwise they're part of step 6 and simply not appended.
+For `pip`/`ace`, the pattern's "Figure detail" lines, its Face Style line,
+`layers.figure.<group>`'s addition, and `figure_proportion` only appear if
+`layers.figure.<group>` is on (transformation decks); otherwise they're part of step 6
+and simply not appended.
 
 ### Theme-derived ornaments/highlights/frame
 
@@ -201,7 +211,7 @@ don't force).
 | mood         | true  | true  | true  |
 
 These reproduce the traditional look out of the box: Court cards carry the full
-pattern including the portrait's figure-only line; plain Pip cards show only
+pattern including its Figure detail and Face Style sections; plain Pip cards show only
 background + center motif + finish (no border, no extra accents, no figure); Aces
 keep their ornamental flourish and border but no figure. Highlights is off everywhere
 by default. `mood` and `theme` are both empty by default, so `[MOOD_LINE]` and the
@@ -259,8 +269,9 @@ reversible two-way court card layout, identical upper and lower portraits rotate
 ## PIP template (2 through 10)
 
 No portrait, no character — unless `layers.figure.pip` is on (transformation-style
-decks), in which case `[STYLE_BLOCK]` carries the pattern's Face Style line (step 6 of
-"Resolving `[STYLE_BLOCK]`") for the small figure within the pip layout. `[RANK_COUNT]`
+decks), in which case `[STYLE_BLOCK]` carries the pattern's Figure detail and Face
+Style lines (step 6 of "Resolving `[STYLE_BLOCK]`") for the small figure within the pip
+layout. `[RANK_COUNT]`
 = the rank number. `[STYLE_BLOCK]` and `[FRAME_LINE]` are resolved per "Layers and
 `[STYLE_BLOCK]` assembly" above for the `pip` group (default: background + center
 motif + finish only — plain pip card, no frame, no figure).
@@ -282,9 +293,9 @@ no watermark
 
 `[STYLE_BLOCK]` and `[FRAME_LINE]` are resolved per "Layers and `[STYLE_BLOCK]`
 assembly" above for the `ace` group (default: everything on except figure — matches
-the previous unconditional behavior). `[STYLE_BLOCK]` carries the pattern's Face Style
-line only if `layers.figure.ace` is on (transformation-style decks with a figure on
-the Ace).
+the previous unconditional behavior). `[STYLE_BLOCK]` carries the pattern's Figure
+detail and Face Style lines only if `layers.figure.ace` is on (transformation-style
+decks with a figure on the Ace).
 
 ```
 [ASPECT_RATIO] aspect ratio, full card visible, transparent background outside the card,

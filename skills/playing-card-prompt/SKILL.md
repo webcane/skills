@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.14.0
+  version: 3.15.0
   description_claudeai: Interactive wizard to build image-gen prompts for stylized playing cards. 4 deck patterns, 6 lettering systems, 3+ styles, court/pip/ace. Trigger on card design requests.
 ---
 
@@ -123,8 +123,10 @@ Folders under `assets/`:
 - `assets/decks/` — one file per deck system (suits + available ranks + default lettering)
 - `assets/lettering/systems.md` — court-card index letters per region
 - `assets/courts/` — `king.md` / `queen.md` / `jack.md`, auto-loaded by chosen rank
-- `assets/pattern/` — one file per visual style; each holds a `[STYLE_BLOCK]` and marks
-  its accent/figure-only lines for PIP/ACE resolution (see `references/REFERENCE.md`)
+- `assets/pattern/` — one file per visual style; each holds layer-fragment sections
+  (Background, Decor, Ornaments, Highlights, Center motif style, Figure detail, Face
+  Style, Finish) that assemble into `[STYLE_BLOCK]` per card group (see
+  `references/REFERENCE.md`)
 - `assets/mood/` — one file per mood/atmosphere preset, each holding a "Mood line"
   used to fill `[MOOD_LINE]` (see Step 7 and `assets/mood/_adding-a-mood.md`)
 - `assets/frame/` — one file per border/frame preset, each holding a "Frame line"
@@ -226,7 +228,8 @@ _Skipped if loaded from config._ Always ask this on first run; never skip it. Li
 they can request another style or era/cultural setting (e.g. "Art Deco", "Mexican
 Loteria", "Egyptian").
 Load the chosen `assets/pattern/<style>.md` and note its layer sections (Background,
-Decor, Ornaments, Highlights, Center motif style, Finish). For a style not on disk,
+Decor, Ornaments, Highlights, Center motif style, Figure detail, Face Style, Finish).
+For a style not on disk,
 improvise these sections following `assets/pattern/_adding-a-pattern.md`, then save
 the improvised text (e.g. note it in the conversation) so later cards in the same deck
 reuse identical wording — every card of the same group should resolve to the SAME

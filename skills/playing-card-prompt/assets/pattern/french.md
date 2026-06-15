@@ -27,10 +27,11 @@ bold clean black outlines, flat areas of solid color with minimal shading,
 classic French Paris-pattern playing-card illustration,
 flat stylized illustration with simple linework,
 ```
-- Figure-only line: none
+
+## Figure detail
+(none)
 
 ## Face Style
-Applies only if `layers.figure.<group>` is on.
 ```
 bold simplified facial features in the iconic stylized French court-card tradition, calm direct expression,
 ```

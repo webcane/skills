@@ -19,9 +19,10 @@ unless the failure stems from missing/ambiguous information only they can resolv
   assembly" in `references/REFERENCE.md` for this card's group: background/decor/
   ornaments/highlights lines appear only when `layers.<layer>.<group>` is not
   `"false"` (with each layer's addition — its cell's text, if not `"true"`/`"false"`
-  — appended when the layer is on), followed by the center-motif style (figure-only
-  line included only if `layers.figure.<group>` is on), then the pattern's Face Style
-  line (also only if `layers.figure.<group>` is on), then finish lines, then
+  — appended when the layer is on), followed by the pattern's Center motif style lines
+  (always present, regardless of `layers.figure.<group>`), then — only if
+  `layers.figure.<group>` is on — the pattern's Figure detail lines (skipped if that
+  section is `(none)`) and its Face Style line, then finish lines, then
   `[MOOD_LINE]`/`layers.mood.<group>`'s addition if applicable, and the `plain card
   face, no additional ornament beyond the pip symbols,` fallback is present for PIP
   when decor, ornaments, and highlights are all off. Nothing from an enabled layer is
@@ -39,8 +40,14 @@ unless the failure stems from missing/ambiguous information only they can resolv
   only if `layers.mood.<group>` is on for this card's group, and only if the
   respective `mood`/addition is non-empty; the text matches those settings verbatim;
   otherwise the corresponding line is absent entirely.
+- [ ] **Figure detail line** — the chosen pattern's "Figure detail" lines (when that
+  section is not `(none)`) appear within `[STYLE_BLOCK]` immediately after the Center
+  motif style lines if and only if `layers.figure.<group>` is on for this card's
+  group, matching that pattern's `assets/pattern/<style>.md` "Figure detail" section
+  verbatim. Otherwise (figure off, or the section is `(none)`) no such line appears.
 - [ ] **Face style line** — the chosen pattern's "Face Style" line appears within
-  `[STYLE_BLOCK]` (right after the center-motif style) if and only if
+  `[STYLE_BLOCK]` (right after the Figure detail lines, or right after the Center
+  motif style lines if Figure detail is `(none)`) if and only if
   `layers.figure.<group>` is on for this card's group, and its text matches that
   pattern's `assets/pattern/<style>.md` "Face Style" section verbatim. If that line
   describes an obscured or mask-like treatment, `[CHARACTER_FEATURES]` contains no

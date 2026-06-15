@@ -30,12 +30,14 @@ fine mica-dust shimmer along key outlines,
 ```
 bold confident black outlines, minimal interior shading, flat unmodulated color fields,
 traditional ukiyo-e woodblock print illustration,
+```
+
+## Figure detail
+```
 pale ivory skin tones with minimal shading,
 ```
-- Figure-only line (drop unless `layers.figure.<group>` is on): `pale ivory skin tones with minimal shading,`
 
 ## Face Style
-Applies only if `layers.figure.<group>` is on.
 ```
 stylized ukiyo-e facial features with simplified, composed and reserved expression,
 ```
