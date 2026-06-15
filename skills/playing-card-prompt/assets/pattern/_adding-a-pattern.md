@@ -11,18 +11,19 @@ fin-de-siècle Europe", "ukiyo-e, Edo-period Japan", "Art Deco, 1920s") — this
 shape the color palette, ornament motifs, and "Technique" linework consistently, not
 just the Finish line's name.
 
-## Technique vs. function
+## Technique vs. Functions
 
-These sections answer two different questions, and each is gated independently via
-its own `layers.<layer>.<group>` cell — see "Technique vs. function" in
-`references/STYLE-COMPONENTS.md`:
+These sections answer two different questions — see "Technique vs. Functions" in `references/STYLE-COMPONENTS.md`:
 
-- **Technique** — *how* the center motif is drawn (medium/linework/rendering).
-- **Background, Decor, Ornaments, Highlights, Finish** — *what* is added to the card
-  and *where* (functional content, not drawing medium).
+- **Technique & Finish** — *how* the card is rendered (medium/linework/rendering, and
+  the final print-quality descriptor). Both are gated together by the single
+  `layers.technique.<group>` cell.
+- **Background, Decor, Ornaments, Highlights** — *what* is added to the card and
+  *where* (content placement, not rendering medium), each gated by its own
+  `layers.<layer>.<group>` cell.
 
-Don't mix the two: keep medium/linework phrasing out of the functional sections, and
-keep content/placement phrasing out of "Technique".
+Don't mix the two: keep medium/linework/print-quality phrasing out of the content
+layers, and keep content/placement phrasing out of "Technique" and "Finish".
 
 ## Background
 Base cardstock color/texture for the card (e.g. `aged ivory playing-card stock, subtle
@@ -86,4 +87,6 @@ detail", whether this section is used for a given card is decided by
 
 ## Finish
 Print-quality / final descriptor lines, ending with
-`highly detailed <Name>-style playing card,`.
+`highly detailed <Name>-style playing card,`. Shares "Technique"'s gate —
+`layers.technique.<group>` (on for every group by default); dropped together with
+"Technique" when that layer is off for a group.

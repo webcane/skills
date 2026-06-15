@@ -52,20 +52,24 @@ text):
 - **Technique** — the rendering technique/medium applied to whatever sits in the
   center (portrait, pip layout, or suit symbol alike) — linework, tonal/area-fill
   rendering, painterly treatment, collage, and so on — plus this group's addition if
-  the cell is custom text. On for every group by default. Distinct from **Figure** —
-  Technique is *how* the center motif is drawn regardless of what it is; Figure is
-  *whether* it's a portrait at all.
+  the cell is custom text. Also gates the pattern's "Finish" lines (the print-quality/
+  final-rendering descriptor for the whole card) — Technique and Finish both describe
+  *how* the card is rendered, so they share one on/off switch. On for every group by
+  default. Distinct from **Figure** — Technique (+ Finish) is *how* the card is
+  rendered regardless of what it shows; Figure is *whether* the center motif is a
+  portrait at all.
 
 Each `assets/pattern/<style>.md` provides the text for Background, Decor, Ornaments,
 Highlights, "Technique" (the linework/medium descriptor applied to whatever sits in
-the center — portrait, pip layout, or suit symbol alike), "Figure detail" (additional
-rendering detail that only makes sense for a portrait, e.g. skin tones — or `(none)`),
-and "Face Style" (how a figure's face reads in this pattern — typage, expression,
-degree of stylization). The pattern file itself never references `layers.*` or any
-other config; whether "Technique" is folded into `[STYLE_BLOCK]` for a given group is
-decided here via `layers.technique.<group>`, and whether "Figure detail" and "Face
-Style" are folded in is decided here via `layers.figure.<group>` — independently of
-each other.
+the center — portrait, pip layout, or suit symbol alike), "Finish" (the print-quality/
+final-rendering descriptor for the whole card), "Figure detail" (additional rendering
+detail that only makes sense for a portrait, e.g. skin tones — or `(none)`), and "Face
+Style" (how a figure's face reads in this pattern — typage, expression, degree of
+stylization). The pattern file itself never references `layers.*` or any other config;
+whether "Technique" and "Finish" are folded into `[STYLE_BLOCK]` for a given group is
+decided here via a single `layers.technique.<group>` gate (see steps 5 and 7 below),
+and whether "Figure detail" and "Face Style" are folded in is decided here via
+`layers.figure.<group>` — independently of `layers.technique.<group>`.
 
 ### Resolving `[STYLE_BLOCK]` for a card group
 
@@ -108,9 +112,13 @@ Then:
    This is independent of `layers.technique.g` — a card can have Technique on with
    Figure off (e.g. plain pip with the pattern's linework but no portrait detail), or
    vice versa.
-7. **Finish** — the pattern's Finish lines, always (not gated by any layer — the
-   print-quality/final descriptor applies to every card regardless of which other
-   layers are on).
+7. **Finish** — the pattern's Finish lines, included under the same gate as step 5:
+   present if `layers.technique.g` is on, dropped entirely if `layers.technique.g` is
+   `"false"`. Finish is the print-quality/final-rendering descriptor for the whole
+   card — describing *how* the card is rendered, like Technique, so the two share one
+   gate even though Finish sits later in `[STYLE_BLOCK]` (after Figure detail/Face
+   Style). `layers.technique.g`'s addition (if any) was already appended in step 5 —
+   Finish doesn't get its own addition slot.
 
 8. **Mood** — if `layers.mood.g` is on: if `mood` is non-empty, append `[MOOD_LINE]`
    — the `mood` text as its own comma phrase (e.g. `gothic and brooding atmosphere,`);
@@ -226,14 +234,15 @@ don't force).
 
 These reproduce the traditional look out of the box: Court cards carry the full
 pattern including its Figure detail and Face Style sections; plain Pip cards show only
-background + technique + finish (no border, no extra accents, no figure); Aces
+background + technique/finish (no border, no extra accents, no figure); Aces
 keep their ornamental flourish and border but no figure. Highlights is off everywhere
 by default. `mood` and `theme` are both empty by default, so `[MOOD_LINE]` and the
 theme-derived ornaments/highlights produce nothing unless set. Technique is on
-everywhere by default — every card keeps the pattern's linework/medium rendering;
-turn it off per group only to drop that styling entirely (e.g. an unstyled pip face).
-Court layers are configurable via `--config` (see `references/CONFIG.md`) but default
-to fully on (except highlights), matching prior behavior.
+everywhere by default — every card keeps the pattern's linework/medium rendering AND
+its Finish lines (the two share one gate); turn it off per group to drop both
+entirely (e.g. an unstyled pip face with no medium or print-quality descriptor at
+all). Court layers are configurable via `--config` (see `references/CONFIG.md`) but
+default to fully on (except highlights), matching prior behavior.
 
 When generating multiple cards for the same deck, reuse the exact same resolved
 `[STYLE_BLOCK]` and `[FRAME_LINE]` for every card of the same group so the set stays

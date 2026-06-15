@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.17.0
+  version: 3.18.0
   description_claudeai: Interactive wizard to build image-gen prompts for stylized playing cards. 4 deck patterns, 6 lettering systems, 3+ styles, court/pip/ace. Trigger on card design requests.
 ---
 
@@ -306,11 +306,13 @@ layers.figure.<group> "<text>"` (see "Figure, face style & proportion" in
 
 The chosen pattern's "Technique" lines (its linework/rendering medium — see "Layers
 and `[STYLE_BLOCK]` assembly" in `references/REFERENCE.md`) apply to every group by
-default, independently of whether that group has a figure. Dropping the pattern's
-illustration technique for one group only (e.g. an unstyled plain pip face) or adding
-a group-specific rendering note is config-only — set via `python3
-scripts/manage_config.py set layers.technique.<group> false` (or `"<text>"` for an
-addition).
+default, independently of whether that group has a figure. The pattern's "Finish"
+lines (print-quality/final-rendering descriptor) share this same gate, so dropping
+Technique drops Finish too. Dropping the pattern's illustration technique (and finish)
+for one group only (e.g. an unstyled plain pip face) or adding a group-specific
+rendering note is config-only — set via `python3 scripts/manage_config.py set
+layers.technique.<group> false` (or `"<text>"` for a Technique addition; Finish has no
+separate addition slot).
 
 ---
 

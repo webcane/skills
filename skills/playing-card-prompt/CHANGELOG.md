@@ -4,6 +4,25 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
+## [Unreleased]
+
+### Changed
+- **`[STYLE_BLOCK]` "Finish" lines now share `layers.technique.<group>`'s gate**
+  instead of always being included. Technique and Finish both describe *how* the card
+  is rendered (medium/linework vs. print-quality descriptor), so turning
+  `layers.technique.<group>` off for a group now drops both together (e.g. a fully
+  unstyled plain pip face has no medium or print-quality descriptor at all). Updated
+  `references/REFERENCE.md` (step 7 of `[STYLE_BLOCK]` resolution, the Technique
+  bullet, the "Each `assets/pattern/<style>.md` provides..." paragraph, and the
+  Defaults table notes), `references/STYLE-COMPONENTS.md` (renamed "Technique vs.
+  function" to "Technique & Finish vs. Decor/Ornaments/Highlights" and regrouped
+  Finish with Technique), `assets/pattern/_adding-a-pattern.md` ("Technique & Finish
+  vs. content layers" section and the "Finish" section's gating note),
+  `references/POST-VALIDATION.md` (Style block integrity check),
+  `references/WIZARD-STEP-MAP.md` (Step 5 row and the technique bullet), `SKILL.md`
+  Step 6, and `references/example-pip-two.md`'s "Technique off" variant (Finish lines
+  now also dropped).
+
 ## [3.17.0] - 2026-06-15
 
 ### Added

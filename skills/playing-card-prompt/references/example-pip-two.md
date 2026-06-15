@@ -17,9 +17,10 @@ Compared to the Austrian `[STYLE_BLOCK]` used on COURT cards:
 - **Technique** keeps its linework/illustration lines (`layers.technique.pip` is on
   by default); **Figure detail** (`warm ochre skin tones,`) and **Face Style** are
   dropped — there's no portrait.
-- **Finish** stays, followed by the plain fallback line
-  `plain card face, no additional ornament beyond the pip symbols,` (appended because
-  both `layers.decor.pip` and `layers.ornaments.pip` are false).
+- **Finish** stays (shares `layers.technique.pip`'s gate, which is on), followed by
+  the plain fallback line `plain card face, no additional ornament beyond the pip
+  symbols,` (appended because both `layers.decor.pip` and `layers.ornaments.pip` are
+  false).
 - `[FRAME_LINE]` (`layers.frame.pip = false`) is omitted entirely.
 - There is no center dividing line — that's COURT-only (reversible two-headed layout).
 
@@ -75,17 +76,15 @@ no watermark
 ## Technique off — `layers.technique.pip = false` (on top of the Default/plain case)
 
 Same plain pip as the Default case, but with the pattern's "Technique" section turned
-off for `pip`. Drops the engraving/illustration descriptor lines entirely — **Finish**
-still applies (it's never gated), and the "plain card face..." fallback still appends
-since decor/ornaments/highlights remain off.
+off for `pip`. Drops both the engraving/illustration descriptor lines AND the Finish
+lines entirely — **Technique and Finish share one gate**, so an unstyled plain pip
+has no medium or print-quality descriptor at all. The "plain card face..." fallback
+still appends since decor/ornaments/highlights remain off.
 
 ```
 9:14 aspect ratio, full card visible, transparent background outside the card,
 Two of Spades playing card,
 aged ivory playing-card stock, subtle paper grain,
-matte finish,
-slight vintage printing imperfections,
-highly detailed Austrian-style playing card,
 plain card face, no additional ornament beyond the pip symbols,
 four corner indices, each with rank 2 stacked above suit symbol ♠, standard small index size, upper indices upright, lower indices rotated 180 degrees,
 2 black spade pip symbols arranged in the traditional symmetrical layout for the Two, upper-half pips upright, lower-half pips rotated 180 degrees,

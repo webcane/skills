@@ -21,7 +21,9 @@ unless the failure stems from missing/ambiguous information only they can resolv
   not `"false"` (with each layer's addition — its cell's text, if not
   `"true"`/`"false"` — appended when the layer is on), then — only if
   `layers.figure.<group>` is on — the pattern's Figure detail lines (skipped if that
-  section is `(none)`) and its Face Style line, then finish lines, then
+  section is `(none)`) and its Face Style line, then the pattern's Finish lines (only
+  if `layers.technique.<group>` is on — same gate as the Technique lines; dropped
+  together with Technique if that layer is off), then
   `[MOOD_LINE]`/`layers.mood.<group>`'s addition if applicable, and the `plain card
   face, no additional ornament beyond the pip symbols,` fallback is present for PIP
   when decor, ornaments, and highlights are all off. Nothing from an enabled layer is

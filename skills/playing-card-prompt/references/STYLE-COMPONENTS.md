@@ -27,24 +27,26 @@ the front-facing cards covered here.
 | 14 | Decoration / ornamentation | Covered | `layers.ornaments.<group>` / `layers.highlights.<group>` / `layers.frame.<group>` (also `background`/`decor`) — each cell both toggles the layer and, as custom text, supplies that group's addition — with theme-derived fallback for ornaments/highlights/frame; `frame` selects the border preset from `assets/frame/` |
 | 15 | Deck-wide theme / symbolism | Covered | `theme` (deck-wide free text) → theme-derived ornaments/highlights; also informs Step 10 character concept suggestions for cards with a figure |
 
-## Technique vs. function
+## Technique vs. Functions
 
-Within `assets/pattern/<style>.md`, "Technique" (#1/#6 above) and the functional
-layers (Decor, Ornaments, Highlights, Finish — #14) answer different questions and
-are gated independently via their own `layers.<layer>.<group>` cells:
+Within `assets/pattern/<style>.md`, "Technique"/"Finish" (#1/#6 above) and the
+content layers (Decor, Ornaments, Highlights — #14) answer different questions:
 
-- **Technique** — *how* the center motif is drawn: linework, tonal/area-fill
-  rendering, painterly treatment, collage, and so on. Applies to whatever sits in the
-  center (portrait, pip layout, or suit symbol alike), regardless of whether that
-  center motif is a figure (`layers.figure.<group>`).
-- **Decor / Ornaments / Highlights / Finish** — *what* is added and *where*: extra
-  background pattern, vignettes/flourishes, shine/gilding accents, and final
-  print-quality descriptors. These don't describe a drawing medium — they describe
-  content placed on the card.
+- **Technique & Finish** — *how* the card is rendered, sharing a single gate
+  (`layers.technique.<group>`): Technique is the medium/linework applied to whatever
+  sits in the center (portrait, pip layout, or suit symbol alike), regardless of
+  whether that center motif is a figure (`layers.figure.<group>`); Finish is the
+  print-quality/final-rendering descriptor for the whole card. Turning
+  `layers.technique.<group>` off drops both together (e.g. an unstyled pip face with
+  no medium or print-quality descriptor at all).
+- **Decor / Ornaments / Highlights** — *what* is added and *where*: extra background
+  pattern, vignettes/flourishes, shine/gilding accents — content placed on the card,
+  each gated by its own `layers.<layer>.<group>` cell.
 
 When adding or editing a pattern (`assets/pattern/_adding-a-pattern.md`), keep
-Technique-flavored phrasing (medium/linework/rendering) out of Decor/Ornaments/
-Highlights/Finish and vice versa — each section should answer only its own question.
+Technique/Finish-flavored phrasing (medium/linework/rendering/print-quality) out of
+Decor/Ornaments/Highlights and vice versa — each section should answer only its own
+question.
 
 ## Open gaps
 
