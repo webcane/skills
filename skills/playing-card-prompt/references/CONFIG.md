@@ -58,9 +58,9 @@ new profile is a self-contained copy a user can then tweak independently.
 
 Dotted keys address nested groups: `index.size`, `index.count`, `index.layout`, and the
 two-level `layers.<layer>.<group>` (e.g. `layers.frame.pip`, `layers.highlights.ace`,
-`layers.figure.pip`, `layers.mood.court`), where `<layer>` is one of `background`,
-`decor`, `ornaments`, `highlights`, `frame`, `figure`, `mood`. `mood`, `theme`, and
-`frame` are flat fields (no `<group>`).
+`layers.figure.pip`, `layers.mood.court`, `layers.technique.pip`), where `<layer>` is
+one of `background`, `decor`, `ornaments`, `highlights`, `frame`, `figure`, `mood`,
+`technique`. `mood`, `theme`, and `frame` are flat fields (no `<group>`).
 
 ## Lookup order
 
@@ -96,7 +96,8 @@ profile holds the fields below:
         "highlights": {"court": "false", "pip": "false", "ace": "false"},
         "frame":      {"court": "true",  "pip": "false", "ace": "true"},
         "figure":     {"court": "true",  "pip": "false", "ace": "false"},
-        "mood":       {"court": "true",  "pip": "true",  "ace": "true"}
+        "mood":       {"court": "true",  "pip": "true",  "ace": "true"},
+        "technique":  {"court": "true",  "pip": "true",  "ace": "true"}
       },
       "mood": "",
       "theme": "",
@@ -139,6 +140,7 @@ Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
 | `layers.frame.<group>`      | `true`, `false`, or custom text (addition)                    | court/ace `true`, pip `false` |
 | `layers.figure.<group>`     | `true`, `false`, or custom text (group-wide figure trait, layered on top of the pattern's Face Style) | court `true`, pip/ace `false` |
 | `layers.mood.<group>`       | `true`, `false`, or custom text (per-group mood addition, on top of deck-wide `mood`) | all `true` |
+| `layers.technique.<group>`  | `true`, `false`, or custom text (addition)                    | all `true`         |
 | `mood`                      | free text (deck-wide atmosphere, e.g. `gothic and brooding atmosphere,`); see `assets/mood/` for presets | `""` |
 | `theme`                     | free text (deck-wide concept/symbolism, e.g. `celestial mythology`) | `""` |
 | `figure_proportion`         | `bust`, `waist-up`, `three-quarter`, `seven-eighths`, `full-body` (or any custom framing/crop description); see `assets/figure-proportion/` for presets | `""` |
@@ -149,15 +151,17 @@ Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
 placement, aspect-ratio syntax, extra parameters) — see `assets/engines/`.
 
 `layers.*` controls which layers (background, decor, ornaments, highlights, frame,
-figure, mood) contribute to `[STYLE_BLOCK]` / `[FRAME_LINE]` / `[MOOD_LINE]` for each
-card group — see "Layers and `[STYLE_BLOCK]` assembly" in `references/REFERENCE.md`.
+figure, mood, technique) contribute to `[STYLE_BLOCK]` / `[FRAME_LINE]` / `[MOOD_LINE]`
+for each card group — see "Layers and `[STYLE_BLOCK]` assembly" in
+`references/REFERENCE.md`.
 Each `layers.<layer>.<group>` cell both gates the layer (`"false"` = off, anything
 else = on) and, when it's not `"false"`/`"true"`, supplies that group's free-text
 addition appended after the layer's own pattern/preset text — `layers.background.
 <group>`, `layers.decor.<group>`, `layers.ornaments.<group>`, `layers.highlights.
-<group>`, and `layers.frame.<group>` work this way (ornaments, highlights, and frame
-may also have their addition auto-derived from `theme` if the cell is exactly
-`"true"` — see "Theme-derived ornaments/highlights/frame"); `layers.mood.<group>`'s
+<group>`, `layers.frame.<group>`, and `layers.technique.<group>` work this way
+(ornaments, highlights, and frame may also have their addition auto-derived from
+`theme` if the cell is exactly `"true"` — see "Theme-derived ornaments/highlights/
+frame"); `layers.mood.<group>`'s
 addition is appended after `[MOOD_LINE]` as a per-group addition on top of the
 deck-wide `mood`. `frame` picks the preset from `assets/frame/` whose "Frame line"
 supplies `[FRAME_LINE]` (any custom string is also accepted). `mood` is a deck-wide

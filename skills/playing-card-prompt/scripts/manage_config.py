@@ -28,7 +28,7 @@ Usage:
 
 Keys (within a profile): deck, lettering, style, frame, aspect_ratio, image_generator,
       index.size, index.count, index.layout,
-      layers.<background|decor|ornaments|highlights|frame|figure|mood>.<court|pip|ace>,
+      layers.<background|decor|ornaments|highlights|frame|figure|mood|technique>.<court|pip|ace>,
       mood, theme, figure_proportion
 
 Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
@@ -64,7 +64,7 @@ ASPECT_PRESETS = ["5:7", "9:14", "14:25", "7:12"]
 BOOL_VALUES = ["true", "false"]
 
 GROUPS = ("court", "pip", "ace")
-LAYERS = ("background", "decor", "ornaments", "highlights", "frame", "figure", "mood")
+LAYERS = ("background", "decor", "ornaments", "highlights", "frame", "figure", "mood", "technique")
 
 # Pre-3.6 field names that are migrated into extras.<layer>.<group> (and from there,
 # on a later load, into layers.<layer>.<group> — see _migrate_layers_extras) on load.
@@ -88,6 +88,7 @@ LAYER_DEFAULTS = {
     "frame": {"court": "true", "pip": "false", "ace": "true"},
     "figure": {"court": "true", "pip": "false", "ace": "false"},
     "mood": {"court": "true", "pip": "true", "ace": "true"},
+    "technique": {"court": "true", "pip": "true", "ace": "true"},
 }
 
 DEFAULTS = {

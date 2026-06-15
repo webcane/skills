@@ -11,21 +11,40 @@ the front-facing cards covered here.
 
 | #  | Component | Status | Mechanism |
 |----|-----------|--------|-----------|
-| 1  | Medium / technique | Covered | `style` pattern choice → "Center motif style" + Finish sections of `assets/pattern/<style>.md` |
+| 1  | Medium / technique | Covered | `style` pattern choice → "Technique" + Finish sections of `assets/pattern/<style>.md`, gated by `layers.technique.<group>` |
 | 2  | Color palette | Covered | `style` pattern choice → Background/Decor sections, gated by `layers.background.<group>` / `layers.decor.<group>` |
 | 3  | Era / cultural context | Covered | `style` pattern presets (austrian, french, english, art-nouveau, japanese), each grounded in an era/culture per `assets/pattern/_adding-a-pattern.md` |
 | 4  | Mood / atmosphere | Covered | `mood` (preset from `assets/mood/`, picked or custom in Step 7) → `[MOOD_LINE]`, gated per group by `layers.mood.<group>` (also set in Step 7); a custom-text `layers.mood.<group>` cell adds a config-only per-group addition |
 | 5  | Composition / rhythm | Partial | Figure framing/cropping covered via `figure_proportion` (Step 8, `assets/figure-proportion/`), folded into `[STYLE_BLOCK]` when `layers.figure.<group>` is on. Beyond that, still indirect via `layers.<layer>.<group>` on/off toggles (decor/ornaments/frame density) and `index.layout`; no dedicated "rhythm" control independent of the chosen pattern |
-| 6  | Line character / rendering | Covered | `style` pattern choice → "Center motif style" linework descriptors |
+| 6  | Line character / rendering | Covered | `style` pattern choice → "Technique" linework descriptors, gated by `layers.technique.<group>` |
 | 7  | Degree of stylization | Partial | Fixed by the `style` choice (e.g. chromolithographic vs. ukiyo-e), including each pattern's Figure detail and Face Style sections for figures; no standalone realistic↔abstract dial |
 | 8  | Figure proportions / plasticity | Not covered | No field or template slot addresses body proportions/anatomical exaggeration (distinct from `figure_proportion`, which addresses framing/cropping, see #5); open gap, not prioritized in this round |
 | 9  | Poses / gestures | Covered (court) / Partial (pip, ace) | COURT: traditional attributes (`assets/courts/<rank>.md`) + Step 10 + Step 11, merged into `[RESOLVED_ATTRIBUTES]`. PIP/ACE figures (`layers.figure.<group> = true`) have no templated pose slot |
 | 10 | Costume / accessories | Covered (court) / N/A (pip, ace) | Same merge pipeline as #9, court-only |
 | 11 | Typage / facial expression | Covered | `style` pattern's "Figure detail" and "Face Style" sections, folded into `[STYLE_BLOCK]`, gated by `layers.figure.<group>` |
-| 12 | Pip / suit symbol design | Partial | Symbol/color/shape fixed per `assets/decks/<deck>.md`; pip layout fixed in the PIP template; rendering follows the pattern's Center motif style but there's no field for alternative pip iconography |
+| 12 | Pip / suit symbol design | Partial | Symbol/color/shape fixed per `assets/decks/<deck>.md`; pip layout fixed in the PIP template; rendering follows the pattern's Technique section (when `layers.technique.<group>` is on) but there's no field for alternative pip iconography |
 | 13 | Typography / indices | Covered | `index.*` (`assets/index/options.md`) → `[INDEX_LINE]`; `lettering` system for rank letters |
 | 14 | Decoration / ornamentation | Covered | `layers.ornaments.<group>` / `layers.highlights.<group>` / `layers.frame.<group>` (also `background`/`decor`) — each cell both toggles the layer and, as custom text, supplies that group's addition — with theme-derived fallback for ornaments/highlights/frame; `frame` selects the border preset from `assets/frame/` |
 | 15 | Deck-wide theme / symbolism | Covered | `theme` (deck-wide free text) → theme-derived ornaments/highlights; also informs Step 10 character concept suggestions for cards with a figure |
+
+## Technique vs. function
+
+Within `assets/pattern/<style>.md`, "Technique" (#1/#6 above) and the functional
+layers (Decor, Ornaments, Highlights, Finish — #14) answer different questions and
+are gated independently via their own `layers.<layer>.<group>` cells:
+
+- **Technique** — *how* the center motif is drawn: linework, tonal/area-fill
+  rendering, painterly treatment, collage, and so on. Applies to whatever sits in the
+  center (portrait, pip layout, or suit symbol alike), regardless of whether that
+  center motif is a figure (`layers.figure.<group>`).
+- **Decor / Ornaments / Highlights / Finish** — *what* is added and *where*: extra
+  background pattern, vignettes/flourishes, shine/gilding accents, and final
+  print-quality descriptors. These don't describe a drawing medium — they describe
+  content placed on the card.
+
+When adding or editing a pattern (`assets/pattern/_adding-a-pattern.md`), keep
+Technique-flavored phrasing (medium/linework/rendering) out of Decor/Ornaments/
+Highlights/Finish and vice versa — each section should answer only its own question.
 
 ## Open gaps
 

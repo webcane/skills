@@ -26,7 +26,7 @@ stylized wave, cherry blossom, and cloud-band motifs along the borders,
 fine mica-dust shimmer along key outlines,
 ```
 
-## Center motif style
+## Technique
 ```
 bold confident black outlines, minimal interior shading, flat unmodulated color fields,
 traditional ukiyo-e woodblock print illustration,

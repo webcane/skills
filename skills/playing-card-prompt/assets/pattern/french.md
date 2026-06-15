@@ -21,7 +21,7 @@ bright vermilion red, deep ultramarine blue, mustard yellow and emerald green ac
 ## Highlights / Overlays
 (none)
 
-## Center motif style
+## Technique
 ```
 bold clean black outlines, flat areas of solid color with minimal shading,
 classic French Paris-pattern playing-card illustration,

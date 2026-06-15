@@ -8,8 +8,21 @@ assembly" in `references/REFERENCE.md` for how these sections combine per card t
 
 Ground the pattern in a specific era and/or cultural context (e.g. "Art Nouveau,
 fin-de-siècle Europe", "ukiyo-e, Edo-period Japan", "Art Deco, 1920s") — this should
-shape the color palette, ornament motifs, and "Center motif style" linework
-consistently, not just the Finish line's name.
+shape the color palette, ornament motifs, and "Technique" linework consistently, not
+just the Finish line's name.
+
+## Technique vs. function
+
+These sections answer two different questions, and each is gated independently via
+its own `layers.<layer>.<group>` cell — see "Technique vs. function" in
+`references/STYLE-COMPONENTS.md`:
+
+- **Technique** — *how* the center motif is drawn (medium/linework/rendering).
+- **Background, Decor, Ornaments, Highlights, Finish** — *what* is added to the card
+  and *where* (functional content, not drawing medium).
+
+Don't mix the two: keep medium/linework phrasing out of the functional sections, and
+keep content/placement phrasing out of "Technique".
 
 ## Background
 Base cardstock color/texture for the card (e.g. `aged ivory playing-card stock, subtle
@@ -31,18 +44,20 @@ Gilding, lacquer, glow, or shine phrasing that can sit on top of the figure/pips
 `gold leaf highlights catching the light along raised linework,`). Usually empty —
 `layers.highlights.<group>`'s addition covers most cases via custom text.
 
-## Center motif style
-The rendering style applied to whatever sits in the card's center (the portrait on
-Court cards, the pip layout on number cards, the large suit symbol on Aces): linework,
-illustration descriptor, and so on. These lines apply regardless of whether the center
-motif is a portrait, a pip layout, or a suit symbol — don't fold portrait-only details
-(skin tones, facial rendering) in here; those belong in "Figure detail" below.
+## Technique
+The rendering technique/medium applied to whatever sits in the card's center (the
+portrait on Court cards, the pip layout on number cards, the large suit symbol on
+Aces): linework, tonal/area-fill rendering, painterly treatment, collage, illustration
+descriptor, and so on. These lines apply regardless of whether the center motif is a
+portrait, a pip layout, or a suit symbol — don't fold portrait-only details (skin
+tones, facial rendering) in here; those belong in "Figure detail" below. Gated by
+`layers.technique.<group>` (on for every group by default).
 
 ## Figure detail
 Any additional rendering detail that only makes sense when the card's center motif is
 a portrait — most often skin-tone/complexion treatment (e.g. `warm ochre skin tones,`).
-Write `(none)` if this pattern has nothing extra to add for portraits beyond "Center
-motif style". Don't write any assembly/config logic here (e.g. don't mention
+Write `(none)` if this pattern has nothing extra to add for portraits beyond
+"Technique". Don't write any assembly/config logic here (e.g. don't mention
 `layers.*`) — whether this section is used for a given card is decided elsewhere (see
 "Layers and `[STYLE_BLOCK]` assembly" in `references/REFERENCE.md`), not by the pattern
 file itself.

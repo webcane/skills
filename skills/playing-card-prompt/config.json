@@ -48,6 +48,11 @@
           "court": "true",
           "pip": "true",
           "ace": "true"
+        },
+        "technique": {
+          "court": "true",
+          "pip": "true",
+          "ace": "true"
         }
       },
       "mood": "",

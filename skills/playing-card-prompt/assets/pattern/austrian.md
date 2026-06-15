@@ -21,7 +21,7 @@ rich crimson red, royal cobalt blue, burnished gold accents,
 ## Highlights / Overlays
 (none)
 
-## Center motif style
+## Technique
 ```
 sharp crisp black outlines, fine engraved linework with dense cross-hatching on all illustrated elements and ornamental details,
 vintage chromolithographic playing-card illustration,

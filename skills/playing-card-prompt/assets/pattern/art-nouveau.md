@@ -26,7 +26,7 @@ sinuous whiplash botanical vines and stylized flowers framing the corners,
 delicate gold-leaf outlining along major contours,
 ```
 
-## Center motif style
+## Technique
 ```
 flowing curvilinear outlines, elegant elongated linework,
 Art Nouveau illustration in the style of Mucha-era poster art,

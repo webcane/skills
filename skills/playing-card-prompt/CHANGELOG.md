@@ -6,7 +6,33 @@ All notable changes to this skill. Released per skill as tag
 
 ## [Unreleased]
 
+### Added
+- New `layers.technique.<group>` layer (default `true` for all groups), gating the
+  pattern's "Technique" section (renamed from "Center motif style" — the
+  linework/medium rendering applied to whatever sits in the center: portrait, pip
+  layout, or suit symbol alike). Independent of `layers.figure.<group>`: a card can
+  have Technique on with Figure off (e.g. a plain pip card that still follows the
+  pattern's linework), or Technique off with Figure on. Updated
+  `scripts/manage_config.py` (added `"technique"` to `LAYERS`/`LAYER_DEFAULTS`),
+  `config.json`, and `references/CONFIG.md` (field reference, dotted-key list,
+  addition-cell description).
+
 ### Changed
+- Renamed the "Center motif style" pattern-file section to "Technique" across all
+  five `assets/pattern/*.md` files, `assets/pattern/_adding-a-pattern.md`,
+  `references/REFERENCE.md` (`[STYLE_BLOCK]` resolution — now step 5, grouped with
+  the other gated layers instead of the "always" group — layer-list bullets, "Each
+  `assets/pattern/<style>.md` provides..." paragraph, "Figure, face style &
+  proportion", Defaults table), `references/STYLE-COMPONENTS.md` (#1, #6, #12, plus a
+  new "Technique vs. function" section distinguishing *how* the center motif is drawn
+  from *what*/*where* is added by Decor/Ornaments/Highlights/Finish),
+  `references/WIZARD-STEP-MAP.md`, `references/POST-VALIDATION.md` (Style block
+  integrity, Figure detail line, Face style line checks), the example prompts
+  (including a new "Technique off" variant in `references/example-pip-two.md`
+  showing the engraving/illustration lines dropped from a plain pip while Finish
+  stays), and `SKILL.md`'s file map / Step 5 / Step 6 (documents
+  `layers.technique.<group>` as a config-only per-group toggle/addition alongside
+  `layers.background`/`layers.decor`).
 - Restructured `assets/pattern/<style>.md` so pattern files contain no
   config/assembly logic: the figure-only "skin tones" line that used to be
   duplicated inside "Center motif style" and re-referenced via a

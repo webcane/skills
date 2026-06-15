@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.15.0
+  version: 3.16.0
   description_claudeai: Interactive wizard to build image-gen prompts for stylized playing cards. 4 deck patterns, 6 lettering systems, 3+ styles, court/pip/ace. Trigger on card design requests.
 ---
 
@@ -124,7 +124,7 @@ Folders under `assets/`:
 - `assets/lettering/systems.md` — court-card index letters per region
 - `assets/courts/` — `king.md` / `queen.md` / `jack.md`, auto-loaded by chosen rank
 - `assets/pattern/` — one file per visual style; each holds layer-fragment sections
-  (Background, Decor, Ornaments, Highlights, Center motif style, Figure detail, Face
+  (Background, Decor, Ornaments, Highlights, Technique, Figure detail, Face
   Style, Finish) that assemble into `[STYLE_BLOCK]` per card group (see
   `references/REFERENCE.md`)
 - `assets/mood/` — one file per mood/atmosphere preset, each holding a "Mood line"
@@ -228,7 +228,7 @@ _Skipped if loaded from config._ Always ask this on first run; never skip it. Li
 they can request another style or era/cultural setting (e.g. "Art Deco", "Mexican
 Loteria", "Egyptian").
 Load the chosen `assets/pattern/<style>.md` and note its layer sections (Background,
-Decor, Ornaments, Highlights, Center motif style, Figure detail, Face Style, Finish).
+Decor, Ornaments, Highlights, Technique, Figure detail, Face Style, Finish).
 For a style not on disk,
 improvise these sections following `assets/pattern/_adding-a-pattern.md`, then save
 the improvised text (e.g. note it in the conversation) so later cards in the same deck
@@ -238,8 +238,8 @@ reuse identical wording — every card of the same group should resolve to the S
 ### Step 6 — Card decoration and theme · _persistent_
 
 _Skipped if loaded from config._ Every card is built from layers — background, decor,
-ornaments, highlights, frame, figure, and mood — controlled per card group via
-`layers.<layer>.<group>` (defaults and full resolution rules are in "Layers and
+ornaments, highlights, frame, figure, mood, and technique — controlled per card group
+via `layers.<layer>.<group>` (defaults and full resolution rules are in "Layers and
 `[STYLE_BLOCK]` assembly" in `references/REFERENCE.md`). Ask these here:
 
 1. **Number cards (2–10)** — how should they look:
@@ -303,6 +303,14 @@ config-only — not asked here — set via `python3 scripts/manage_config.py set
 layers.figure.<group> "<text>"` (see "Figure, face style & proportion" in
 `references/REFERENCE.md`). For `pip`/`ace`, this also turns figures on for that group
 (transformation-style deck) — the trait only makes sense if the group has a figure.
+
+The chosen pattern's "Technique" lines (its linework/rendering medium — see "Layers
+and `[STYLE_BLOCK]` assembly" in `references/REFERENCE.md`) apply to every group by
+default, independently of whether that group has a figure. Dropping the pattern's
+illustration technique for one group only (e.g. an unstyled plain pip face) or adding
+a group-specific rendering note is config-only — set via `python3
+scripts/manage_config.py set layers.technique.<group> false` (or `"<text>"` for an
+addition).
 
 ---
 

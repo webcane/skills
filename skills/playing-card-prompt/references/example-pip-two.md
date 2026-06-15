@@ -5,7 +5,7 @@ it as a reference for how `[STYLE_BLOCK]` and `[FRAME_LINE]` resolve for the `pi
 group per "Layers and `[STYLE_BLOCK]` assembly" in `references/REFERENCE.md`, and as a
 sanity check after assembly.
 
-## Default — all `layers.*.pip` false except `background` (plain pip)
+## Default — all `layers.*.pip` false except `background`, `technique`, and `mood` (plain pip)
 
 Compared to the Austrian `[STYLE_BLOCK]` used on COURT cards:
 - **Background** stays (`aged ivory playing-card stock, subtle paper grain,`) — on for
@@ -14,8 +14,9 @@ Compared to the Austrian `[STYLE_BLOCK]` used on COURT cards:
   the suit's own color.
 - **Ornaments** and **Highlights** are off and empty for Austrian anyway, so nothing
   to drop.
-- **Center motif style** keeps its linework/illustration lines; **Figure detail**
-  (`warm ochre skin tones,`) and **Face Style** are dropped — there's no portrait.
+- **Technique** keeps its linework/illustration lines (`layers.technique.pip` is on
+  by default); **Figure detail** (`warm ochre skin tones,`) and **Face Style** are
+  dropped — there's no portrait.
 - **Finish** stays, followed by the plain fallback line
   `plain card face, no additional ornament beyond the pip symbols,` (appended because
   both `layers.decor.pip` and `layers.ornaments.pip` are false).
@@ -48,8 +49,8 @@ Same card, with the wizard's "Decorated" option chosen and
 - **Ornaments** is on: Austrian's Ornaments section is empty, so only
   `layers.ornaments.pip`'s addition contributes, as its own phrase.
 - **Highlights** stays off (not set).
-- **Figure detail** and **Face Style** are dropped as always (no portrait); **Center
-  motif style** and **Finish** stay. No "plain card face..." line in this branch —
+- **Figure detail** and **Face Style** are dropped as always (no portrait);
+  **Technique** and **Finish** stay. No "plain card face..." line in this branch —
   decor and ornaments are both on.
 - `[FRAME_LINE]` is included (`layers.frame.pip = true`).
 
@@ -65,6 +66,27 @@ matte finish,
 slight vintage printing imperfections,
 highly detailed Austrian-style playing card,
 thin single black border around the card perimeter, plus a separate thin black border individually framing each of the four corner index areas,
+four corner indices, each with rank 2 stacked above suit symbol ♠, standard small index size, upper indices upright, lower indices rotated 180 degrees,
+2 black spade pip symbols arranged in the traditional symmetrical layout for the Two, upper-half pips upright, lower-half pips rotated 180 degrees,
+black spade suit symbols,
+no watermark
+```
+
+## Technique off — `layers.technique.pip = false` (on top of the Default/plain case)
+
+Same plain pip as the Default case, but with the pattern's "Technique" section turned
+off for `pip`. Drops the engraving/illustration descriptor lines entirely — **Finish**
+still applies (it's never gated), and the "plain card face..." fallback still appends
+since decor/ornaments/highlights remain off.
+
+```
+9:14 aspect ratio, full card visible, transparent background outside the card,
+Two of Spades playing card,
+aged ivory playing-card stock, subtle paper grain,
+matte finish,
+slight vintage printing imperfections,
+highly detailed Austrian-style playing card,
+plain card face, no additional ornament beyond the pip symbols,
 four corner indices, each with rank 2 stacked above suit symbol ♠, standard small index size, upper indices upright, lower indices rotated 180 degrees,
 2 black spade pip symbols arranged in the traditional symmetrical layout for the Two, upper-half pips upright, lower-half pips rotated 180 degrees,
 black spade suit symbols,

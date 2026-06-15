@@ -21,7 +21,7 @@ classic red, blue, and yellow with restrained gold detailing,
 ## Highlights / Overlays
 (none)
 
-## Center motif style
+## Technique
 ```
 clean precise black outlines, light controlled cross-hatching for shading,
 classic Anglo-American standard playing-card illustration,

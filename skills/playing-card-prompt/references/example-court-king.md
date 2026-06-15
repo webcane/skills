@@ -16,7 +16,7 @@ Note how the attributes are resolved into ONE list with no contradictions or lab
   `no watermark` — nothing is repeated or labeled "exclusions".
 
 `[STYLE_BLOCK]` for the `court` group with all default layers on (background, decor,
-ornaments — empty for Austrian, highlights — off by default, center motif style, then
+ornaments — empty for Austrian, highlights — off by default, technique, then
 the pattern's Figure detail and Face Style lines since `layers.figure.court` is on,
 finish):
 
