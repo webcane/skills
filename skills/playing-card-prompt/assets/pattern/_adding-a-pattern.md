@@ -47,11 +47,25 @@ Gilding, lacquer, glow, or shine phrasing that can sit on top of the figure/pips
 ## Technique
 The rendering technique/medium applied to whatever sits in the card's center (the
 portrait on Court cards, the pip layout on number cards, the large suit symbol on
-Aces): linework, tonal/area-fill rendering, painterly treatment, collage, illustration
-descriptor, and so on. These lines apply regardless of whether the center motif is a
-portrait, a pip layout, or a suit symbol — don't fold portrait-only details (skin
-tones, facial rendering) in here; those belong in "Figure detail" below. Gated by
+Aces). These lines apply regardless of whether the center motif is a portrait, a pip
+layout, or a suit symbol — don't fold portrait-only details (skin tones, facial
+rendering) in here; those belong in "Figure detail" below. Gated by
 `layers.technique.<group>` (on for every group by default).
+
+Some example mediums to ground this in (pick and combine whatever fits the pattern's
+era/culture — this isn't an exhaustive list):
+- **Linework** — outline, hatching, cross-hatching, engraving (e.g. `fine engraved
+  linework with dense cross-hatching on all illustrated elements,`).
+- **Tonal / area-fill** — flat color shapes, block printing, silhouette work (e.g.
+  `bold flat-color block-printed shapes with minimal outlines,`).
+- **Painterly** — visible brushwork, watercolor washes, gouache (e.g. `soft watercolor
+  washes with loose painterly brushwork,`).
+- **Textures** — paper grain, woodblock texture, fabric weave showing through the
+  illustration (e.g. `visible woodblock-grain texture throughout the illustration,`).
+- **Gradients** — smooth tonal transitions, airbrush-style shading (e.g. `smooth
+  airbrushed gradients shading the illustrated forms,`).
+- **Collage** — cut-paper, mixed-media, layered composition (e.g. `cut-paper collage
+  composition with layered geometric shapes,`).
 
 ## Figure detail
 Any additional rendering detail that only makes sense when the card's center motif is

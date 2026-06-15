@@ -17,6 +17,11 @@ All notable changes to this skill. Released per skill as tag
   `config.json`, and `references/CONFIG.md` (field reference, dotted-key list,
   addition-cell description).
 
+### Added
+- `assets/pattern/_adding-a-pattern.md` "Technique" section now lists example
+  mediums (linework, tonal/area-fill, painterly, textures, gradients, collage) with
+  short sample phrases, to give pattern authors more vocabulary beyond "and so on".
+
 ### Changed
 - Renamed the "Center motif style" pattern-file section to "Technique" across all
   five `assets/pattern/*.md` files, `assets/pattern/_adding-a-pattern.md`,
