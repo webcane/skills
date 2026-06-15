@@ -59,6 +59,17 @@ bash scripts/install-skill.sh <skill-name> [version] [install-dir]
 # e.g.: INSTALL_DIR=~/.claude/skills bash scripts/install-skill.sh content-writer-linkedin
 ```
 
+**Release a skill (tag, push, GitHub release):**
+```bash
+bash scripts/release-skill.sh [skill-name]
+# e.g.: bash scripts/release-skill.sh playing-card-prompt
+```
+If `[skill-name]` is omitted, prompts to choose from `skills/`. Reads the
+version from `SKILL.md` frontmatter (`metadata.version`), creates and pushes
+the tag `<skill-name>/v<version>`, and runs `gh release create` non-
+interactively (release notes come from the skill's `[Unreleased]`
+CHANGELOG section, or a title-only message if that section is empty).
+
 **Inspect a `.skill` archive:**
 ```bash
 tar -tzf dist/<skill-name>.skill   # list contents
@@ -83,8 +94,7 @@ color: cyan
 1. Edit `skills/<skill-name>/SKILL.md` and bump `metadata.version` in its frontmatter.
 2. Add the change to `skills/<skill-name>/CHANGELOG.md` under `## [Unreleased]`.
 3. (Optional local check) `bash scripts/package-skill.sh <skill-name>` — version is read from frontmatter.
-4. Tag and push: `git tag -a <skill-name>/v<version> -m "<skill-name> v<version>"` then `git push origin <skill-name>/v<version>`.
-5. `gh release create <skill-name>/v<version> --title "<skill-name> v<version>"`.
+4. `bash scripts/release-skill.sh [skill-name]` — tags, pushes, and creates the GitHub release (non-interactively). If `[skill-name]` is omitted, it prompts to choose from `skills/`.
 
 On a published release CI parses the `<skill>/v<version>` tag, packages and
 uploads **only that skill**, and promotes that skill's `[Unreleased]` CHANGELOG

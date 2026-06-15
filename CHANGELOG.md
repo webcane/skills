@@ -7,6 +7,7 @@ and each skill is versioned and released independently.
 ## [Unreleased]
 
 ### Added
+- `scripts/release-skill.sh`: tags, pushes, and creates a GitHub release for a skill, with an interactive picker when no skill name is given. Reads the version from `SKILL.md` frontmatter (`metadata.version`), tags `<skill-name>/v<version>`, and runs `gh release create` non-interactively using the skill's `[Unreleased]` CHANGELOG section as release notes (falling back to a title-only message)
 - `scripts/install-local.sh`: build a skill from source and install/reinstall it into a local Claude skills directory, with an interactive picker when no skill name is given
 - Documented local build/install/reinstall workflow in `README.md`
 - `scripts/package-skill-claudeai.sh` (with helper `scripts/build_claudeai_skill_md.py`): packages a skill for Claude.ai's skill upload, which has different requirements than the `.skill` (tar.gz) format — lowercase `skill.md` instead of `SKILL.md`, a `description` <= 200 chars instead of 1024, and a zip with the skill files nested in a `<skill-name>/` folder instead of at the zip root. Outputs `dist/<skill-name>-claudeai.zip` and a versioned copy. Honors an optional `metadata.description_claudeai` frontmatter field for a purpose-written short description; otherwise truncates `description` to fit with a warning
