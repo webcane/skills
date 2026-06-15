@@ -4,7 +4,7 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
-## [Unreleased]
+## [3.17.0] - 2026-06-15
 
 ### Added
 - New `layers.technique.<group>` layer (default `true` for all groups), gating the
