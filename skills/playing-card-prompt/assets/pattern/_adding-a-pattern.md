@@ -23,13 +23,13 @@ empty (just `(none)`) if the style has nothing here.
 
 ## Ornaments
 Vignettes, corner flourishes, or decorative elements that are NOT the frame/border
-itself. Often empty for a first draft — `extras.ornaments.<group>` (free text from the
-wizard or config) is appended after whatever's here.
+itself. Often empty for a first draft — `layers.ornaments.<group>`'s addition (custom
+text from the wizard or config) is appended after whatever's here.
 
 ## Highlights / Overlays
 Gilding, lacquer, glow, or shine phrasing that can sit on top of the figure/pips (e.g.
 `gold leaf highlights catching the light along raised linework,`). Usually empty —
-`extras.highlights.<group>` covers most cases via free text.
+`layers.highlights.<group>`'s addition covers most cases via custom text.
 
 ## Center motif style
 The rendering style applied to whatever sits in the card's center (the portrait on

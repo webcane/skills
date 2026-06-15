@@ -14,7 +14,7 @@ the front-facing cards covered here.
 | 1  | Medium / technique | Covered | `style` pattern choice → "Center motif style" + Finish sections of `assets/pattern/<style>.md` |
 | 2  | Color palette | Covered | `style` pattern choice → Background/Decor sections, gated by `layers.background.<group>` / `layers.decor.<group>` |
 | 3  | Era / cultural context | Covered | `style` pattern presets (austrian, french, english, art-nouveau, japanese), each grounded in an era/culture per `assets/pattern/_adding-a-pattern.md` |
-| 4  | Mood / atmosphere | Covered | `mood` (preset from `assets/mood/`, picked or custom in Step 7) → `[MOOD_LINE]`, gated per group by `layers.mood.<group>` (also set in Step 7); `extras.mood.<group>` adds a config-only per-group addition |
+| 4  | Mood / atmosphere | Covered | `mood` (preset from `assets/mood/`, picked or custom in Step 7) → `[MOOD_LINE]`, gated per group by `layers.mood.<group>` (also set in Step 7); a custom-text `layers.mood.<group>` cell adds a config-only per-group addition |
 | 5  | Composition / rhythm | Partial | Figure framing/cropping covered via `figure_proportion` (Step 8, `assets/figure-proportion/`), folded into `[STYLE_BLOCK]` when `layers.figure.<group>` is on. Beyond that, still indirect via `layers.<layer>.<group>` on/off toggles (decor/ornaments/frame density) and `index.layout`; no dedicated "rhythm" control independent of the chosen pattern |
 | 6  | Line character / rendering | Covered | `style` pattern choice → "Center motif style" linework descriptors |
 | 7  | Degree of stylization | Partial | Fixed by the `style` choice (e.g. chromolithographic vs. ukiyo-e), including each pattern's Face Style line for figures; no standalone realistic↔abstract dial |
@@ -24,7 +24,7 @@ the front-facing cards covered here.
 | 11 | Typage / facial expression | Covered | `style` pattern's "Face Style" section, folded into `[STYLE_BLOCK]`, gated by `layers.figure.<group>` |
 | 12 | Pip / suit symbol design | Partial | Symbol/color/shape fixed per `assets/decks/<deck>.md`; pip layout fixed in the PIP template; rendering follows the pattern's Center motif style but there's no field for alternative pip iconography |
 | 13 | Typography / indices | Covered | `index.*` (`assets/index/options.md`) → `[INDEX_LINE]`; `lettering` system for rank letters |
-| 14 | Decoration / ornamentation | Covered | `layers.ornaments.<group>` / `layers.highlights.<group>` / `layers.frame.<group>` (also `background`/`decor`) + `extras.<layer>.<group>` for each, with theme-derived fallback for ornaments/highlights/frame; `frame` selects the border preset from `assets/frame/` |
+| 14 | Decoration / ornamentation | Covered | `layers.ornaments.<group>` / `layers.highlights.<group>` / `layers.frame.<group>` (also `background`/`decor`) — each cell both toggles the layer and, as custom text, supplies that group's addition — with theme-derived fallback for ornaments/highlights/frame; `frame` selects the border preset from `assets/frame/` |
 | 15 | Deck-wide theme / symbolism | Covered | `theme` (deck-wide free text) → theme-derived ornaments/highlights; also informs Step 10 character concept suggestions for cards with a figure |
 
 ## Open gaps

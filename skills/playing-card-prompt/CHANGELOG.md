@@ -6,6 +6,22 @@ All notable changes to this skill. Released per skill as tag
 
 ## [3.7.1] - 2026-06-13
 
+### Changed
+- Merged the `extras.<layer>.<group>` namespace into `layers.<layer>.<group>`:
+  each cell is now a free-text string with three meanings — `"false"` (layer
+  off for this group), `"true"` (layer on, no group-wide addition), or any
+  other text (layer on, and that text is appended as the group's addition on
+  top of the layer's own pattern/preset text). The `extras` namespace is
+  dropped entirely; theme-derived fallback for ornaments/highlights/frame now
+  triggers when the cell is exactly `"true"`. Updated `scripts/manage_config.py`
+  (removed `EXTRA_LAYERS`, added `_migrate_layers_extras` to fold pre-3.13
+  `extras.*` into `layers.*` on load), `config.json`, `references/CONFIG.md`,
+  `references/REFERENCE.md`, `references/POST-VALIDATION.md`,
+  `references/STYLE-COMPONENTS.md`, `references/WIZARD-STEP-MAP.md`,
+  `references/example-pip-two.md`, `assets/frame/_adding-a-frame.md`,
+  `assets/pattern/_adding-a-pattern.md`, and `SKILL.md` (Steps 6-8 and
+  "Assembling the prompt").
+
 ### Added
 - New `extras.figure.<group>` config field — a group-wide figure trait (e.g. "all
   court figures shown with a slight hunch") layered on top of the chosen pattern's

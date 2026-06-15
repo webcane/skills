@@ -29,13 +29,17 @@ Usage:
 Keys (within a profile): deck, lettering, style, frame, aspect_ratio, image_generator,
       index.size, index.count, index.layout,
       layers.<background|decor|ornaments|highlights|frame|figure|mood>.<court|pip|ace>,
-      extras.<background|decor|ornaments|highlights|frame|figure|mood>.<court|pip|ace>,
       mood, theme, figure_proportion
 
+Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
+"false" (layer off), "true" (layer on, no addition), or any other text (layer on,
+used as that group's addition on top of the layer's own pattern/preset text).
+
 A pre-3.6 config.json may still have the old per-layer `ornaments_extra.<group>`,
-`highlights_extra.<group>`, and `frame_extra.<group>` fields — these are migrated
-automatically into `extras.ornaments.<group>`, `extras.highlights.<group>`, and
-`extras.frame.<group>` the first time the file is loaded.
+`highlights_extra.<group>`, and `frame_extra.<group>` fields, and a pre-3.13
+config.json may still have a separate `extras.<layer>.<group>` namespace — both are
+migrated automatically into the merged `layers.<layer>.<group>` cells the first time
+the file is loaded.
 """
 from __future__ import annotations
 
@@ -62,13 +66,8 @@ BOOL_VALUES = ["true", "false"]
 GROUPS = ("court", "pip", "ace")
 LAYERS = ("background", "decor", "ornaments", "highlights", "frame", "figure", "mood")
 
-# Layers that can carry a per-group free-text "extras" addition. `extras.figure.<group>`
-# is a group-wide figure trait (e.g. "all court figures shown with a slight hunch"),
-# layered on top of the pattern's Face Style; it only applies if `layers.figure.<group>`
-# is true.
-EXTRA_LAYERS = ("background", "decor", "ornaments", "highlights", "frame", "figure", "mood")
-
-# Pre-3.6 field names that are migrated into extras.<layer>.<group> on load.
+# Pre-3.6 field names that are migrated into extras.<layer>.<group> (and from there,
+# on a later load, into layers.<layer>.<group> — see _migrate_layers_extras) on load.
 LEGACY_EXTRA_KEYS = {
     "ornaments_extra": "ornaments",
     "highlights_extra": "highlights",
@@ -100,7 +99,6 @@ DEFAULTS = {
     "image_generator": "nanobanana",
     "index": {"size": "standard", "count": "4-index", "layout": "stacked"},
     "layers": {layer: dict(groups) for layer, groups in LAYER_DEFAULTS.items()},
-    "extras": {layer: {g: "" for g in GROUPS} for layer in EXTRA_LAYERS},
     "mood": "",
     "theme": "",
     "figure_proportion": "",
@@ -119,7 +117,6 @@ PERSISTENT_KEYS = {"deck", "lettering", "style", "frame", "aspect_ratio", "image
                    "index.size", "index.count", "index.layout", "mood", "theme",
                    "figure_proportion"}
 PERSISTENT_KEYS |= {f"layers.{layer}.{g}" for layer in LAYERS for g in GROUPS}
-PERSISTENT_KEYS |= {f"extras.{layer}.{g}" for layer in EXTRA_LAYERS for g in GROUPS}
 
 
 def _discover(subdir: str) -> list[str]:
@@ -174,12 +171,9 @@ def options_for(key: str):
     if key.startswith("layers.") and key.count(".") == 2:
         _, layer, group = key.split(".")
         if layer in LAYERS and group in GROUPS:
-            return (BOOL_VALUES, True)
-        return None
-    if key.startswith("extras.") and key.count(".") == 2:
-        _, layer, group = key.split(".")
-        if layer in EXTRA_LAYERS and group in GROUPS:
-            return (None, False)  # free text
+            # "true"/"false" toggle the layer; any other text both enables it
+            # and becomes its group-wide addition (see validate_value).
+            return (BOOL_VALUES, False)
         return None
     return None
 
@@ -201,6 +195,9 @@ def validate_value(key: str, value: str) -> tuple[bool, str]:
         return True, ""
     if strict:
         return False, f"{key} must be one of: {', '.join(allowed)}"
+    if key.startswith("layers."):
+        return True, (f"note: '{value}' enables this layer (if it wasn't already) "
+                       f"and is used as its group-wide addition")
     return True, f"note: '{value}' is a custom {key} (not in {', '.join(allowed)})"
 
 
@@ -235,8 +232,36 @@ def _migrate_extras(profile: dict) -> bool:
     return migrated
 
 
+def _migrate_layers_extras(profile: dict) -> bool:
+    """Fold a pre-3.13 `extras.<layer>.<group>` namespace into `layers.<layer>.<group>`.
+
+    `layers.<layer>.<group>` becomes a free-text cell: "false" (layer off), "true"
+    (layer on, no addition), or any other text (layer on, used as its group-wide
+    addition). A layer that was "false" drops its extras text (it was never applied,
+    so dropping it preserves the old resolved output); a layer that was "true" (or
+    unset, defaulting to "true") becomes its extras text if that text is non-empty.
+
+    Returns True if an `extras` namespace was found and removed.
+    """
+    extras = profile.pop("extras", None)
+    if not isinstance(extras, dict):
+        return False
+    layers = profile.setdefault("layers", {})
+    for layer, groups in extras.items():
+        if not isinstance(groups, dict):
+            continue
+        for group, extra in groups.items():
+            if not extra:
+                continue
+            current = layers.get(layer, {}).get(group, LAYER_DEFAULTS.get(layer, {}).get(group, "true"))
+            if current != "false":
+                layers.setdefault(layer, {})[group] = extra
+    return True
+
+
 def load_raw() -> dict:
-    """Load config.json, migrating a pre-3.0 flat file and pre-3.6 *_extra fields."""
+    """Load config.json, migrating a pre-3.0 flat file, pre-3.6 *_extra fields, and a
+    pre-3.13 extras.<layer>.<group> namespace."""
     if not CONFIG_PATH.exists():
         return json.loads(json.dumps(BUILTIN_CONFIG))
     try:
@@ -250,9 +275,15 @@ def load_raw() -> dict:
     cfg.setdefault("active_profile", DEFAULT_PROFILE_NAME)
     cfg.setdefault("profiles", {})
     cfg["profiles"].setdefault(DEFAULT_PROFILE_NAME, {})
-    if any([_migrate_extras(prof) for prof in cfg["profiles"].values()]):
-        save_raw(cfg)
+    migrated = False
+    if any(_migrate_extras(prof) for prof in cfg["profiles"].values()):
+        migrated = True
         print("note: migrated ornaments_extra/highlights_extra/frame_extra into extras.*", file=sys.stderr)
+    if any(_migrate_layers_extras(prof) for prof in cfg["profiles"].values()):
+        migrated = True
+        print("note: merged extras.<layer>.<group> into layers.<layer>.<group>", file=sys.stderr)
+    if migrated:
+        save_raw(cfg)
     return cfg
 
 

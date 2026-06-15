@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.12.0
+  version: 3.14.0
   description_claudeai: Interactive wizard to build image-gen prompts for stylized playing cards. 4 deck patterns, 6 lettering systems, 3+ styles, court/pip/ace. Trigger on card design requests.
 ---
 
@@ -42,7 +42,7 @@ the shell's current working directory.
 
 Before asking any wizard questions, load the active profile's persistent settings
 (`deck`, `lettering`, `style`, `frame`, `aspect_ratio`, `image_generator`, `index.*`,
-`layers.*`, `extras.*`, `mood`, `theme`, `figure_proportion`) via
+`layers.*`, `mood`, `theme`, `figure_proportion`) via
 `python3 scripts/manage_config.py show`. This also lists every saved profile and which
 one is active.
 Everything else — schema, profile concept, lookup order, field reference, and the
@@ -241,16 +241,17 @@ ornaments, highlights, frame, figure, and mood — controlled per card group via
 
 1. **Number cards (2–10)** — how should they look:
    - **Plain (default)** — large suit-color pip symbols only: no extra decor, no
-     ornaments, no border. Sets `layers.decor.pip = false`,
-     `layers.ornaments.pip = false`, `layers.frame.pip = false`.
+     ornaments, no border. Sets `layers.decor.pip = "false"`,
+     `layers.ornaments.pip = "false"`, `layers.frame.pip = "false"`.
    - **Decorated** — keeps the style's decor accents and adds ornaments plus a
-     border. Sets `layers.decor.pip = true`, `layers.ornaments.pip = true`,
-     `layers.frame.pip = true`, then ask, free text, what extra ornament to add (e.g.
-     "small corner flourishes", "ornamental pip surrounds") and save it as
-     `extras.ornaments.pip`.
+     border. Sets `layers.decor.pip = "true"`, `layers.frame.pip = "true"`, then ask,
+     free text, what extra ornament to add (e.g. "small corner flourishes",
+     "ornamental pip surrounds"). If given, set `layers.ornaments.pip` to that text
+     (this both turns ornaments on and supplies the addition); if skipped, set
+     `layers.ornaments.pip = "true"`.
 
 2. **Frame / border style (optional, deck-wide)** — ask which border style the framed
-   groups (`layers.frame.<group>` true — court/ace by default, plus pip if Decorated
+   groups (`layers.frame.<group>` on — court/ace by default, plus pip if Decorated
    above) should use. List the `*.md` files in `assets/frame/` (ignore names starting
    with `_`) as options, e.g.:
    - **Boxed Index (default)**
@@ -264,27 +265,29 @@ ornaments, highlights, frame, figure, and mood — controlled per card group via
    comma-terminated phrase. If skipped, leave `frame` at its default
    (`boxed-index`). Per-group additions on top of the chosen frame (e.g. "gold
    foil edging" only on court cards) are config-only, not asked here — set via
-   `python3 scripts/manage_config.py set extras.frame.<group> "<text>"`.
+   `python3 scripts/manage_config.py set layers.frame.<group> "<text>"` (this also
+   turns the frame on for that group if it was off).
 
 3. **Highlights / overlays (optional, all cards)** — ask, free text, whether to add
    any gilding, lacquer, glow, or shine accents (e.g. "gold leaf highlights along the
-   raised linework"). If the user gives a description, save it to
-   `extras.highlights.court`, `extras.highlights.pip`, and `extras.highlights.ace`, and
-   set `layers.highlights.<group> = true` for all three groups. If skipped, leave the
-   highlights layer off everywhere (the default).
+   raised linework"). If the user gives a description, set
+   `layers.highlights.court`, `layers.highlights.pip`, and `layers.highlights.ace` to
+   that text (this both turns the highlights layer on and supplies the addition for
+   all three groups). If skipped, leave the highlights layer off everywhere (the
+   default).
 
    Per-group additions to the background or background pattern/accents (e.g. "faint
    marbling on the court cards only") are likewise config-only, not asked here — set
-   via `python3 scripts/manage_config.py set extras.background.<group> "<text>"` /
-   `extras.decor.<group> "<text>"`.
+   via `python3 scripts/manage_config.py set layers.background.<group> "<text>"` /
+   `layers.decor.<group> "<text>"` (also turns that layer on for that group if off).
 
 4. **Theme / symbolism (optional, deck-wide)** — ask, free text, for an overarching
    concept tying the deck together (e.g. "celestial mythology", "botanical garden",
-   "clockwork/steampunk"). If given, save it as the `theme` setting; empty
-   `extras.ornaments`/`extras.highlights`/`extras.frame` slots then fall back to a
-   theme-derived phrase (see "Theme-derived ornaments/highlights/frame" in
-   `references/REFERENCE.md`) — explicit values always win. If skipped, leave `theme`
-   empty.
+   "clockwork/steampunk"). If given, save it as the `theme` setting; any
+   `layers.ornaments`/`layers.highlights`/`layers.frame` cell left at exactly `"true"`
+   (on, no explicit addition) then falls back to a theme-derived phrase (see
+   "Theme-derived ornaments/highlights/frame" in `references/REFERENCE.md`) — explicit
+   additions always win. If skipped, leave `theme` empty.
 
 Court and Ace keep their other layers on by default (see the Defaults table in
 `references/REFERENCE.md`); tune any layer via `python3 scripts/manage_config.py set
@@ -294,8 +297,9 @@ transformation-style deck where number cards carry small figures).
 A group-wide figure trait shared by every figure in a group (e.g. "all court figures
 shown with a slight hunch"), layered on top of the chosen pattern's Face Style, is
 config-only — not asked here — set via `python3 scripts/manage_config.py set
-extras.figure.<group> "<text>"` (applies only while `layers.figure.<group>` is `true`;
-see "Figure, face style & proportion" in `references/REFERENCE.md`).
+layers.figure.<group> "<text>"` (see "Figure, face style & proportion" in
+`references/REFERENCE.md`). For `pip`/`ace`, this also turns figures on for that group
+(transformation-style deck) — the trait only makes sense if the group has a figure.
 
 ---
 
@@ -332,7 +336,7 @@ deselected ones.
 
 A per-group mood addition on top of the deck-wide `mood` (e.g. extra atmosphere only
 on the court cards) is config-only, not asked here — set via
-`python3 scripts/manage_config.py set extras.mood.<group> "<text>"` (see "Resolving
+`python3 scripts/manage_config.py set layers.mood.<group> "<text>"` (see "Resolving
 `[STYLE_BLOCK]`" step 8 in `references/REFERENCE.md` for how it's appended).
 
 ---
@@ -349,12 +353,12 @@ are per-card.
 
 ### Step 8 — Figure proportion / framing · _persistent_
 
-_Skipped if loaded from config, or if `layers.figure.<group>` is `false` for this
+_Skipped if loaded from config, or if `layers.figure.<group>` is `"false"` for this
 card's group (see the check above)._ Ask how much of the figure should be shown
 across the deck — this becomes `figure_proportion`, folded into `[STYLE_BLOCK]` after
-the chosen pattern's Face Style line and `extras.figure.<group>` (see "Figure, face
-style & proportion" in `references/REFERENCE.md`), for every card whose group has
-`layers.figure.<group>` set to `true`.
+the chosen pattern's Face Style line and `layers.figure.<group>`'s addition (see
+"Figure, face style & proportion" in `references/REFERENCE.md`), for every card whose
+group has `layers.figure.<group>` on.
 
 List the `*.md` files in `assets/figure-proportion/` (ignore names starting with `_`)
 as options. Offer **None** as the default, plus the most common framings as explicit
@@ -375,9 +379,9 @@ description (e.g. "tightly cropped headshot, shoulders only,").
 - If "None" or skipped, leave `figure_proportion` empty — no framing line is added for
   any card.
 
-This is a single deck-wide setting (no per-group `extras.figure_proportion.<group>`) —
-the same resolved framing phrase is reused across every card with a figure so the set
-reads as consistently framed.
+This is a single deck-wide setting (no per-group equivalent) — the same resolved
+framing phrase is reused across every card with a figure so the set reads as
+consistently framed.
 
 ### Step 9 — Character / figure description (REQUIRED for cards with a figure) · _per-card_
 
@@ -482,13 +486,14 @@ Offer to save the choice to `config.json` like the other persistent settings.
    contradiction-free state — do not list "traditional" and "override" side by side).
 4. Resolve `[STYLE_BLOCK]` and `[FRAME_LINE]` for this card's group (court/pip/ace) per
    "Layers and `[STYLE_BLOCK]` assembly" and "Figure, face style & proportion" in
-   `references/REFERENCE.md`, using the `layers.*`, `extras.*`, `frame`, `mood`, and
-   `theme` settings (deriving thematic ornaments/highlights/frame additions per
+   `references/REFERENCE.md`, using the `layers.*`, `frame`, `mood`, and `theme`
+   settings (deriving thematic ornaments/highlights/frame additions per
    "Theme-derived ornaments/highlights/frame" where applicable, and including the
    chosen pattern's Face Style line when `layers.figure.<group>` is on). `[FRAME_LINE]`
    is the chosen `frame` preset's "Frame line" from `assets/frame/<frame>.md` plus
-   `extras.frame.g` if set, included only if `layers.frame.g` is `true`. Splice the
-   result **in full** — never summarize, reorder, or drop a line from an enabled layer.
+   `layers.frame.g`'s addition if its cell is custom text, included only if
+   `layers.frame.g` is on. Splice the result **in full** — never summarize, reorder, or
+   drop a line from an enabled layer.
    When generating multiple cards for the same deck, reuse the exact same resolved
    `[STYLE_BLOCK]`/`[FRAME_LINE]`/derived theme phrases for every card of the same
    group so the set stays visually consistent.

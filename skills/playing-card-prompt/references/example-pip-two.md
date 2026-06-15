@@ -41,12 +41,12 @@ no watermark
 ## Decorated — `layers.decor.pip`, `layers.ornaments.pip`, `layers.frame.pip` all true
 
 Same card, with the wizard's "Decorated" option chosen and
-`extras.ornaments.pip = "small ornamental corner flourishes around each index"`.
+`layers.ornaments.pip = "small ornamental corner flourishes around each index"`.
 
 - **Background** stays, as always.
 - **Decor** is kept (`rich crimson red, royal cobalt blue, burnished gold accents,`).
 - **Ornaments** is on: Austrian's Ornaments section is empty, so only
-  `extras.ornaments.pip` contributes, as its own phrase.
+  `layers.ornaments.pip`'s addition contributes, as its own phrase.
 - **Highlights** stays off (not set).
 - **Center motif style** drops the figure-only line as always; **Finish** stays. No
   "plain card face..." line in this branch — decor and ornaments are both on.

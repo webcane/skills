@@ -19,11 +19,11 @@ files starting with `_`) as a frame option, and uses the "Frame line" text verba
 ```
 
 `[FRAME_LINE]` is its own template slot (not part of `[STYLE_BLOCK]`), included only
-when `layers.frame.<group>` is `true` for the card's group — see "Layers and
-`[STYLE_BLOCK]` assembly" in `references/REFERENCE.md`. If `extras.frame.<group>` is
-set (free text, tunable via `--config`, e.g. `manage_config.py set extras.frame.court
-"gold foil edging,"`), append it as its own comma phrase after the preset's "Frame
-line" text.
+when `layers.frame.<group>` is not `"false"` for the card's group — see "Layers and
+`[STYLE_BLOCK]` assembly" in `references/REFERENCE.md`. If `layers.frame.<group>` is
+set to custom text (tunable via `--config`, e.g. `manage_config.py set
+layers.frame.court "gold foil edging,"` — this also turns the frame on for that group
+if it was off), append it as its own comma phrase after the preset's "Frame line" text.
 Custom frame descriptions typed directly via `--config` (`frame` set to free text not
 matching any preset) follow the same one-line, comma-terminated convention but aren't
 saved as a file.

@@ -23,28 +23,32 @@ toggled off, because they're what makes the card that card:
   per-rank content built directly into the COURT/PIP/ACE templates below.
 
 The rest are **configurable layers**, each controlled per card group (`court` / `pip`
-/ `ace`) via `layers.<layer>.<group>` in `references/CONFIG.md`:
+/ `ace`) via `layers.<layer>.<group>` in `references/CONFIG.md`. Each cell is
+`"false"` (layer off), `"true"` (layer on, no addition), or any other text (layer on,
+that text is this group's addition, appended after the layer's own pattern/preset
+text):
 
-- **Background** — base cardstock color/texture, plus `extras.background.<group>` if
-  set. On for every group by default.
+- **Background** — base cardstock color/texture, plus this group's addition if the
+  cell is custom text. On for every group by default.
 - **Decor** — background pattern / accent colors beyond the suit's own color, plus
-  `extras.decor.<group>` if set.
+  this group's addition if the cell is custom text.
 - **Ornaments** — vignettes, corner flourishes, decorative elements that aren't the
-  frame itself, plus `extras.ornaments.<group>` if set.
+  frame itself, plus this group's addition if the cell is custom text.
 - **Highlights** — gilding, lacquer, glow, shine — accents that can sit over the
-  figure/pips, plus `extras.highlights.<group>` if set.
+  figure/pips, plus this group's addition if the cell is custom text.
 - **Frame** — the border/architectural framing (`[FRAME_LINE]`), its text drawn from
-  the chosen `frame` preset in `assets/frame/`, plus `extras.frame.<group>` if set.
+  the chosen `frame` preset in `assets/frame/`, plus this group's addition if the cell
+  is custom text.
 - **Figure** — whether this group's center motif carries a figure/portrait at all.
   Gates the Center motif style's figure-only line, the pattern's Face Style section,
-  `extras.figure.<group>` if set, and the deck-wide `figure_proportion` if set. On for
-  `court` by default (the portrait); off for `pip`/`ace` (no figure) — turn on for
-  `pip`/`ace` only for transformation-style decks where number/ace cards carry small
-  figures.
+  this group's addition if the cell is custom text, and the deck-wide
+  `figure_proportion` if set. On for `court` by default (the portrait); off for
+  `pip`/`ace` (no figure) — turn on for `pip`/`ace` only for transformation-style
+  decks where number/ace cards carry small figures.
 - **Mood** — whether `[MOOD_LINE]` (the deck's overall atmosphere, from the `mood`
-  setting) and `extras.mood.<group>` (a per-group mood addition) apply to this group.
-  On for every group by default; both are empty (and dropped) unless `mood` and/or
-  `extras.mood.<group>` are set.
+  setting) and this group's addition (a per-group mood addition, when the cell is
+  custom text) apply to this group. On for every group by default; both are empty
+  (and dropped) unless `mood` and/or this group's addition are set.
 
 Each `assets/pattern/<style>.md` provides the text for Background, Decor, Ornaments,
 Highlights, "Center motif style" (the linework/illustration descriptor applied to
@@ -55,56 +59,61 @@ stylization — also gated to portraits only).
 
 ### Resolving `[STYLE_BLOCK]` for a card group
 
-For the group `g` (`court`, `pip`, or `ace`), build `[STYLE_BLOCK]` by concatenating,
-in this order, only the layers where `layers.<layer>.g` is `true`:
+For the group `g` (`court`, `pip`, or `ace`), each `layers.<layer>.g` cell resolves to
+**off** (cell is `"false"`), **on, no addition** (cell is `"true"`), or **on, with
+addition** (cell is any other text — that text is the addition). Build `[STYLE_BLOCK]`
+by concatenating, in this order, only the layers that are on:
 
-1. **Background** — the pattern's Background lines, then `extras.background.g` (free
-   text, own comma phrase) if set.
-2. **Decor** — the pattern's Decor lines, then `extras.decor.g` (free text, own comma
-   phrase) if set.
-3. **Ornaments** — the pattern's Ornaments lines (if any), then `extras.ornaments.g`
-   (free text, own comma phrase) if set — see "Theme-derived ornaments/highlights/frame"
-   below if `extras.ornaments.g` is empty and `theme` is set.
-4. **Highlights** — the pattern's Highlights lines (if any), then `extras.highlights.g`
-   (free text, own comma phrase) if set — same theme fallback as Ornaments.
+1. **Background** — the pattern's Background lines, then `layers.background.g`'s
+   addition (free text, own comma phrase) if the cell is custom text.
+2. **Decor** — the pattern's Decor lines, then `layers.decor.g`'s addition (free
+   text, own comma phrase) if the cell is custom text.
+3. **Ornaments** — the pattern's Ornaments lines (if any), then `layers.ornaments.g`'s
+   addition (free text, own comma phrase) if the cell is custom text — see
+   "Theme-derived ornaments/highlights/frame" below if the cell is exactly `"true"`
+   and `theme` is set.
+4. **Highlights** — the pattern's Highlights lines (if any), then
+   `layers.highlights.g`'s addition (free text, own comma phrase) if the cell is
+   custom text — same theme fallback as Ornaments.
 
 Then, always (these aren't gated by layers — they're part of the structural center
 motif and finish):
 
 5. **Center motif style** — the pattern's lines, including the figure-only line only
-   if `layers.figure.g` is `true` (default: on for `court`, off for `pip`/`ace`).
-6. **Face Style** — if `layers.figure.g` is `true`, append the pattern's "Face Style"
+   if `layers.figure.g` is on (default: on for `court`, off for `pip`/`ace`).
+6. **Face Style** — if `layers.figure.g` is on, append the pattern's "Face Style"
    line (how a figure's face reads in this pattern — typage, expression, degree of
-   stylization), then `extras.figure.g` (free text, own comma phrase) if set — a
-   group-wide figure trait layered on top of the pattern's Face Style for every card
-   in this group (e.g. "all court figures shown with a slight hunch"). Then, if
-   `figure_proportion` is non-empty, append it as its own comma phrase — a deck-wide
-   framing/crop description (e.g. `waist-up portrait, torso and arms visible, hands
-   free to hold attributes,`), reused across every card with a figure. All three are
-   dropped entirely if `layers.figure.g` is `false` (the default for `pip`/`ace`).
+   stylization), then `layers.figure.g`'s addition (free text, own comma phrase) if
+   the cell is custom text — a group-wide figure trait layered on top of the pattern's
+   Face Style for every card in this group (e.g. "all court figures shown with a
+   slight hunch"). Then, if `figure_proportion` is non-empty, append it as its own
+   comma phrase — a deck-wide framing/crop description (e.g. `waist-up portrait, torso
+   and arms visible, hands free to hold attributes,`), reused across every card with a
+   figure. All three are dropped entirely if `layers.figure.g` is `"false"` (the
+   default for `pip`/`ace`).
 7. **Finish** — the pattern's Finish lines.
 
-8. **Mood** — if `layers.mood.g` is `true`: if `mood` is non-empty, append
-   `[MOOD_LINE]` — the `mood` text as its own comma phrase (e.g. `gothic and brooding
-   atmosphere,`); then, if `extras.mood.g` is non-empty, append it as its own comma
-   phrase too — a per-group mood addition layered on top of (or in place of) the
-   deck-wide `mood`. If both `mood` and `extras.mood.g` are empty, no mood line is
-   added for this group, regardless of `layers.mood.g`.
+8. **Mood** — if `layers.mood.g` is on: if `mood` is non-empty, append `[MOOD_LINE]`
+   — the `mood` text as its own comma phrase (e.g. `gothic and brooding atmosphere,`);
+   then, if `layers.mood.g`'s addition is non-empty (the cell is custom text), append
+   it as its own comma phrase too — a per-group mood addition layered on top of (or in
+   place of) the deck-wide `mood`. If both `mood` and `layers.mood.g`'s addition are
+   empty, no mood line is added for this group, regardless of `layers.mood.g`.
 
 9. **Plain fallback** — if `g` is `pip` and `layers.decor.pip`, `layers.ornaments.pip`,
-   and `layers.highlights.pip` are all `false`, append the line `plain card face, no
+   and `layers.highlights.pip` are all `"false"`, append the line `plain card face, no
    additional ornament beyond the pip symbols,` after Mood (a pip card with nothing
    else added should read as a plain number card).
 
 `[FRAME_LINE]` is built from the chosen `frame` preset's "Frame line" in
 `assets/frame/<frame>.md` (default `boxed-index`: `thin single black border around the
 card perimeter, plus a separate thin black border individually framing each of the four
-corner index areas,`), with `extras.frame.g` appended as
-its own comma phrase if set — see "Theme-derived ornaments/highlights/frame" below if
-`extras.frame.g` is empty and `theme` is set. Included verbatim if `layers.frame.g` is
-`true` and dropped entirely otherwise — it sits in its own template slot, not inside
-`[STYLE_BLOCK]`. The same resolved `[FRAME_LINE]` is reused across all cards of the
-same group/deck, like `[STYLE_BLOCK]`.
+corner index areas,`), with `layers.frame.g`'s addition appended as its own comma
+phrase if the cell is custom text — see "Theme-derived ornaments/highlights/frame"
+below if the cell is exactly `"true"` and `theme` is set. Included verbatim if
+`layers.frame.g` is on and dropped entirely otherwise — it sits in its own template
+slot, not inside `[STYLE_BLOCK]`. The same resolved `[FRAME_LINE]` is reused across all
+cards of the same group/deck, like `[STYLE_BLOCK]`.
 
 ### Figure, face style & proportion (within `[STYLE_BLOCK]`)
 
@@ -126,11 +135,11 @@ into Center motif style or vice versa.
 - **Deck-wide (framing)** — `figure_proportion` (free text, picked from
   `assets/figure-proportion/` or typed in Step 8): how much of the figure is shown and
   how it's cropped (e.g. "bust", "waist-up", "full body"), reused across every card
-  with a figure. Appended right after `extras.figure.<group>`.
-- **Group-wide** — `extras.figure.<group>` (free text, config-only): an optional
-  trait shared by every figure in one group (`court`/`pip`/`ace`) — e.g. "all court
-  figures shown with a slight hunch" — appended right after the pattern's Face Style
-  line for that group.
+  with a figure. Appended right after `layers.figure.<group>`'s addition.
+- **Group-wide** — `layers.figure.<group>`'s addition, when the cell is custom text
+  (config-only): an optional trait shared by every figure in one group
+  (`court`/`pip`/`ace`) — e.g. "all court figures shown with a slight hunch" —
+  appended right after the pattern's Face Style line for that group.
 - **Per-card** — `[CHARACTER_NAME]`/`[CHARACTER_FEATURES]` plus the Steps 10-12
   attributes/reference-transfers/exclusions: who this specific card's figure is,
   always supplied per card (from the user or a reference image).
@@ -149,35 +158,35 @@ description from `[CHARACTER_FEATURES]` (silhouette/costume only — see SKILL S
 the two don't contradict each other. Otherwise, no source-resolution step is needed —
 the pattern's Face Style line and the character's own features simply stack.
 
-For `pip`/`ace`, the Face Style line, `extras.figure.<group>`, and `figure_proportion`
-only appear if `layers.figure.<group> = true` (transformation decks); otherwise they're
-part of step 6 and simply not appended.
+For `pip`/`ace`, the Face Style line, `layers.figure.<group>`'s addition, and
+`figure_proportion` only appear if `layers.figure.<group>` is on (transformation
+decks); otherwise they're part of step 6 and simply not appended.
 
 ### Theme-derived ornaments/highlights/frame
 
 If `theme` (a free-text deck-wide concept, e.g. "celestial mythology", "botanical
-garden") is set, and for group `g` a layer is enabled but its `extras.<layer>.g` field
-is empty:
+garden") is set, and for group `g` a layer's cell is exactly `"true"` (on, with no
+explicit addition):
 
-- `layers.ornaments.g = true` and `extras.ornaments.g == ""` → derive a short ornament
-  phrase expressing `theme` (e.g. theme "celestial mythology" → `star and
-  constellation motifs in the corner ornaments,`) and use it as that card's
-  `extras.ornaments.g` for this generation.
-- `layers.highlights.g = true` and `extras.highlights.g == ""` → same derivation for
-  highlights (e.g. → `faint star-glow highlights,`).
-- `layers.frame.g = true` and `extras.frame.g == ""` → same derivation for the frame
-  (e.g. → `star-and-comet motifs worked into the corner cut-ins,`), appended after the
-  chosen `frame` preset's "Frame line".
+- `layers.ornaments.g == "true"` → derive a short ornament phrase expressing `theme`
+  (e.g. theme "celestial mythology" → `star and constellation motifs in the corner
+  ornaments,`) and use it as that card's ornaments addition for this generation.
+- `layers.highlights.g == "true"` → same derivation for highlights (e.g. → `faint
+  star-glow highlights,`).
+- `layers.frame.g == "true"` → same derivation for the frame (e.g. → `star-and-comet
+  motifs worked into the corner cut-ins,`), appended after the chosen `frame` preset's
+  "Frame line".
 
-This theme-derivation applies only to ornaments, highlights, and frame —
-`extras.background.g`, `extras.decor.g`, and `extras.mood.g` are plain free text with
+This theme-derivation applies only to ornaments, highlights, and frame — for
+background, decor, and mood, a cell of exactly `"true"` simply has no addition, with
 no `theme` fallback.
 
-An explicit `extras.ornaments.g` / `extras.highlights.g` / `extras.frame.g` (set by the
-user or saved in config) always wins — `theme` only fills empty slots. Reuse the same
-derived phrase across all cards of the same group/deck so the set stays consistent. For
-cards with a figure, `theme` may also inform the character concept and Step 10 attribute
-suggestions (suggest, don't force).
+An explicit addition (`layers.ornaments.g` / `layers.highlights.g` / `layers.frame.g`
+set to custom text, by the user or saved in config) always wins — `theme` only fills
+in for cells that are exactly `"true"`. Reuse the same derived phrase across all cards
+of the same group/deck so the set stays consistent. For cards with a figure, `theme`
+may also inform the character concept and Step 10 attribute suggestions (suggest,
+don't force).
 
 ### Defaults
 

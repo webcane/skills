@@ -58,10 +58,9 @@ new profile is a self-contained copy a user can then tweak independently.
 
 Dotted keys address nested groups: `index.size`, `index.count`, `index.layout`, and the
 two-level `layers.<layer>.<group>` (e.g. `layers.frame.pip`, `layers.highlights.ace`,
-`layers.figure.pip`, `layers.mood.court`) and `extras.<layer>.<group>` (e.g.
-`extras.ornaments.pip`, `extras.frame.court`, `extras.mood.ace`, `extras.figure.court`),
-where `<layer>` is one of `background`, `decor`, `ornaments`, `highlights`, `frame`,
-`figure`, `mood`. `mood`, `theme`, and `frame` are flat fields (no `<group>`).
+`layers.figure.pip`, `layers.mood.court`), where `<layer>` is one of `background`,
+`decor`, `ornaments`, `highlights`, `frame`, `figure`, `mood`. `mood`, `theme`, and
+`frame` are flat fields (no `<group>`).
 
 ## Lookup order
 
@@ -99,15 +98,6 @@ profile holds the fields below:
         "figure":     {"court": "true",  "pip": "false", "ace": "false"},
         "mood":       {"court": "true",  "pip": "true",  "ace": "true"}
       },
-      "extras": {
-        "background": {"court": "", "pip": "", "ace": ""},
-        "decor":      {"court": "", "pip": "", "ace": ""},
-        "ornaments":  {"court": "", "pip": "", "ace": ""},
-        "highlights": {"court": "", "pip": "", "ace": ""},
-        "frame":      {"court": "", "pip": "", "ace": ""},
-        "figure":     {"court": "", "pip": "", "ace": ""},
-        "mood":       {"court": "", "pip": "", "ace": ""}
-      },
       "mood": "",
       "theme": "",
       "figure_proportion": ""
@@ -119,6 +109,15 @@ profile holds the fields below:
 Within a profile, all fields are optional. Any missing field falls back to the next
 source in the lookup order, ultimately to the built-in default (the field reference
 below).
+
+Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
+- `"false"` — the layer is off for this group; nothing from it appears.
+- `"true"` — the layer is on, contributing only its own pattern/preset text (no
+  group-wide addition).
+- any other text — the layer is on, and that text is appended as this group's
+  addition on top of the layer's own pattern/preset text (e.g.
+  `"layers": {"ornaments": {"pip": "small corner flourishes,"}}` turns pip ornaments
+  on and adds that phrase).
 
 ### Field reference
 
@@ -133,20 +132,13 @@ below).
 | `index.size`                | `standard`, `jumbo`, `magnum`                                 | `standard`         |
 | `index.count`               | `2-index`, `4-index`                                          | `4-index`          |
 | `index.layout`              | `stacked`, `side-by-side`, `peek`, `none`                     | `stacked`          |
-| `layers.background.<group>` | `true`, `false`                                               | all `true`         |
-| `layers.decor.<group>`      | `true`, `false`                                               | court/ace `true`, pip `false` |
-| `layers.ornaments.<group>`  | `true`, `false`                                               | court/ace `true`, pip `false` |
-| `layers.highlights.<group>` | `true`, `false`                                               | all `false`        |
-| `layers.frame.<group>`      | `true`, `false`                                               | court/ace `true`, pip `false` |
-| `layers.figure.<group>`     | `true`, `false`                                               | court `true`, pip/ace `false` |
-| `layers.mood.<group>`       | `true`, `false`                                               | all `true`         |
-| `extras.background.<group>` | free text                                                     | `""`               |
-| `extras.decor.<group>`      | free text                                                      | `""`               |
-| `extras.ornaments.<group>`  | free text                                                      | `""`               |
-| `extras.highlights.<group>` | free text                                                      | `""`               |
-| `extras.frame.<group>`      | free text                                                      | `""`               |
-| `extras.figure.<group>`     | free text (group-wide figure trait, layered on top of the pattern's Face Style; applies only if `layers.figure.<group>` is `true`) | `""` |
-| `extras.mood.<group>`       | free text (per-group mood addition, on top of deck-wide `mood`) | `""`             |
+| `layers.background.<group>` | `true`, `false`, or custom text (addition)                    | all `true`         |
+| `layers.decor.<group>`      | `true`, `false`, or custom text (addition)                    | court/ace `true`, pip `false` |
+| `layers.ornaments.<group>`  | `true`, `false`, or custom text (addition)                    | court/ace `true`, pip `false` |
+| `layers.highlights.<group>` | `true`, `false`, or custom text (addition)                    | all `false`        |
+| `layers.frame.<group>`      | `true`, `false`, or custom text (addition)                    | court/ace `true`, pip `false` |
+| `layers.figure.<group>`     | `true`, `false`, or custom text (group-wide figure trait, layered on top of the pattern's Face Style) | court `true`, pip/ace `false` |
+| `layers.mood.<group>`       | `true`, `false`, or custom text (per-group mood addition, on top of deck-wide `mood`) | all `true` |
 | `mood`                      | free text (deck-wide atmosphere, e.g. `gothic and brooding atmosphere,`); see `assets/mood/` for presets | `""` |
 | `theme`                     | free text (deck-wide concept/symbolism, e.g. `celestial mythology`) | `""` |
 | `figure_proportion`         | `bust`, `waist-up`, `three-quarter`, `seven-eighths`, `full-body` (or any custom framing/crop description); see `assets/figure-proportion/` for presets | `""` |
@@ -159,41 +151,42 @@ placement, aspect-ratio syntax, extra parameters) — see `assets/engines/`.
 `layers.*` controls which layers (background, decor, ornaments, highlights, frame,
 figure, mood) contribute to `[STYLE_BLOCK]` / `[FRAME_LINE]` / `[MOOD_LINE]` for each
 card group — see "Layers and `[STYLE_BLOCK]` assembly" in `references/REFERENCE.md`.
-`extras.<layer>.<group>` is the free-text addition appended within that layer when
-`layers.<layer>.<group>` is enabled — `extras.background.<group>`,
-`extras.decor.<group>`, `extras.ornaments.<group>`, `extras.highlights.<group>`, and
-`extras.frame.<group>` are appended after the layer's own text (ornaments, highlights,
-and frame may also be auto-derived from `theme` if left empty — see "Theme-derived
-ornaments/highlights/frame"); `extras.mood.<group>` is appended after `[MOOD_LINE]`
-as a per-group addition on top of the deck-wide `mood`. `frame` picks the preset from
-`assets/frame/` whose "Frame line" supplies `[FRAME_LINE]` (any custom string is also
-accepted). `mood` is a deck-wide free-text atmosphere description, either picked from
-a preset in `assets/mood/` or typed as custom text in Step 7, which also sets
-`layers.mood.<group>` per card group. When `layers.figure.<group>` is on, the chosen
-pattern's own "Face Style" section is folded into `[STYLE_BLOCK]` automatically —
-how a figure's face reads is part of the `style` pattern, not a separate setting.
-`extras.figure.<group>` is appended after the pattern's Face Style line, also only
-when `layers.figure.<group>` is `true` — a group-wide figure trait (e.g. "all court
-figures shown with a slight hunch") layered on top of the pattern's Face Style for
-every card in that group, distinct from the per-card `[CHARACTER_FEATURES]` (Steps
-9-12).
+Each `layers.<layer>.<group>` cell both gates the layer (`"false"` = off, anything
+else = on) and, when it's not `"false"`/`"true"`, supplies that group's free-text
+addition appended after the layer's own pattern/preset text — `layers.background.
+<group>`, `layers.decor.<group>`, `layers.ornaments.<group>`, `layers.highlights.
+<group>`, and `layers.frame.<group>` work this way (ornaments, highlights, and frame
+may also have their addition auto-derived from `theme` if the cell is exactly
+`"true"` — see "Theme-derived ornaments/highlights/frame"); `layers.mood.<group>`'s
+addition is appended after `[MOOD_LINE]` as a per-group addition on top of the
+deck-wide `mood`. `frame` picks the preset from `assets/frame/` whose "Frame line"
+supplies `[FRAME_LINE]` (any custom string is also accepted). `mood` is a deck-wide
+free-text atmosphere description, either picked from a preset in `assets/mood/` or
+typed as custom text in Step 7, which also sets `layers.mood.<group>` per card group.
+When `layers.figure.<group>` is on, the chosen pattern's own "Face Style" section is
+folded into `[STYLE_BLOCK]` automatically — how a figure's face reads is part of the
+`style` pattern, not a separate setting. `layers.figure.<group>`'s addition (when the
+cell is neither `"false"` nor `"true"`) is appended after the pattern's Face Style
+line — a group-wide figure trait (e.g. "all court figures shown with a slight hunch")
+layered on top of the pattern's Face Style for every card in that group, distinct from
+the per-card `[CHARACTER_FEATURES]` (Steps 9-12).
 
-`figure_proportion` is folded into `[STYLE_BLOCK]` right after `extras.figure.<group>`
-(i.e. after the pattern's Face Style line and its group-wide addition), also only when
-`layers.figure.<group>` is `true` — a deck-wide framing/crop description (e.g.
+`figure_proportion` is folded into `[STYLE_BLOCK]` right after `layers.figure.<group>`'s
+addition (i.e. after the pattern's Face Style line and its group-wide addition), also
+only when `layers.figure.<group>` is on — a deck-wide framing/crop description (e.g.
 `waist-up portrait, torso and arms visible, hands free to hold attributes,`) reused
 across every card with a figure so the set reads as consistently framed. Picked from a
 preset in `assets/figure-proportion/` or typed as custom text in Step 8. There is no
-per-group `extras.figure_proportion.<group>` — it's a single deck-wide phrase, gated
+per-group equivalent for `figure_proportion` — it's a single deck-wide phrase, gated
 entirely by `layers.figure.<group>` like Face Style.
 
 **Three scopes of figure content**, from broadest to narrowest:
 - **Deck-wide** — the pattern's Face Style line (from `style`) plus `figure_proportion`:
   how ANY figure's face reads in this pattern (typage, expression, degree of
   stylization), and how much of the figure is shown/cropped.
-- **Group-wide** — `extras.figure.<group>`: an optional trait shared by every
-  figure in one group (`court`/`pip`/`ace`), layered on top of the pattern's Face
-  Style for that group.
+- **Group-wide** — `layers.figure.<group>`'s addition (when the cell is custom text):
+  an optional trait shared by every figure in one group (`court`/`pip`/`ace`), layered
+  on top of the pattern's Face Style for that group.
 - **Per-card** — `[CHARACTER_NAME]`/`[CHARACTER_FEATURES]` and the Step 10-12
   attributes/transfers/exclusions: who this specific card's figure is, always
   supplied per card (from the user or a reference image).
@@ -204,7 +197,7 @@ like Pip/Ace, can be tuned per layer via `--config`.
 
 **Persistent** (saved per profile — rarely change between cards):
 `deck`, `lettering`, `style`, `frame`, `aspect_ratio`, `image_generator`, `index.*`,
-`layers.*`, `extras.*`, `mood`, `theme`, `figure_proportion`
+`layers.*`, `mood`, `theme`, `figure_proportion`
 
 **Per-card** (always asked in the wizard — never saved):
 `rank`, `suit`, `character_name`, `character_features`, `extra_attributes`,
