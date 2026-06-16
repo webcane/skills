@@ -4,7 +4,7 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
-## [Unreleased]
+## [3.19.0] - 2026-06-16
 
 ### Added
 - New persistent `structure` setting (`full` default, or `illustration`) for users
