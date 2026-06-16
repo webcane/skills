@@ -10,6 +10,40 @@ Roadmap 1 first, Roadmap 2 to follow.
 
 ---
 
+## Human-in-the-loop policy (applies to both roadmaps)
+
+Card generation is not a fire-and-forget pipeline. The image-gen model
+is non-deterministic and the prompt is complex; the first result will
+often be close but not right. **HITL is mandatory at two moments:**
+
+1. **Golden-card gate (before the deck loop starts):** Generate one card,
+   show it to the user, and get explicit approval. If the result misses the
+   mark — wrong style, wrong framing, wrong mood — collect feedback, adjust
+   the prompt (re-run the `playing-card-prompt` wizard, edit the captured
+   `[STYLE_BLOCK]`/`[FRAME_LINE]`, or tweak mood/theme phrases directly),
+   and re-generate. Repeat until the user approves. The approved prompt is
+   the template for all 52+ cards; catching a style issue here saves
+   re-generating the entire deck.
+
+2. **Per-batch checkpoints (during the deck loop):** After each configurable
+   batch (default: one suit = 13 cards), pause and show the results. The
+   user can approve and continue, flag individual cards for re-generation
+   (per-card prompt fix), or flag a systemic issue (deck-wide prompt fix +
+   re-generate all affected cards). The loop resumes only after the user
+   explicitly continues.
+
+**Prompt correction workflow:** When a card fails review, the agent must:
+- Identify the failure mode (lighting, composition, character accuracy,
+  style drift, etc.)
+- Propose a concrete prompt edit (add/remove a phrase, adjust a layer value)
+- Re-generate that card with the corrected prompt
+- Present the new result for approval before moving on
+
+The corrected prompt fragment is saved back to the manifest so the same fix
+applies to all remaining cards of the same group.
+
+---
+
 ## Roadmap 1 — playing-deck wraps playing-card-prompt as-is
 
 Core principle: `playing-card-prompt` is **not modified for the core flow**
@@ -43,6 +77,14 @@ format.
   N retries with backoff, and after exhaustion fall back to manual
   prompt-handoff (recorded in the deck manifest). Policy is configurable via
   `config.json`.
+- **Human-in-the-loop (mandatory):** After generating the first card image,
+  present it to the user for approval before proceeding. If the result does
+  not match expectations, collect feedback, adjust the prompt (e.g. re-run
+  `playing-card-prompt` in Generate mode with revised style/mood/theme, or
+  directly edit the captured intermediate values), and re-generate. Repeat
+  until the user approves the "golden card." Only then continue to Phase 2
+  and beyond. The approved prompt fragments and resolved values become the
+  reference for all subsequent cards.
 
 ### Phase 2 — SVG assembly for a single card
 - Pre-built base SVG frame templates for the frame presets in
@@ -65,6 +107,16 @@ format.
   all cards of a group for visual consistency.
 - Delegate image-gen calls to subagents (per card or batch) to keep the main
   context clean.
+- **Human-in-the-loop checkpoints (mandatory):** Pause for user review at
+  configurable intervals (default: after each suit completes, i.e. every
+  13 cards). Present the batch of generated images; if any card fails the
+  visual check, identify whether the issue is per-card (character prompt
+  needs adjustment) or deck-wide (style/mood/frame phrase needs adjustment).
+  For a per-card issue: correct that card's prompt and re-generate only that
+  card. For a deck-wide issue: stop the loop, correct the shared prompt
+  fragments, and re-generate all already-failed cards before continuing.
+  The user can also approve the batch and continue, or request a full restart
+  with revised settings. Checkpoint interval is configurable via `config.json`.
 - Produce a manifest of all output files.
 
 ### Phase 4 — Validate deck results
@@ -170,6 +222,11 @@ Three variants were considered:
   CARD_BACK/JOKER/SUMMARY groups, box/cover) on top of the
   `playing-card` + `playing-deck` pair instead of
   `playing-card-prompt` + `playing-deck`.
+- The HITL policy from Roadmap 1 (golden-card approval after Phase 1,
+  per-suit checkpoints in Phase 3) applies identically here. The key
+  difference: when a deck-wide issue is found during a checkpoint, the
+  correction target is `playing-deck`'s assembled `[STYLE_BLOCK]`/
+  `[FRAME_LINE]` rather than `playing-card-prompt`'s wizard output.
 
 ### Phase 5 — `playing-card-prompt` fate
 - Remains as a frozen, standalone full-card prompt generator (v3.18.0+) for
