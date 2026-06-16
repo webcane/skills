@@ -6,6 +6,22 @@ All notable changes to this skill. Released per skill as tag
 
 ## [Unreleased]
 
+### Added
+- New persistent `structure` setting (`full` default, or `illustration`) for users
+  who composite the AI-generated artwork into their own SVG/HTML card template (with
+  its own frame, corner indices, fonts, and margins). Under `structure: illustration`,
+  the assembled prompt drops `[INDEX_LINE]` and `[FRAME_LINE]` entirely (without
+  modifying `layers.frame.<group>` in `config.json`), replaces the templates' opening
+  line with an illustration-only variant, and appends a fixed block to
+  `[NEGATIVE_LIST]`; `[STYLE_BLOCK]` and the Center motif (including `[RANK_COUNT]`)
+  are unaffected. Added a new "`structure` setting" section to
+  `references/REFERENCE.md`, a field-reference row and persistent-settings entry to
+  `references/CONFIG.md`, a `structure` step (config mode item 9) and assembly
+  branches (steps 1–4) to `SKILL.md`, a Structure check to
+  `references/POST-VALIDATION.md`, a cross-reference note to
+  `references/WIZARD-STEP-MAP.md`, and `structure`/`STRUCTURE` handling to
+  `scripts/manage_config.py` and the shipped `config.json` default profile.
+
 ### Changed
 - **`[STYLE_BLOCK]` "Finish" lines now share `layers.technique.<group>`'s gate**
   instead of always being included. Technique and Finish both describe *how* the card

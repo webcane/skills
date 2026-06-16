@@ -84,6 +84,7 @@ profile holds the fields below:
       "frame": "boxed-index",
       "aspect_ratio": "9:14",
       "image_generator": "nanobanana",
+      "structure": "full",
       "index": {
         "size": "standard",
         "count": "4-index",
@@ -130,6 +131,7 @@ Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
 | `frame`                     | `boxed-index`, `stepped-corners`, `double-rule`, `ornate-scrollwork`, `art-deco-geometric`, `rope-twist` (or any custom frame name/description) | `boxed-index` |
 | `aspect_ratio`              | `5:7`, `9:14`, `14:25`, `7:12`, or custom                    | `9:14`             |
 | `image_generator`           | `nanobanana`, `stable-diffusion`, `midjourney`, `dalle`, `kaze`, or custom | `nanobanana` |
+| `structure`                 | `full`, `illustration`                                        | `full`             |
 | `index.size`                | `standard`, `jumbo`, `magnum`                                 | `standard`         |
 | `index.count`               | `2-index`, `4-index`                                          | `4-index`          |
 | `index.layout`              | `stacked`, `side-by-side`, `peek`, `none`                     | `stacked`          |
@@ -149,6 +151,12 @@ Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
 
 `image_generator` controls how the assembled prompt is adapted (negative-list
 placement, aspect-ratio syntax, extra parameters) — see `assets/engines/`.
+
+`structure` controls whether the assembled prompt describes a complete card (`full`,
+the default) or only the center illustration (`illustration`, for users compositing
+the artwork into their own card template that already supplies the frame and corner
+indices) — see "`structure` setting" in `references/REFERENCE.md` for the exact
+assembly changes and scope.
 
 `layers.*` controls which layers (background, decor, ornaments, highlights, frame,
 figure, mood, technique) contribute to `[STYLE_BLOCK]` / `[FRAME_LINE]` / `[MOOD_LINE]`
@@ -202,8 +210,8 @@ like Pip/Ace, can be tuned per layer via `--config`.
 ### Which settings are "session" vs "persistent"
 
 **Persistent** (saved per profile — rarely change between cards):
-`deck`, `lettering`, `style`, `frame`, `aspect_ratio`, `image_generator`, `index.*`,
-`layers.*`, `mood`, `theme`, `figure_proportion`
+`deck`, `lettering`, `style`, `frame`, `aspect_ratio`, `image_generator`, `structure`,
+`index.*`, `layers.*`, `mood`, `theme`, `figure_proportion`
 
 **Per-card** (always asked in the wizard — never saved):
 `rank`, `suit`, `character_name`, `character_features`, `extra_attributes`,

@@ -250,6 +250,58 @@ visually consistent.
 
 ---
 
+## `structure` setting (`full` vs `illustration`)
+
+`structure` (persistent, deck-wide) controls whether the assembled prompt describes a
+complete card or only the center illustration. The `illustration` value is for users
+who composite the AI-generated artwork into their own SVG/HTML card template — one
+that already supplies the frame, corner indices, fonts, and margins — and so want a
+prompt that describes ONLY what goes in the center clip area.
+
+- **`full`** (default) — current behavior, unchanged.
+- **`illustration`** — exactly four changes to assembly, all others unchanged:
+  1. **Drop `[INDEX_LINE]`** entirely from every template — no corner rank/suit
+     markers (the user's own template supplies these).
+  2. **Drop `[FRAME_LINE]`** entirely from every template, regardless of
+     `layers.frame.<group>`. The `layers.frame.<group>` cells in `config.json` are
+     **not modified or cleared** — they're simply ignored at assembly time, so
+     switching back to `structure: full` restores the prior frame behavior exactly as
+     configured.
+  3. **Replace the templates' opening line.** Instead of:
+     `[ASPECT_RATIO] aspect ratio, full card visible, transparent background outside
+     the card,`
+     use:
+     `[ASPECT_RATIO] aspect ratio, single self-contained illustration filling the
+     entire frame edge-to-edge, no card shape, no border, no background beyond the
+     illustration itself,`
+     `[ASPECT_RATIO]` (Step 13) is itself unchanged — only its meaning shifts, from the
+     proportions of the whole card to the proportions of the illustration/clip area in
+     the user's template.
+  4. **Append a fixed block to `[NEGATIVE_LIST]`**, after the usual exclusions:
+     `no card border, no frame, no corner index letters or numbers, no corner suit
+     symbols`
+
+**Scope — everything else is unaffected.** `structure: illustration` touches only the
+four items above. The following remain fully AI-generated regardless of `structure`:
+- All of `[STYLE_BLOCK]` — background, decor, ornaments, highlights, figure, mood, and
+  technique layers (including Finish lines), resolved exactly as for `structure: full`.
+- The **Center motif** — the portrait + `[RESOLVED_ATTRIBUTES]` on Court cards, the
+  `[RANK_COUNT]` pip layout on Pip cards, and the large suit symbol on Aces.
+
+Rounded or cut corners need no separate handling: that treatment lives in
+`[FRAME_LINE]` (e.g. `assets/frame/cut-corner.md`, `assets/frame/rounded-cut-corner.md`),
+which is already dropped under `structure: illustration`.
+
+**Reusing one illustration as a style reference.** When generating several cards for
+the same deck under `structure: illustration`, it often helps to generate one card
+first and then reuse it as a style/composition reference for the rest (e.g.
+Midjourney's `--sref`, or a `style_reference`/`image_reference` parameter on other
+engines), so the whole set of illustrations reads as one consistent style. This is a
+workflow tip for the user — this skill does not inject reference-image parameters into
+the generated prompt text itself.
+
+---
+
 ## COURT template (King / Queen / Jack)
 
 `[CHARACTER_NAME]` and `[CHARACTER_FEATURES]` are REQUIRED (at minimum a name). The

@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.18.0
+  version: 3.19.0
   description_claudeai: Interactive wizard to build image-gen prompts for stylized playing cards. 4 deck patterns, 6 lettering systems, 3+ styles, court/pip/ace. Trigger on card design requests.
 ---
 
@@ -41,8 +41,8 @@ the shell's current working directory.
 ## Startup: loading saved settings
 
 Before asking any wizard questions, load the active profile's persistent settings
-(`deck`, `lettering`, `style`, `frame`, `aspect_ratio`, `image_generator`, `index.*`,
-`layers.*`, `mood`, `theme`, `figure_proportion`) via
+(`deck`, `lettering`, `style`, `frame`, `aspect_ratio`, `image_generator`, `structure`,
+`index.*`, `layers.*`, `mood`, `theme`, `figure_proportion`) via
 `python3 scripts/manage_config.py show`. This also lists every saved profile and which
 one is active.
 Everything else — schema, profile concept, lookup order, field reference, and the
@@ -79,11 +79,15 @@ Steps to ask in config mode:
 6. Figure proportion / framing (Step 8)
 7. Aspect ratio (Step 13)
 8. Image generator (optional — see Step 14)
-9. (Optional, only if user asks) Index settings, or per-layer overrides via
-   `layers.<layer>.<group>` for Court/Pip/Ace (e.g. `layers.ornaments.ace`,
-   `layers.figure.pip`, `layers.mood.court`). Turning on `layers.figure.pip` or
-   `layers.figure.ace` (transformation decks) makes Steps 8–12 apply to pip/ace
-   cards too, the same way they apply to court by default.
+9. Structure — full card (`full`, default) or center-illustration-only
+   (`illustration`, for users compositing the artwork into their own SVG/HTML card
+   template that already supplies the frame and corner indices). See "`structure`
+   setting" in `references/REFERENCE.md` for what changes under `illustration`.
+10. (Optional, only if user asks) Index settings, or per-layer overrides via
+    `layers.<layer>.<group>` for Court/Pip/Ace (e.g. `layers.ornaments.ace`,
+    `layers.figure.pip`, `layers.mood.court`). Turning on `layers.figure.pip` or
+    `layers.figure.ace` (transformation decks) makes Steps 8–12 apply to pip/ace
+    cards too, the same way they apply to court by default.
 
 ## Mode: Profile (`--profile <name>` or other profile commands)
 
@@ -463,7 +467,10 @@ _Skipped if loaded from config._ Ask the card type (see the aspect-ratio table i
 - **Mini** — 5:7
 - or a custom ratio (free text)
 
-Fill `[ASPECT_RATIO]` with the ratio only.
+Fill `[ASPECT_RATIO]` with the ratio only. If `structure` is `illustration`, this
+ratio describes the proportions of the center illustration/clip area in the user's
+own card template, not the whole card — see "`structure` setting" in
+`references/REFERENCE.md`.
 
 ---
 
@@ -489,14 +496,22 @@ Offer to save the choice to `config.json` like the other persistent settings.
 
 ## Assembling the prompt
 
-1. Pick the template (COURT / PIP / ACE) from `references/REFERENCE.md`.
+1. Pick the template (COURT / PIP / ACE) from `references/REFERENCE.md`. If
+   `structure` is `illustration`, replace the template's opening line with the
+   illustration-only opening line from "`structure` setting" in
+   `references/REFERENCE.md` (otherwise use the template's default opening line
+   unchanged).
 2. Build `[INDEX_LINE]` from `assets/index/options.md` using the silent defaults (Standard size,
    4-Index, rank stacked above suit) — unless the user explicitly asked for a different
-   index, in which case combine the chosen fragments.
+   index, in which case combine the chosen fragments. If `structure` is `illustration`,
+   skip this entirely and drop `[INDEX_LINE]` from the template.
 3. For cards with a figure, fill `[CHARACTER_NAME]`/`[CHARACTER_FEATURES]` (required), then build
    `[RESOLVED_ATTRIBUTES]` and `[NEGATIVE_LIST]` by following the merge rules in
    `references/REFERENCE.md` (resolve conflicts down to one final, deduplicated,
    contradiction-free state — do not list "traditional" and "override" side by side).
+   If `structure` is `illustration`, append the fixed negative block from "`structure`
+   setting" in `references/REFERENCE.md` (`no card border, no frame, no corner index
+   letters or numbers, no corner suit symbols`) to `[NEGATIVE_LIST]`.
 4. Resolve `[STYLE_BLOCK]` and `[FRAME_LINE]` for this card's group (court/pip/ace) per
    "Layers and `[STYLE_BLOCK]` assembly" and "Figure, face style & proportion" in
    `references/REFERENCE.md`, using the `layers.*`, `frame`, `mood`, and `theme`
@@ -506,7 +521,9 @@ Offer to save the choice to `config.json` like the other persistent settings.
    is the chosen `frame` preset's "Frame line" from `assets/frame/<frame>.md` plus
    `layers.frame.g`'s addition if its cell is custom text, included only if
    `layers.frame.g` is on. Splice the result **in full** — never summarize, reorder, or
-   drop a line from an enabled layer.
+   drop a line from an enabled layer. If `structure` is `illustration`, drop
+   `[FRAME_LINE]` from the template entirely regardless of `layers.frame.g` — leave
+   `layers.frame.<group>` in `config.json` untouched, just don't emit the line.
    When generating multiple cards for the same deck, reuse the exact same resolved
    `[STYLE_BLOCK]`/`[FRAME_LINE]`/derived theme phrases for every card of the same
    group so the set stays visually consistent.

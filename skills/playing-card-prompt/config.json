@@ -8,6 +8,7 @@
       "frame": "boxed-index",
       "aspect_ratio": "9:14",
       "image_generator": "nanobanana",
+      "structure": "full",
       "index": {
         "size": "standard",
         "count": "4-index",

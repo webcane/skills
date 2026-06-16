@@ -84,3 +84,10 @@ unless the failure stems from missing/ambiguous information only they can resolv
   handling, aspect-ratio syntax, and extra parameters from
   `assets/engines/<engine>.md` are all applied; for `nanobanana` the prompt matches
   the base template unchanged.
+- [ ] **Structure** — if `structure` is `illustration` (see "`structure` setting" in
+  `references/REFERENCE.md`): the opening line is the illustration-only variant (not
+  "full card visible, transparent background outside the card,"), `[INDEX_LINE]` and
+  `[FRAME_LINE]` are both absent entirely, and `[NEGATIVE_LIST]` ends with `no card
+  border, no frame, no corner index letters or numbers, no corner suit symbols`.
+  `[STYLE_BLOCK]` and the Center motif are otherwise unaffected. If `structure` is
+  `full` (default), none of this applies and the prompt is built as usual.

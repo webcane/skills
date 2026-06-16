@@ -34,6 +34,13 @@ transformation-style decks where `layers.figure.pip`/`.ace` was turned on via
 (`figure_proportion`) is persistent — asked once and skipped on later cards/if loaded
 from config — while Steps 9–12 are per-card.
 
+**`structure` setting** (`full`/`illustration`, config mode item 9, persistent) — when
+`illustration`, alters the opening line used in step 1's template, drops
+`[INDEX_LINE]` (step 2's placeholder, normally fed by the "not covered" item below),
+drops `[FRAME_LINE]` (fed by step 6) regardless of `layers.frame.<group>`, and appends
+a fixed block to `[NEGATIVE_LIST]` (step 12). See "`structure` setting" in
+`REFERENCE.md`. All other steps/components are unaffected.
+
 **Not covered by a dedicated step (silent / assembly-only):**
 - **`[INDEX_LINE]`** — assembled from `assets/index/options.md` via silent defaults in Assembling step 2; not asked in the wizard.
 - **Figure detail & Face Style** — folded into `[STYLE_BLOCK]` automatically from the chosen pattern when `layers.figure.<group>` is on; no separate wizard question or config field.

@@ -27,7 +27,7 @@ Usage:
   manage_config.py profile reset <name> --yes         # clear a profile's overrides
 
 Keys (within a profile): deck, lettering, style, frame, aspect_ratio, image_generator,
-      index.size, index.count, index.layout,
+      structure, index.size, index.count, index.layout,
       layers.<background|decor|ornaments|highlights|frame|figure|mood|technique>.<court|pip|ace>,
       mood, theme, figure_proportion
 
@@ -62,6 +62,7 @@ INDEX_COUNT = ["2-index", "4-index"]
 INDEX_LAYOUT = ["stacked", "side-by-side", "peek", "none"]
 ASPECT_PRESETS = ["5:7", "9:14", "14:25", "7:12"]
 BOOL_VALUES = ["true", "false"]
+STRUCTURE = ["full", "illustration"]
 
 GROUPS = ("court", "pip", "ace")
 LAYERS = ("background", "decor", "ornaments", "highlights", "frame", "figure", "mood", "technique")
@@ -98,6 +99,7 @@ DEFAULTS = {
     "frame": "boxed-index",
     "aspect_ratio": "9:14",
     "image_generator": "nanobanana",
+    "structure": "full",
     "index": {"size": "standard", "count": "4-index", "layout": "stacked"},
     "layers": {layer: dict(groups) for layer, groups in LAYER_DEFAULTS.items()},
     "mood": "",
@@ -115,7 +117,7 @@ BUILTIN_CONFIG = {
 }
 
 PERSISTENT_KEYS = {"deck", "lettering", "style", "frame", "aspect_ratio", "image_generator",
-                   "index.size", "index.count", "index.layout", "mood", "theme",
+                   "structure", "index.size", "index.count", "index.layout", "mood", "theme",
                    "figure_proportion"}
 PERSISTENT_KEYS |= {f"layers.{layer}.{g}" for layer in LAYERS for g in GROUPS}
 
@@ -160,6 +162,7 @@ def options_for(key: str):
         "frame": (allowed_frames(), False),          # custom allowed
         "aspect_ratio": (ASPECT_PRESETS, False),     # custom N:M allowed
         "image_generator": (allowed_engines(), False),  # custom allowed
+        "structure": (STRUCTURE, True),
         "index.size": (INDEX_SIZE, True),
         "index.count": (INDEX_COUNT, True),
         "index.layout": (INDEX_LAYOUT, True),
