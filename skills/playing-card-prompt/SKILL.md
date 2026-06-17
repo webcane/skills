@@ -42,9 +42,9 @@ the shell's current working directory.
 
 Before asking any wizard questions, load the active profile's persistent settings
 (`deck`, `lettering`, `style`, `frame`, `aspect_ratio`, `image_generator`, `structure`,
-`index.symbol`, `index.*`, `layers.*`, `mood`, `theme`, `figure_proportion`) via
-`python3 scripts/manage_config.py show`. This also lists every saved profile and which
-one is active.
+`index.symbol`, `index.*`, `layers.*`, `mood`, `theme`, `figure_scale`,
+`character_framing`) via `python3 scripts/manage_config.py show`. This also lists
+every saved profile and which one is active.
 Everything else — schema, profile concept, lookup order, field reference, and the
 full CLI — is in `references/CONFIG.md`; read it whenever you need to inspect,
 change, or validate `config.json`. Per-card fields (`rank`, `suit`,
@@ -76,7 +76,10 @@ Steps to ask in config mode:
 3. Visual style / pattern
 4. Card decoration layers and theme (Step 6)
 5. Mood / atmosphere (Step 7)
-6. Figure proportion / framing (Step 8)
+6. Figure block — figure_scale (deck-wide scale), split (per-group split layout),
+   figure_type (per-group character/building/animal/custom), and
+   character_framing (deck-wide framing, character-only) — from the figure-block
+   steps (Steps 8a–8e)
 7. Aspect ratio (Step 13)
 8. Image generator (optional — see Step 14)
 9. Structure — full card (`full`, default) or center-illustration-only
@@ -139,9 +142,21 @@ Folders under `assets/`:
   used to fill `[MOOD_LINE]` (see Step 7 and `assets/mood/_adding-a-mood.md`)
 - `assets/frame/` — one file per border/frame preset, each holding a "Frame line"
   used to fill `[FRAME_LINE]` (see Step 6 and `assets/frame/_adding-a-frame.md`)
-- `assets/figure-proportion/` — one file per figure framing/cropping preset, each
-  holding a "Figure proportion line" folded into `[STYLE_BLOCK]` (see Step 8 and
-  `assets/figure-proportion/_adding-a-figure-proportion.md`)
+- `assets/figure-type/` — one file per figure type (`character.md`, `building.md`,
+  `animal.md`, `custom.md`), each holding the canonical prompt phrase for that figure
+  type's contribution to `[STYLE_BLOCK]` (see Steps 8a–8c and
+  `assets/figure-type/_adding-a-figure-type.md`)
+- `assets/split/` — one file per split mode (`horizontal-mirrored.md`,
+  `angled-mirrored.md`), each holding the canonical prompt phrase for that split mode
+  appended as the outer compositional wrapper in `[STYLE_BLOCK]` (see Step 8b and
+  `assets/split/_adding-a-split.md`); `none`/`false` produce no text
+- `assets/character-framing/` — one file per character framing/cropping preset (e.g.
+  `waist-up.md`, `full-body.md`), each holding a "Character framing line" folded into
+  `[STYLE_BLOCK]` for character-type figures only (see Step 8e and
+  `assets/character-framing/_adding-a-character-framing.md`)
+- `assets/figure-proportion/` — legacy directory from pre-4.0; content is preserved
+  for reference but superseded by `assets/character-framing/` (see migration notes in
+  `references/CONFIG.md`)
 - `assets/index/options.md` — corner-index settings (advanced; NOT asked in the wizard)
 - `assets/engines/` — one file per image-generation engine, describing how to adapt
   the assembled prompt (negative-list placement, aspect-ratio syntax, extra
@@ -213,11 +228,11 @@ Always ask. Offer only the ranks listed in the chosen `assets/decks/<deck>.md`
 (standard set: A, 2–10, J, Q, K, Joker). Resolve via the rank table in
 `references/REFERENCE.md`:
 - **K / Q / J → COURT** → auto-load `assets/courts/<rank>.md`; this card's group is
-  `court` (`layers.figure.court` defaults to `true`).
-- **A → ACE** → this card's group is `ace` (`layers.figure.ace` defaults to `false`).
-- **2–10 → PIP** → this card's group is `pip` (`layers.figure.pip` defaults to `false`).
+  `court` (`layers.figure.court` defaults to `"character"`).
+- **A → ACE** → this card's group is `ace` (`layers.figure.ace` defaults to `"false"`).
+- **2–10 → PIP** → this card's group is `pip` (`layers.figure.pip` defaults to `"false"`).
 - **Joker → JOKER** → auto-load `assets/courts/joker.md`; this card's group is
-  `joker` (`layers.figure.joker` defaults to `true`). Skip Step 4 (no suit); run
+  `joker` (`layers.figure.joker` defaults to `"character"`). Skip Step 4 (no suit); run
   Steps 4.1 and 4.2 below instead.
 
 Whether Steps 9–12 apply to this card depends on `layers.figure.<group>` for the group
@@ -397,29 +412,111 @@ on the court cards) is config-only, not asked here — set via
 
 ---
 
-**Check `layers.figure.<group>` for this card's group** (`court`/`pip`/`ace`/`joker`,
-default `true` for court and joker, `false` for pip/ace unless previously configured
-via `--config`). If it's `false`, this card has no figure — skip straight to Step 13
-(Aspect ratio). Otherwise, Steps 8–12 apply: court and joker cards by default, plus
-any pip/ace card whose `layers.figure.<group>` was turned on for a transformation-style
-deck. Step 8 (figure proportion) is persistent — skipped if already set or loaded from
-config; Steps 9–12 are per-card.
+**Check `layers.figure.<group>` for this card's group** (`court`/`pip`/`ace`/`joker`).
+The value is `"false"` (no figure) or a figure type (`"character"`, `"building"`,
+`"animal"`, `"custom"`), defaulting to `"character"` for court and joker, `"false"` for
+pip/ace unless previously configured via `--config`). If it's `"false"`, this card has
+no figure — **skip the entire figure block (Steps 8a–8e) and go straight to Step 13**
+(Aspect ratio). Otherwise, the figure block (Steps 8a–8e) and Steps 9–12 apply: court
+and joker cards by default, plus any pip/ace card whose `layers.figure.<group>` was set
+to a type value for a transformation-style deck. Steps 8a–8c are persistent — skipped if
+already set or loaded from config; Steps 8d–8e are character-only persistent (skipped if
+`layers.figure.<group>` is not `"character"`); Steps 9–12 are per-card.
 
 ---
 
-### Step 8 — Figure proportion / framing · _persistent_
+### Step 8a — Figure scale · _persistent_
 
-_Skipped if loaded from config, or if `layers.figure.<group>` is `"false"` for this
-card's group (see the check above)._ Ask how much of the figure should be shown
-across the deck — this becomes `figure_proportion`, folded into `[STYLE_BLOCK]` after
-the chosen pattern's Face Style line and `layers.figure.<group>`'s addition (see
-"Figure, face style & proportion" in `references/REFERENCE.md`), for every card whose
-group has `layers.figure.<group>` on.
+_Skipped if already set in config, or if `layers.figure.<group>` is `"false"` for
+this card's group (see the check above)._ Ask how the figure should sit in the frame
+across the deck — this becomes `figure_scale`, applied to every card with a figure
+(all figure types: character, building, animal, custom). This is a deck-wide setting;
+the same scale is reused for every figure card so the set reads consistently framed.
 
-List the `*.md` files in `assets/figure-proportion/` (ignore names starting with `_`)
-as options. Offer **None** as the default, plus the most common framings as explicit
-choices, e.g.:
-- **None (default)** — no framing line; `figure_proportion` stays empty (the
+Offer (default first, per the AskUserQuestion 4-option limit):
+- **Inscribed in frame (default)** — the figure is fully contained within the card
+  border. Sets `figure_scale = "inscribed-in-frame"`.
+- **Full-bleed** — the figure fills and bleeds to the edges of the frame. Sets
+  `figure_scale = "full-bleed"`.
+- **Small centered** — a small figure centered with space around it. Sets
+  `figure_scale = "small-centered"`.
+- **Other** — any custom crop/scale description (free text).
+
+Save via `python3 scripts/manage_config.py set figure_scale <value>`. If custom text,
+save it phrased as its own comma-separated phrase (ending in a comma).
+
+### Step 8b — Split layout · _per-group persistent_
+
+_Skipped if already set for this group in config, or if `layers.figure.<group>` is
+`"false"` (the whole figure block is skipped when the layer is off — SPLT-04)._ Ask
+how the figures on the cards in this group should be split (per-group; asked once for
+each group, then reused). Applies to all figure types.
+
+Offer (default first):
+- **Full body, no split (default)** — single upright figure, no mirroring. Sets
+  `layers.split.<group> = "none"`.
+- **Horizontal mirrored** — two mirror-image halves meeting at a horizontal edge
+  through the center. Sets `layers.split.<group> = "horizontal-mirrored"`.
+- **Angled mirrored** — two mirror-image halves angled around the figure. Sets
+  `layers.split.<group> = "angled-mirrored"`.
+- **Other** — any custom split/mirror description (free text).
+
+Save via `python3 scripts/manage_config.py set layers.split.<group> <value>` (replace
+`<group>` with the actual group: `court`, `pip`, `ace`, or `joker`).
+
+### Step 8c — Figure type · _per-group persistent_
+
+_Skipped if already set for this group in config, or if `layers.figure.<group>` is
+`"false"`._ Ask what kind of figure this group carries. This sets the group's figure
+layer value — the value IS the figure type, keeping the layer on while recording the
+type (D-02). Per-group; asked once, then reused.
+
+Offer (default first, per 4-option AskUserQuestion limit):
+- **Character (default)** — a person or humanoid figure. Sets
+  `layers.figure.<group> = "character"`.
+- **Building** — an architectural structure. Sets
+  `layers.figure.<group> = "building"`.
+- **Animal** — a creature or beast. Sets `layers.figure.<group> = "animal"`.
+- **Custom** — user-described figure type (free text). Sets
+  `layers.figure.<group> = "custom"` (or the user's description).
+
+Save via `python3 scripts/manage_config.py set layers.figure.<group> <type>` (replace
+`<group>` with the actual group). Note that this both keeps the figure layer on for
+this group and records the figure type.
+
+**Steps 8d–8e apply ONLY when the group's figure type is `"character"`.** For
+`building`, `animal`, and `custom` figure types, skip Steps 8d–8e and proceed directly
+to Steps 9–12 (character description steps, adapted for the figure type). Building,
+animal, and custom figures still benefit from figure_scale (Step 8a) and split
+(Step 8b) — only the character-specific face_style and character_framing are skipped
+(FIG-08).
+
+### Step 8d — Face style (character-only gate)
+
+_Applies ONLY when `layers.figure.<group>` is `"character"`._ For `building`,
+`animal`, and `custom` figure types, face_style is not applied — skip this step.
+
+For character type: how a figure's face reads (typage, expression, degree of
+stylization) comes from the chosen pattern's own "Face Style" section, folded into
+`[STYLE_BLOCK]` automatically whenever the figure type is `character`. There is no
+separate question for this — the pattern supplies it. State this gate explicitly so
+the user understands: **Face Style from the pattern applies only when figure type is
+character**; building/animal/custom figures receive the figure-type text and figure
+scale, but not the pattern's Face Style line.
+
+### Step 8e — Character framing · _character-only persistent_
+
+_Applies ONLY when `layers.figure.<group>` is `"character"`. Skipped if already set
+in config, or if figure type is not character._ Ask how much of the character figure
+is shown across the deck — this becomes `character_framing`, folded into `[STYLE_BLOCK]`
+for every character-type card (see "Figure, face style & proportion" in
+`references/REFERENCE.md`). This is a deck-wide setting; reused across every card
+whose group's figure type is character. Building, animal, and custom figures skip this
+step (FIG-08).
+
+List the `*.md` files in `assets/character-framing/` (ignore names starting with `_`)
+as options. Offer (default first, per 4-option AskUserQuestion limit):
+- **None (default)** — no framing line; `character_framing` stays empty (the
   pattern/template's own framing applies, unconstrained).
 - **Waist-up**
 - **Three-quarter**
@@ -428,16 +525,14 @@ choices, e.g.:
 "Other" covers the remaining presets (Bust, Seven-eighths) and any custom framing/crop
 description (e.g. "tightly cropped headshot, shoulders only,").
 
-- If a preset is named, load `assets/figure-proportion/<name>.md` and use its "Figure
-  proportion line" text verbatim as `figure_proportion`.
-- If the user gives custom text instead, save it as `figure_proportion`, phrased as
+- If a preset is named, load `assets/character-framing/<name>.md` and use its
+  "Character framing line" text verbatim as `character_framing`.
+- If the user gives custom text instead, save it as `character_framing`, phrased as
   its own comma-separated phrase (ending in a comma).
-- If "None" or skipped, leave `figure_proportion` empty — no framing line is added for
-  any card.
+- If "None" or skipped, leave `character_framing` empty — no framing line is added for
+  character cards.
 
-This is a single deck-wide setting (no per-group equivalent) — the same resolved
-framing phrase is reused across every card with a figure so the set reads as
-consistently framed.
+Save via `python3 scripts/manage_config.py set character_framing <value>`.
 
 ### Step 9 — Character / figure description (REQUIRED for cards with a figure) · _per-card_
 
