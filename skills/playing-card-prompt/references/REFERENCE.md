@@ -76,7 +76,7 @@ and whether "Figure detail" and "Face Style" are folded in is decided here via
 
 ### Resolving `[STYLE_BLOCK]` for a card group
 
-For the group `g` (`court`, `pip`, `ace`, `joker`, or `back`), each `layers.<layer>.g` cell resolves to
+For the group `g` (`court`, `pip`, `ace`, `joker`, `back`, or `special`), each `layers.<layer>.g` cell resolves to
 **off** (cell is `"false"`), **on, no addition** (cell is `"true"`), or **on, with
 addition** (cell is any other text — that text is the addition). Build `[STYLE_BLOCK]`
 by concatenating, in this order, only the layers that are on:
@@ -274,20 +274,20 @@ don't force).
 `layers.figure.<group>` now stores the figure type, not a boolean. `"false"` = no
 figure; `"character"` / `"building"` / `"animal"` / `"custom"` = figure on + that type.
 
-| Layer        | court       | pip    | ace    | joker       | back   |
-|--------------|-------------|--------|--------|-------------|--------|
-| background   | true        | true   | true   | true        | true   |
-| decor        | true        | false  | true   | true        | true   |
-| ornaments    | true        | false  | true   | true        | true   |
-| highlights   | false       | false  | false  | false       | false  |
-| frame        | true        | true   | true   | true        | true   |
-| figure       | "character" | false  | false  | "character" | false  |
-| split        | false       | false  | false  | false       | false  |
-| mood         | true        | true   | true   | true        | true   |
-| technique    | true        | true   | true   | true        | true   |
+| Layer        | court       | pip    | ace    | joker       | back   | special |
+|--------------|-------------|--------|--------|-------------|--------|---------|
+| background   | true        | true   | true   | true        | true   | true    |
+| decor        | true        | false  | true   | true        | true   | true    |
+| ornaments    | true        | false  | true   | true        | true   | true    |
+| highlights   | false       | false  | false  | false       | false  | false   |
+| frame        | true        | true   | true   | true        | true   | false   |
+| figure       | "character" | false  | false  | "character" | false  | false   |
+| split        | false       | false  | false  | false       | false  | false   |
+| mood         | true        | true   | true   | true        | true   | true    |
+| technique    | true        | true   | true   | true        | true   | true    |
 
 The `figure` row uses type enum values: `"character"` = portrait on + character type
-(default for court/joker); `false` = no figure (default for pip/ace). The `split` row
+(default for court/joker); `false` = no figure (default for pip/ace/back/special). The `split` row
 defaults to `false` (not configured) for all groups — `"false"` means the wizard asks
 the first time a figure card in that group is generated; `"none"` means configured as
 no split; `"horizontal-mirrored"` / `"angled-mirrored"` means that split mode.
@@ -306,6 +306,11 @@ both entirely (e.g. an unstyled pip face with no medium or print-quality descrip
 all). Court and Joker layers are configurable via `--config` (see
 `references/CONFIG.md`) but default to fully on (except highlights), matching prior
 behavior.
+
+Special cards default `frame` to `false` (no standard card border — special cards typically
+have non-standard layouts) and `figure` to `false` (no figure by default; set
+`layers.figure.special` to a type value to add a figure). There are no corner indices on
+Special cards — see the SPECIAL template.
 
 When generating multiple cards for the same deck, reuse the exact same resolved
 `[STYLE_BLOCK]` and `[FRAME_LINE]` for every card of the same group so the set stays
@@ -520,28 +525,69 @@ no corner indices, no rank letters, no suit symbols,
 
 ---
 
+## SPECIAL template
+
+Used when rank = Special. No suit, no corner indices, no card frame by default
+(`layers.frame.special` defaults to `"false"`). STYLE_BLOCK and FRAME_LINE are resolved
+for the `special` group per "Layers and [STYLE_BLOCK] assembly" above. Unlike Back cards,
+Special cards have no built-in forced STYLE_BLOCK addition — STYLE_BLOCK assembles
+normally from whatever `layers.*.<special>` cells are configured.
+
+`[SPECIAL_TYPE_LINE]` is the "Special type line" text from the selected type's asset
+file in `assets/special/` (e.g., `prospect.md` or `marketing.md`), OR free text if the
+user chose "Custom text" in the wizard (Step S2). Drop this line if empty.
+
+`[CARD_NAME]` is the display name the user provided for this specific card (e.g.,
+"King of Clubs" for a prospect card, or any custom name). Required.
+
+`[FIGURE_DESCRIPTION]` is the figure description:
+- For **prospect-type** cards: the named figure assigned to this card slot by the
+  wizard (Step S4), e.g., "Peter the Great, Russian Emperor, in imperial regalia,"
+- For **other types**: the user's visual content description from Step S3.
+Drop this line if empty.
+
+`[SPECIAL_ATTRIBUTES]` is any additional attributes or props the user provides in Step S5. Drop if empty.
+
+```
+[ASPECT_RATIO] aspect ratio, special playing card,
+[CARD_NAME],
+[SPECIAL_TYPE_LINE]
+[STYLE_BLOCK]
+[FRAME_LINE]
+no corner indices, no standard rank letters, no suit symbols,
+[FIGURE_DESCRIPTION]
+[SPECIAL_ATTRIBUTES]
+[NEGATIVE_LIST]
+```
+
+---
+
 ## Rank reference table
 
-| Choice | RANK_NAME | RANK_LETTER source                | Template | RANK_COUNT |
-|--------|-----------|-----------------------------------|----------|------------|
-| A      | Ace       | `A` (or `1`)                      | ACE      | 1          |
-| 2      | Two       | `2`                               | PIP      | 2          |
-| 3      | Three     | `3`                               | PIP      | 3          |
-| 4      | Four      | `4`                               | PIP      | 4          |
-| 5      | Five      | `5`                               | PIP      | 5          |
-| 6      | Six       | `6`                               | PIP      | 6          |
-| 7      | Seven     | `7`                               | PIP      | 7          |
-| 8      | Eight     | `8`                               | PIP      | 8          |
-| 9      | Nine      | `9`                               | PIP      | 9          |
-| 10     | Ten       | `10`                              | PIP      | 10         |
-| J      | Jack      | from lettering system (J/V/B/В/Kn)| COURT    | —          |
-| Q      | Queen     | from lettering system (Q/D/V/Д)   | COURT    | —          |
-| K      | King      | from lettering system (K/R/H/К)   | COURT    | —          |
-| Jkr    | Joker     | `index.symbol` (star-in-circle default) | JOKER | —       |
-| Back   | Back      | — (no index letter)                     | BACK  | —       |
+| Choice  | RANK_NAME | RANK_LETTER source                      | Template | RANK_COUNT |
+|---------|-----------|------------------------------------------|----------|------------|
+| A       | Ace       | `A` (or `1`)                            | ACE      | 1          |
+| 2       | Two       | `2`                                     | PIP      | 2          |
+| 3       | Three     | `3`                                     | PIP      | 3          |
+| 4       | Four      | `4`                                     | PIP      | 4          |
+| 5       | Five      | `5`                                     | PIP      | 5          |
+| 6       | Six       | `6`                                     | PIP      | 6          |
+| 7       | Seven     | `7`                                     | PIP      | 7          |
+| 8       | Eight     | `8`                                     | PIP      | 8          |
+| 9       | Nine      | `9`                                     | PIP      | 9          |
+| 10      | Ten       | `10`                                    | PIP      | 10         |
+| J       | Jack      | from lettering system (J/V/B/В/Kn)      | COURT    | —          |
+| Q       | Queen     | from lettering system (Q/D/V/Д)         | COURT    | —          |
+| K       | King      | from lettering system (K/R/H/К)         | COURT    | —          |
+| Jkr     | Joker     | `index.symbol` (star-in-circle default) | JOKER    | —          |
+| Back    | Back      | — (no index letter)                     | BACK     | —          |
+| Special | Special   | — (no index letter)                     | SPECIAL  | —          |
 
 > **Back cards** have no corner indices — `[INDEX_LINE]` is replaced by the literal
 > `no corner indices, no rank letters, no suit symbols,` in the BACK template.
+
+> **Special cards** have no corner indices — the SPECIAL template hardcodes
+> `no corner indices, no standard rank letters, no suit symbols,` inline (no `[INDEX_LINE]`).
 
 RANK_NAME is always the English word; RANK_LETTER is the localized printed index per
 `assets/lettering/systems.md` (for court cards) or the `index.symbol` glyph phrase

@@ -150,7 +150,18 @@ Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
 | `index.symbol`              | `star-in-circle`, `star`, `Jkr`, `J`, `crown`, `jester-face`, `none` (or custom); the glyph shown in Joker corner indices (see `assets/index/options.md` Symbol table for the phrase each value produces) | `star-in-circle` |
 | `index.type`                | `standard` (rank+suit index), `joker` (symbol-only index via Menu D2); auto-derived from card group during assembly — set explicitly only to force joker-style indices on all cards | `standard` |
 
-`<group>` is one of `court`, `pip`, `ace`, `joker`.
+`<group>` is one of `court`, `pip`, `ace`, `joker`, `back`, `special`.
+
+**Back group defaults** — `layers.figure.back` = `"false"`, `layers.split.back` = `"false"`;
+all other layers default `"true"` except highlights (`"false"`). Back cards always include
+the symmetry instruction from `assets/back/symmetry.md` in their STYLE_BLOCK regardless of
+layer settings (see REFERENCE.md).
+
+**Special group defaults** — `layers.frame.special` = `"false"` (no standard card border),
+`layers.figure.special` = `"false"` (no figure by default), `layers.split.special` = `"false"`.
+Special cards have no corner indices — the SPECIAL template hardcodes `no corner indices,
+no standard rank letters, no suit symbols,`. All other layers default `"true"` except
+highlights (`"false"`).
 
 `image_generator` controls how the assembled prompt is adapted (negative-list
 placement, aspect-ratio syntax, extra parameters) — see `assets/engines/`.
