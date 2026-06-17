@@ -28,12 +28,20 @@ Usage:
 
 Keys (within a profile): deck, lettering, style, frame, aspect_ratio, image_generator,
       structure, index.size, index.count, index.layout, index.symbol, index.type,
-      layers.<background|decor|ornaments|highlights|frame|figure|mood|technique>.<court|pip|ace|joker>,
-      mood, theme, figure_proportion
+      layers.<background|decor|ornaments|highlights|frame|figure|mood|technique|split>.<court|pip|ace|joker>,
+      mood, theme, figure_scale, character_framing
 
 Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
 "false" (layer off), "true" (layer on, no addition), or any other text (layer on,
 used as that group's addition on top of the layer's own pattern/preset text).
+
+`layers.figure.<group>` extends this with type-encoding: "false" (off), "character",
+"building", "animal", "custom" (on + figure type). `layers.split.<group>` accepts
+"false" (not configured), "none" (no split), "horizontal-mirrored", "angled-mirrored".
+
+A pre-4.0 config.json may still have `figure_proportion` — it is migrated automatically
+to `character_framing` on load (figure_proportion value → character_framing; figure_scale
+defaults to "inscribed-in-frame"; layers.figure.<group>="true" → "character").
 
 A pre-3.6 config.json may still have the old per-layer `ornaments_extra.<group>`,
 `highlights_extra.<group>`, and `frame_extra.<group>` fields, and a pre-3.13
@@ -67,7 +75,11 @@ BOOL_VALUES = ["true", "false"]
 STRUCTURE = ["full", "illustration"]
 
 GROUPS = ("court", "pip", "ace", "joker")
-LAYERS = ("background", "decor", "ornaments", "highlights", "frame", "figure", "mood", "technique")
+LAYERS = ("background", "decor", "ornaments", "highlights", "frame", "figure", "mood", "technique", "split")
+
+FIGURE_TYPE = ["character", "building", "animal", "custom"]
+SPLIT_VALUES = ["false", "none", "horizontal-mirrored", "angled-mirrored"]
+FIGURE_SCALE = ["full-bleed", "inscribed-in-frame", "small-centered"]
 
 # Pre-3.6 field names that are migrated into extras.<layer>.<group> (and from there,
 # on a later load, into layers.<layer>.<group> — see _migrate_layers_extras) on load.
@@ -92,6 +104,7 @@ LAYER_DEFAULTS = {
     "figure":     {"court": "true", "pip": "false", "ace": "false", "joker": "true"},
     "mood":       {"court": "true", "pip": "true",  "ace": "true",  "joker": "true"},
     "technique":  {"court": "true", "pip": "true",  "ace": "true",  "joker": "true"},
+    "split":      {"court": "false", "pip": "false", "ace": "false", "joker": "false"},
 }
 
 DEFAULTS = {
@@ -106,7 +119,8 @@ DEFAULTS = {
     "layers": {layer: dict(groups) for layer, groups in LAYER_DEFAULTS.items()},
     "mood": "",
     "theme": "",
-    "figure_proportion": "",
+    "figure_scale": "inscribed-in-frame",
+    "character_framing": "",
 }
 
 # Top-level field names of a profile — used to detect a pre-3.0 flat config.json
@@ -120,7 +134,7 @@ BUILTIN_CONFIG = {
 
 PERSISTENT_KEYS = {"deck", "lettering", "style", "frame", "aspect_ratio", "image_generator",
                    "structure", "index.size", "index.count", "index.layout", "index.symbol",
-                   "index.type", "mood", "theme", "figure_proportion"}
+                   "index.type", "mood", "theme", "figure_scale", "character_framing"}
 PERSISTENT_KEYS |= {f"layers.{layer}.{g}" for layer in LAYERS for g in GROUPS}
 
 
@@ -151,6 +165,24 @@ def allowed_figure_proportions() -> list[str]:
     return _discover("figure-proportion") or ["waist-up"]
 
 
+def allowed_figure_types() -> list[str]:
+    # Figure types are discovered from assets/figure-type/; fall back to enum.
+    return _discover("figure-type") or FIGURE_TYPE
+
+
+def allowed_character_framings() -> list[str]:
+    # Character framings may be custom; this is the on-disk set used for suggestions.
+    return _discover("character-framing") or ["waist-up"]
+
+
+def allowed_splits() -> list[str]:
+    # Split values are the on-disk stems plus "false" and "none" (which have no file).
+    on_disk = _discover("split")
+    known = [v for v in SPLIT_VALUES if v not in ("false", "none")]
+    merged = list(dict.fromkeys(["false", "none"] + on_disk + known))
+    return merged
+
+
 def allowed_engines() -> list[str]:
     # Engines may be custom; this is the on-disk set used for suggestions.
     return _discover("engines") or ["nanobanana", "stable-diffusion", "midjourney", "dalle", "kaze"]
@@ -172,17 +204,24 @@ def options_for(key: str):
         "index.type": (INDEX_TYPE, True),
         "mood": (None, False),    # free text deck-wide atmosphere
         "theme": (None, False),   # free text deck-wide theme/symbolism
-        "figure_proportion": (allowed_figure_proportions(), False),  # custom allowed
+        "figure_scale": (FIGURE_SCALE, False),       # custom crop text allowed
+        "character_framing": (allowed_character_framings(), False),  # custom allowed; "" = not set
     }.get(key)
     if fixed is not None:
         return fixed
     if key.startswith("layers.") and key.count(".") == 2:
         _, layer, group = key.split(".")
-        if layer in LAYERS and group in GROUPS:
-            # "true"/"false" toggle the layer; any other text both enables it
-            # and becomes its group-wide addition (see validate_value).
-            return (BOOL_VALUES, False)
-        return None
+        if layer not in LAYERS or group not in GROUPS:
+            return None
+        if layer == "split":
+            # Split values are strict to the four defined modes.
+            return (allowed_splits(), True)
+        if layer == "figure":
+            # figure layer accepts type enum (false/character/building/animal/custom)
+            # plus free-text additions (non-strict, preserving existing behavior).
+            return (["false"] + allowed_figure_types(), False)
+        # All other layers: "true"/"false" toggle; any other text enables + adds.
+        return (BOOL_VALUES, False)
     return None
 
 
@@ -194,6 +233,8 @@ def validate_value(key: str, value: str) -> tuple[bool, str]:
         return False, f"unknown key '{key}' (valid: {', '.join(sorted(PERSISTENT_KEYS))})"
     allowed, strict = opt
     if allowed is None:  # free text
+        return True, ""
+    if value == "":  # empty string = "not set" — always valid, no suggestions
         return True, ""
     if key == "aspect_ratio":
         if value in allowed or re.fullmatch(r"\d+:\d+", value):
@@ -267,9 +308,36 @@ def _migrate_layers_extras(profile: dict) -> bool:
     return True
 
 
+def _migrate_figure_proportion(profile: dict) -> bool:
+    """Migrate a pre-4.0 profile that has `figure_proportion` to the new schema.
+
+    Mapping (D-06/D-07):
+    - figure_proportion → character_framing (if character_framing not already set)
+    - figure_scale defaults to "inscribed-in-frame" if not already set
+    - layers.figure.<group> = "true" → "character" (existing enabled figures default to character)
+    - figure_proportion key is removed from the profile
+
+    Returns True if anything was changed.
+    """
+    if "figure_proportion" not in profile:
+        return False
+    old_val = profile.pop("figure_proportion")
+    changed = True
+    if old_val and not profile.get("character_framing"):
+        profile["character_framing"] = old_val
+    profile.setdefault("figure_scale", "inscribed-in-frame")
+    # Migrate layers.figure.<group> = "true" → "character"
+    layers = profile.get("layers", {})
+    fig = layers.get("figure", {})
+    for group in GROUPS:
+        if fig.get(group) == "true":
+            fig[group] = "character"
+    return changed
+
+
 def load_raw() -> dict:
-    """Load config.json, migrating a pre-3.0 flat file, pre-3.6 *_extra fields, and a
-    pre-3.13 extras.<layer>.<group> namespace."""
+    """Load config.json, migrating a pre-3.0 flat file, pre-3.6 *_extra fields, a
+    pre-3.13 extras.<layer>.<group> namespace, and a pre-4.0 figure_proportion field."""
     if not CONFIG_PATH.exists():
         return json.loads(json.dumps(BUILTIN_CONFIG))
     try:
@@ -290,6 +358,9 @@ def load_raw() -> dict:
     if any(_migrate_layers_extras(prof) for prof in cfg["profiles"].values()):
         migrated = True
         print("note: merged extras.<layer>.<group> into layers.<layer>.<group>", file=sys.stderr)
+    if any(_migrate_figure_proportion(prof) for prof in cfg["profiles"].values()):
+        migrated = True
+        print("note: migrated figure_proportion to figure_scale + character_framing", file=sys.stderr)
     if migrated:
         save_raw(cfg)
     return cfg

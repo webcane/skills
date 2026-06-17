@@ -48,10 +48,10 @@
           "joker": "true"
         },
         "figure": {
-          "court": "true",
+          "court": "character",
           "pip": "false",
           "ace": "false",
-          "joker": "true"
+          "joker": "character"
         },
         "mood": {
           "court": "true",
@@ -64,11 +64,18 @@
           "pip": "false",
           "ace": "false",
           "joker": "true"
+        },
+        "split": {
+          "court": "false",
+          "pip": "false",
+          "ace": "false",
+          "joker": "false"
         }
       },
       "mood": "",
       "theme": "",
-      "figure_proportion": ""
+      "figure_scale": "inscribed-in-frame",
+      "character_framing": ""
     }
   }
 }
