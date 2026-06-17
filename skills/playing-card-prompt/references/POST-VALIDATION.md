@@ -77,9 +77,16 @@ unless the failure stems from missing/ambiguous information only they can resolv
 - [ ] **Aspect ratio** — the aspect ratio is a concrete `W:H` ratio (from Step 12 or
   the user's custom value) or its engine-specific equivalent (pixel size, `--ar`,
   fixed size), not descriptive text.
-- [ ] **Template match** — the COURT/PIP/ACE template matches the resolved rank, and no
-  figure-only fields (character, attributes, negatives) appear in a PIP/ACE prompt
-  whose group has `layers.figure.<group>` set to `false`.
+- [ ] **Template match** — the COURT/PIP/ACE/JOKER template matches the resolved rank,
+  and no figure-only fields (character, attributes, negatives) appear in a PIP/ACE
+  prompt whose group has `layers.figure.<group>` set to `false`.
+- [ ] **Joker correctness** — if the rank is Joker: `[JOKER_ROLE]` is present (Big
+  Joker / Little Joker / Wild Joker or custom); no `[SUIT_NAME_TITLE]` /
+  `[SUIT_SYMBOL]` / `[SUIT_COLOR]` placeholders appear; no reversible-layout or
+  central-dividing-line phrase appears; `[INDEX_LINE]` is built from Menu D2 in
+  `assets/index/options.md` (symbol-only, `no rank letter, no suit symbol`), or
+  replaced entirely by `no corner indices, full-bleed illustration,` when
+  `index.count = "none"`.
 - [ ] **Engine formatting** — the chosen `image_generator` (Step 13)'s negative
   handling, aspect-ratio syntax, and extra parameters from
   `assets/engines/<engine>.md` are all applied; for `nanobanana` the prompt matches

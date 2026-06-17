@@ -58,9 +58,10 @@ new profile is a self-contained copy a user can then tweak independently.
 
 Dotted keys address nested groups: `index.size`, `index.count`, `index.layout`, and the
 two-level `layers.<layer>.<group>` (e.g. `layers.frame.pip`, `layers.highlights.ace`,
-`layers.figure.pip`, `layers.mood.court`, `layers.technique.pip`), where `<layer>` is
-one of `background`, `decor`, `ornaments`, `highlights`, `frame`, `figure`, `mood`,
-`technique`. `mood`, `theme`, and `frame` are flat fields (no `<group>`).
+`layers.figure.pip`, `layers.mood.court`, `layers.technique.pip`,
+`layers.figure.joker`), where `<layer>` is one of `background`, `decor`, `ornaments`,
+`highlights`, `frame`, `figure`, `mood`, `technique`. `mood`, `theme`, `frame`, and
+`mood`, `theme`, and `frame` are flat fields (no `<group>`).
 
 ## Lookup order
 
@@ -146,8 +147,10 @@ Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
 | `mood`                      | free text (deck-wide atmosphere, e.g. `gothic and brooding atmosphere,`); see `assets/mood/` for presets | `""` |
 | `theme`                     | free text (deck-wide concept/symbolism, e.g. `celestial mythology`) | `""` |
 | `figure_proportion`         | `bust`, `waist-up`, `three-quarter`, `seven-eighths`, `full-body` (or any custom framing/crop description); see `assets/figure-proportion/` for presets | `""` |
+| `index.symbol`              | `star-in-circle`, `star`, `Jkr`, `J`, `crown`, `jester-face`, `none` (or custom); the glyph shown in Joker corner indices (see `assets/index/options.md` Symbol table for the phrase each value produces) | `star-in-circle` |
+| `index.type`                | `standard` (rank+suit index), `joker` (symbol-only index via Menu D2); auto-derived from card group during assembly — set explicitly only to force joker-style indices on all cards | `standard` |
 
-`<group>` is one of `court`, `pip`, `ace`.
+`<group>` is one of `court`, `pip`, `ace`, `joker`.
 
 `image_generator` controls how the assembled prompt is adapted (negative-list
 placement, aspect-ratio syntax, extra parameters) — see `assets/engines/`.
@@ -211,11 +214,12 @@ like Pip/Ace, can be tuned per layer via `--config`.
 
 **Persistent** (saved per profile — rarely change between cards):
 `deck`, `lettering`, `style`, `frame`, `aspect_ratio`, `image_generator`, `structure`,
-`index.*`, `layers.*`, `mood`, `theme`, `figure_proportion`
+`index.*` (including `index.symbol` and `index.type`), `layers.*`, `mood`, `theme`,
+`figure_proportion`
 
 **Per-card** (always asked in the wizard — never saved):
-`rank`, `suit`, `character_name`, `character_features`, `extra_attributes`,
-`reference_transfers`, `exclusions`
+`rank`, `suit` (or `joker_color` for Joker cards), `character_name`,
+`character_features`, `extra_attributes`, `reference_transfers`, `exclusions`
 
 ## Example `config.json`
 

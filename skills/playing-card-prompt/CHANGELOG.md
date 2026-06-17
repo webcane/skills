@@ -4,6 +4,26 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
+## [Unreleased]
+
+### Added
+- **Joker card support** — new `joker` card group, available in all four deck systems
+  (French, German, Swiss, Latin). Selecting Joker as the rank runs a JOKER-specific
+  wizard flow: Step 4 is replaced by Step 4.1 (Joker color: Multicolor / Red / Black,
+  per-card) and Step 4.2 (Joker index glyph: `✪`, `★`, `Jkr`, `none`, or custom —
+  persistent, deck-wide). The Joker uses its own JOKER template (non-reversible
+  full-card single-figure composition, no suit fields, no central dividing line) and
+  its own `[INDEX_LINE]` construction (corner glyph only, no rank+suit stack). A new
+  `assets/courts/joker.md` supplies traditional Joker attributes (jester's cap, motley
+  costume, bauble, theatrical pose). Joker defaults to fully decorated with a figure
+  (like Court cards): all layers on except highlights. Added `index.symbol` (Joker
+  corner glyph, named string — `star-in-circle` default), `index.type`
+  (`standard`/`joker`), and extended `index.count` with `top-only` and `none` (Menu D2
+  Joker placement) to `scripts/manage_config.py`, `config.json`,
+  `assets/index/options.md`, `references/CONFIG.md`, `references/REFERENCE.md`, and
+  `references/POST-VALIDATION.md`; updated `references/WIZARD-STEP-MAP.md`, all four
+  deck files, and `TODO.md`. Added new Joker role variants: Big / Little / Wild.
+
 ## [3.19.0] - 2026-06-16
 
 ### Added

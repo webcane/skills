@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.19.0
+  version: 3.20.0
   description_claudeai: Interactive wizard to build image-gen prompts for stylized playing cards. 4 deck patterns, 6 lettering systems, 3+ styles, court/pip/ace. Trigger on card design requests.
 ---
 
@@ -42,7 +42,7 @@ the shell's current working directory.
 
 Before asking any wizard questions, load the active profile's persistent settings
 (`deck`, `lettering`, `style`, `frame`, `aspect_ratio`, `image_generator`, `structure`,
-`index.*`, `layers.*`, `mood`, `theme`, `figure_proportion`) via
+`index.symbol`, `index.*`, `layers.*`, `mood`, `theme`, `figure_proportion`) via
 `python3 scripts/manage_config.py show`. This also lists every saved profile and which
 one is active.
 Everything else — schema, profile concept, lookup order, field reference, and the
@@ -83,7 +83,11 @@ Steps to ask in config mode:
    (`illustration`, for users compositing the artwork into their own SVG/HTML card
    template that already supplies the frame and corner indices). See "`structure`
    setting" in `references/REFERENCE.md` for what changes under `illustration`.
-10. (Optional, only if user asks) Index settings, or per-layer overrides via
+10. Joker index (D2) — `index.count` (placement: `4-index` / `2-index` / `top-only` /
+    `none`) and `index.symbol` (glyph: `star-in-circle` / `star` / `Jkr` / `crown` /
+    `jester-face` / `none` / custom). Only surface when the user mentions Joker
+    settings or asks explicitly.
+11. (Optional, only if user asks) Standard index settings, or per-layer overrides via
     `layers.<layer>.<group>` for Court/Pip/Ace (e.g. `layers.ornaments.ace`,
     `layers.figure.pip`, `layers.mood.court`). Turning on `layers.figure.pip` or
     `layers.figure.ace` (transformation decks) makes Steps 8–12 apply to pip/ace
@@ -206,23 +210,58 @@ letter); for number cards it's unused, but ask it here to keep the flow consiste
 ### Step 3 — Rank · _per-card_
 
 Always ask. Offer only the ranks listed in the chosen `assets/decks/<deck>.md`
-(standard set: A, 2–10, J, Q, K). Resolve via the rank table in `references/REFERENCE.md`:
+(standard set: A, 2–10, J, Q, K, Joker). Resolve via the rank table in
+`references/REFERENCE.md`:
 - **K / Q / J → COURT** → auto-load `assets/courts/<rank>.md`; this card's group is
   `court` (`layers.figure.court` defaults to `true`).
 - **A → ACE** → this card's group is `ace` (`layers.figure.ace` defaults to `false`).
 - **2–10 → PIP** → this card's group is `pip` (`layers.figure.pip` defaults to `false`).
+- **Joker → JOKER** → auto-load `assets/courts/joker.md`; this card's group is
+  `joker` (`layers.figure.joker` defaults to `true`). Skip Step 4 (no suit); run
+  Steps 4.1 and 4.2 below instead.
 
 Whether Steps 9–12 apply to this card depends on `layers.figure.<group>` for the group
 just set — see the check after Step 7.
 
-Set `RANK_NAME` (English word) and `RANK_LETTER` (localized letter from Step 2 for
-courts; the numeral for pips; `A` for Ace unless the user wants `1`).
+Set `RANK_NAME` (English word: Joker for the Joker) and `RANK_LETTER` (localized
+letter from Step 2 for courts; numeral for pips; `A` for Ace; `index.symbol` value for
+the Joker — see Steps 4.1–4.2).
 
-### Step 4 — Suit · _per-card_
+### Step 4 — Suit · _per-card_ (skipped for Joker — see Steps 4.1–4.2)
 
-Always ask. Offer the four suits from the chosen deck (show symbol/shape + name,
-e.g. "♠ Spades" or "Acorns"). Fill `SUIT_NAME_TITLE`, `SUIT_NAME`, `SUIT_SYMBOL`,
-`SUIT_COLOR` from the deck file.
+Always ask for non-Joker cards. Offer the four suits from the chosen deck (show
+symbol/shape + name, e.g. "♠ Spades" or "Acorns"). Fill `SUIT_NAME_TITLE`,
+`SUIT_NAME`, `SUIT_SYMBOL`, `SUIT_COLOR` from the deck file.
+
+### Steps 4.1–4.2 — Joker-only (run instead of Step 4 when rank is Joker)
+
+**Step 4.1 — Joker type · _per-card_**
+
+Ask which type of Joker this is. This fills `[JOKER_ROLE]` in the JOKER template.
+Options:
+- **Big Joker (Full)** — primary Joker; vivid full-color elaborate composition. `[JOKER_ROLE]` = `Big Joker, full-color vivid elaborate palette`
+- **Little Joker (Half)** — secondary Joker; simpler, subdued or monochrome. `[JOKER_ROLE]` = `Little Joker, simplified subdued monochrome palette`
+- **Wild / Trump Joker** — European tradition (Narr / Fool); unpaired. `[JOKER_ROLE]` = `Wild Joker, European fool-card tradition, unpaired`
+- **Custom** — user supplies their own type/color/variant description
+
+**Step 4.2 — Joker index placement + symbol · _persistent_ (skipped if loaded from config)**
+
+Ask two things for the Joker's corner indices (Menu D2 — see `assets/index/options.md`):
+
+**Placement** (`index.count`):
+- **4-corner** (default) — all four corners
+- **2-corner** — top-left and bottom-right only
+- **Top-only** — single top-left index
+- **None / Full-bleed** — no corner indices
+
+**Symbol** (`index.symbol`, skipped if placement is None):
+- **star-in-circle** (default) — `a star enclosed in a circle glyph`
+- **star** — `a five-pointed star`
+- **Jkr** — `the text "Jkr"`
+- or Other: `J`, `crown`, `jester-face`, any custom glyph/text
+
+Save choices via `python3 scripts/manage_config.py set index.count <value>` and
+`python3 scripts/manage_config.py set index.symbol <value>`.
 
 ### Step 5 — Visual style / pattern (REQUIRED) · _persistent_
 
@@ -278,10 +317,10 @@ via `layers.<layer>.<group>` (defaults and full resolution rules are in "Layers 
 3. **Highlights / overlays (optional, all cards)** — ask, free text, whether to add
    any gilding, lacquer, glow, or shine accents (e.g. "gold leaf highlights along the
    raised linework"). If the user gives a description, set
-   `layers.highlights.court`, `layers.highlights.pip`, and `layers.highlights.ace` to
-   that text (this both turns the highlights layer on and supplies the addition for
-   all three groups). If skipped, leave the highlights layer off everywhere (the
-   default).
+   `layers.highlights.court`, `layers.highlights.pip`, `layers.highlights.ace`, and
+   `layers.highlights.joker` to that text (this both turns the highlights layer on and
+   supplies the addition for all groups). If skipped, leave the highlights layer off
+   everywhere (the default).
 
    Per-group additions to the background or background pattern/accents (e.g. "faint
    marbling on the court cards only") are likewise config-only, not asked here — set
@@ -347,7 +386,7 @@ and dreamlike, soft starlight glow,").
   regardless of `layers.mood.<group>`, so skip the group question below.
 
 If `mood` is non-empty, ask which card groups should carry it — multiSelect (Court,
-Pip, Ace; default: all three selected, matching the current `layers.mood.<group>`
+Pip, Ace, Joker; default: all four selected, matching the current `layers.mood.<group>`
 defaults). Set `layers.mood.<group>` to `true` for selected groups and `false` for any
 deselected ones.
 
@@ -358,13 +397,13 @@ on the court cards) is config-only, not asked here — set via
 
 ---
 
-**Check `layers.figure.<group>` for this card's group** (`court`/`pip`/`ace`, default
-`true` for court, `false` for pip/ace unless previously configured via `--config`). If
-it's `false`, this card has no figure — skip straight to Step 13 (Aspect ratio).
-Otherwise, Steps 8–12 apply: court cards by default, plus any pip/ace card whose
-`layers.figure.<group>` was turned on for a transformation-style deck. Step 8 (figure
-proportion) is persistent — skipped if already set or loaded from config; Steps 9–12
-are per-card.
+**Check `layers.figure.<group>` for this card's group** (`court`/`pip`/`ace`/`joker`,
+default `true` for court and joker, `false` for pip/ace unless previously configured
+via `--config`). If it's `false`, this card has no figure — skip straight to Step 13
+(Aspect ratio). Otherwise, Steps 8–12 apply: court and joker cards by default, plus
+any pip/ace card whose `layers.figure.<group>` was turned on for a transformation-style
+deck. Step 8 (figure proportion) is persistent — skipped if already set or loaded from
+config; Steps 9–12 are per-card.
 
 ---
 
@@ -496,15 +535,19 @@ Offer to save the choice to `config.json` like the other persistent settings.
 
 ## Assembling the prompt
 
-1. Pick the template (COURT / PIP / ACE) from `references/REFERENCE.md`. If
+1. Pick the template (COURT / PIP / ACE / JOKER) from `references/REFERENCE.md`. If
    `structure` is `illustration`, replace the template's opening line with the
    illustration-only opening line from "`structure` setting" in
    `references/REFERENCE.md` (otherwise use the template's default opening line
    unchanged).
-2. Build `[INDEX_LINE]` from `assets/index/options.md` using the silent defaults (Standard size,
-   4-Index, rank stacked above suit) — unless the user explicitly asked for a different
-   index, in which case combine the chosen fragments. If `structure` is `illustration`,
-   skip this entirely and drop `[INDEX_LINE]` from the template.
+2. Build `[INDEX_LINE]` from `assets/index/options.md`:
+   - **Standard cards** (`index.type = "standard"`): Menus A/B/C — rank+suit, silent
+     defaults (4-Index, stacked, standard size).
+   - **Joker cards** (`index.type = "joker"`, always for the `joker` group): Menu D2 +
+     Symbol table — placement from `index.count`, symbol from `index.symbol`. When
+     `index.count = "none"` (or `index.symbol = "none"`), emit only `no corner indices,
+     full-bleed illustration,`.
+   - If `structure` is `illustration`, skip this step entirely for all card types.
 3. For cards with a figure, fill `[CHARACTER_NAME]`/`[CHARACTER_FEATURES]` (required), then build
    `[RESOLVED_ATTRIBUTES]` and `[NEGATIVE_LIST]` by following the merge rules in
    `references/REFERENCE.md` (resolve conflicts down to one final, deduplicated,

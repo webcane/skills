@@ -12,48 +12,58 @@
       "index": {
         "size": "standard",
         "count": "4-index",
-        "layout": "stacked"
+        "layout": "stacked",
+        "symbol": "star-in-circle",
+        "type": "standard"
       },
       "layers": {
         "background": {
           "court": "true",
           "pip": "true",
-          "ace": "true"
+          "ace": "true",
+          "joker": "true"
         },
         "decor": {
           "court": "true",
           "pip": "false",
-          "ace": "false"
+          "ace": "false",
+          "joker": "true"
         },
         "ornaments": {
           "court": "true",
           "pip": "false",
-          "ace": "false"
+          "ace": "false",
+          "joker": "true"
         },
         "highlights": {
           "court": "false",
           "pip": "false",
-          "ace": "false"
+          "ace": "false",
+          "joker": "false"
         },
         "frame": {
           "court": "true",
           "pip": "true",
-          "ace": "true"
+          "ace": "true",
+          "joker": "true"
         },
         "figure": {
           "court": "true",
           "pip": "false",
-          "ace": "false"
+          "ace": "false",
+          "joker": "true"
         },
         "mood": {
           "court": "true",
           "pip": "false",
-          "ace": "false"
+          "ace": "false",
+          "joker": "true"
         },
         "technique": {
           "court": "true",
           "pip": "false",
-          "ace": "false"
+          "ace": "false",
+          "joker": "true"
         }
       },
       "mood": "",

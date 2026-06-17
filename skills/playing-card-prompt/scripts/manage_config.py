@@ -27,8 +27,8 @@ Usage:
   manage_config.py profile reset <name> --yes         # clear a profile's overrides
 
 Keys (within a profile): deck, lettering, style, frame, aspect_ratio, image_generator,
-      structure, index.size, index.count, index.layout,
-      layers.<background|decor|ornaments|highlights|frame|figure|mood|technique>.<court|pip|ace>,
+      structure, index.size, index.count, index.layout, index.symbol, index.type,
+      layers.<background|decor|ornaments|highlights|frame|figure|mood|technique>.<court|pip|ace|joker>,
       mood, theme, figure_proportion
 
 Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
@@ -58,13 +58,15 @@ DEFAULT_PROFILE_NAME = "default"
 # Enumerations that do not depend on disk contents.
 LETTERING = ["anglo-american", "french", "german", "russian", "dutch", "scandinavian"]
 INDEX_SIZE = ["standard", "jumbo", "magnum"]
-INDEX_COUNT = ["2-index", "4-index"]
+INDEX_COUNT = ["4-index", "2-index", "top-only", "none"]
 INDEX_LAYOUT = ["stacked", "side-by-side", "peek", "none"]
+INDEX_SYMBOL = ["star-in-circle", "star", "Jkr", "J", "crown", "jester-face", "none"]
+INDEX_TYPE = ["standard", "joker"]
 ASPECT_PRESETS = ["5:7", "9:14", "14:25", "7:12"]
 BOOL_VALUES = ["true", "false"]
 STRUCTURE = ["full", "illustration"]
 
-GROUPS = ("court", "pip", "ace")
+GROUPS = ("court", "pip", "ace", "joker")
 LAYERS = ("background", "decor", "ornaments", "highlights", "frame", "figure", "mood", "technique")
 
 # Pre-3.6 field names that are migrated into extras.<layer>.<group> (and from there,
@@ -82,14 +84,14 @@ LEGACY_EXTRA_KEYS = {
 # shipped in config.json — that file is the human-readable copy; this dict is what
 # every profile falls back to for fields it doesn't override.
 LAYER_DEFAULTS = {
-    "background": {"court": "true", "pip": "true", "ace": "true"},
-    "decor": {"court": "true", "pip": "false", "ace": "true"},
-    "ornaments": {"court": "true", "pip": "false", "ace": "true"},
-    "highlights": {"court": "false", "pip": "false", "ace": "false"},
-    "frame": {"court": "true", "pip": "false", "ace": "true"},
-    "figure": {"court": "true", "pip": "false", "ace": "false"},
-    "mood": {"court": "true", "pip": "true", "ace": "true"},
-    "technique": {"court": "true", "pip": "true", "ace": "true"},
+    "background": {"court": "true", "pip": "true",  "ace": "true",  "joker": "true"},
+    "decor":      {"court": "true", "pip": "false", "ace": "true",  "joker": "true"},
+    "ornaments":  {"court": "true", "pip": "false", "ace": "true",  "joker": "true"},
+    "highlights": {"court": "false","pip": "false", "ace": "false", "joker": "false"},
+    "frame":      {"court": "true", "pip": "false", "ace": "true",  "joker": "true"},
+    "figure":     {"court": "true", "pip": "false", "ace": "false", "joker": "true"},
+    "mood":       {"court": "true", "pip": "true",  "ace": "true",  "joker": "true"},
+    "technique":  {"court": "true", "pip": "true",  "ace": "true",  "joker": "true"},
 }
 
 DEFAULTS = {
@@ -100,7 +102,7 @@ DEFAULTS = {
     "aspect_ratio": "9:14",
     "image_generator": "nanobanana",
     "structure": "full",
-    "index": {"size": "standard", "count": "4-index", "layout": "stacked"},
+    "index": {"size": "standard", "count": "4-index", "layout": "stacked", "symbol": "star-in-circle", "type": "standard"},
     "layers": {layer: dict(groups) for layer, groups in LAYER_DEFAULTS.items()},
     "mood": "",
     "theme": "",
@@ -117,8 +119,8 @@ BUILTIN_CONFIG = {
 }
 
 PERSISTENT_KEYS = {"deck", "lettering", "style", "frame", "aspect_ratio", "image_generator",
-                   "structure", "index.size", "index.count", "index.layout", "mood", "theme",
-                   "figure_proportion"}
+                   "structure", "index.size", "index.count", "index.layout", "index.symbol",
+                   "index.type", "mood", "theme", "figure_proportion"}
 PERSISTENT_KEYS |= {f"layers.{layer}.{g}" for layer in LAYERS for g in GROUPS}
 
 
@@ -166,6 +168,8 @@ def options_for(key: str):
         "index.size": (INDEX_SIZE, True),
         "index.count": (INDEX_COUNT, True),
         "index.layout": (INDEX_LAYOUT, True),
+        "index.symbol": (INDEX_SYMBOL, False),   # custom glyph/text allowed
+        "index.type": (INDEX_TYPE, True),
         "mood": (None, False),    # free text deck-wide atmosphere
         "theme": (None, False),   # free text deck-wide theme/symbolism
         "figure_proportion": (allowed_figure_proportions(), False),  # custom allowed

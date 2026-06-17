@@ -11,7 +11,7 @@ Latin-suited deck. SUIT_SYMBOL is a described shape.
 | Coins (Oros / Denari)        | Coins           | coin      | gold coin   | gold       |
 
 ## Ranks available
-Default standard set: A, 2–10, J, Q, K.
+Default standard set: A, 2–10, J, Q, K, Joker (optional).
 (Authentic Latin packs are 40- or 48-card: 1–7 (or 1–9) plus Knave/Knight/King and
 no Ten/Queen. To model that, edit this rank list. Left standard by default.)
 

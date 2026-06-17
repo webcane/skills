@@ -11,8 +11,10 @@ loads.
 |---|---|---|---|---|---|
 | **1** | Deck type | #12 Pip/suit symbol design (deck's suits) | — | — (loads the suit/rank table) | `assets/decks/<deck>.md` |
 | **2** | Court lettering | #13 Typography / indices | Index *(structural — rank letters)* | `RANK_LETTER` (for court/ace) | `assets/lettering/systems.md` |
-| **3** | Rank | — *(template choice, not a style component)* | Center motif *(structural — selects COURT/PIP/ACE)*; sets this card's group (`court`/`pip`/`ace`), which determines the `layers.figure.<group>` default checked after Step 7 | `RANK_NAME`, `RANK_LETTER` | `references/REFERENCE.md` (rank table), `assets/courts/<rank>.md` if court |
-| **4** | Suit | #12 Pip/suit symbol design | Center motif *(structural)* | `SUIT_NAME_TITLE`, `SUIT_NAME`, `SUIT_SYMBOL`, `SUIT_COLOR` | `assets/decks/<deck>.md` |
+| **3** | Rank | — *(template choice, not a style component)* | Center motif *(structural — selects COURT/PIP/ACE/JOKER)*; sets this card's group (`court`/`pip`/`ace`/`joker`), which determines the `layers.figure.<group>` default checked after Step 7 | `RANK_NAME`, `RANK_LETTER` | `references/REFERENCE.md` (rank table), `assets/courts/<rank>.md` if court or joker |
+| **4** | Suit *(skipped for Joker)* | #12 Pip/suit symbol design | Center motif *(structural)* | `SUIT_NAME_TITLE`, `SUIT_NAME`, `SUIT_SYMBOL`, `SUIT_COLOR` | `assets/decks/<deck>.md` |
+| **4.1** | Joker role *(Joker only, per-card)* | #2 Color palette | Center motif *(structural)* | `JOKER_ROLE` | — |
+| **4.2** | Joker index glyph *(Joker only, persistent)* | #13 Typography / indices | Index *(structural)* | `JOKER_INDEX` → feeds `[INDEX_LINE]` | — |
 | **5** | Visual style/pattern | #1 Medium/technique, #2 Color palette, #3 Era/cultural context, #6 Line character, #7 Degree of stylization *(partial)*, #11 Typage/facial expression | Background, Decor, Ornaments, Highlights, Technique, Finish, Figure detail, Face Style — supplies the TEXT for all of them | feeds `[STYLE_BLOCK]` (layer text, incl. Technique and Finish — sharing one gate — when `layers.technique.<group>` is on, and Figure detail/Face Style when `layers.figure.<group>` is on) | `assets/pattern/<style>.md`, `assets/pattern/_adding-a-pattern.md` (if custom) |
 | **6** | Card decoration & theme | #14 Decoration/ornamentation, #15 Deck-wide theme/symbolism, #5 Composition/rhythm *(partial)* | Decor.pip, Ornaments.pip, Frame.pip, Highlights.\* (each toggled and given a per-group addition via `layers.<layer>.<group>`, incl. theme-derived for ornaments/highlights/frame); `layers.background`/`layers.decor` additions (config-only) | feeds `[STYLE_BLOCK]` (layer additions), `[FRAME_LINE]` (preset text + `layers.frame.<group>`'s addition) | `assets/frame/<frame>.md`, `assets/frame/_adding-a-frame.md` (if custom), `references/REFERENCE.md` ("Theme-derived ornaments/highlights/frame") |
 | **7** | Mood / atmosphere | #4 Mood/atmosphere | Mood.\* (per-group toggle via `layers.mood.<group>`); `mood` (preset or custom text); `layers.mood.<group>`'s addition (config-only per-group addition) | feeds `[STYLE_BLOCK]` (`[MOOD_LINE]` + per-group addition) | `assets/mood/<name>.md`, `assets/mood/_adding-a-mood.md` (if custom) |
@@ -28,7 +30,7 @@ loads.
 it's a persistent, deck-wide setting like Steps 1–2 and 5–6.
 
 **Steps 8–12 (the figure block) only run for a card whose group has
-`layers.figure.<group> = true`** — `court` by default, or `pip`/`ace` for
+`layers.figure.<group> = true`** — `court` and `joker` by default, or `pip`/`ace` for
 transformation-style decks where `layers.figure.pip`/`.ace` was turned on via
 `--config`. Otherwise the wizard goes straight from Step 7 to Step 13. Step 8
 (`figure_proportion`) is persistent — asked once and skipped on later cards/if loaded

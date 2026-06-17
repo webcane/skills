@@ -221,28 +221,30 @@ don't force).
 
 ### Defaults
 
-| Layer        | court | pip   | ace   |
-|--------------|-------|-------|-------|
-| background   | true  | true  | true  |
-| decor        | true  | false | true  |
-| ornaments    | true  | false | true  |
-| highlights   | false | false | false |
-| frame        | true  | true  | true  |
-| figure       | true  | false | false |
-| mood         | true  | true  | true  |
-| technique    | true  | true  | true  |
+| Layer        | court | pip   | ace   | joker |
+|--------------|-------|-------|-------|-------|
+| background   | true  | true  | true  | true  |
+| decor        | true  | false | true  | true  |
+| ornaments    | true  | false | true  | true  |
+| highlights   | false | false | false | false |
+| frame        | true  | true  | true  | true  |
+| figure       | true  | false | false | true  |
+| mood         | true  | true  | true  | true  |
+| technique    | true  | true  | true  | true  |
 
 These reproduce the traditional look out of the box: Court cards carry the full
 pattern including its Figure detail and Face Style sections; plain Pip cards show only
 background + technique/finish (no border, no extra accents, no figure); Aces
-keep their ornamental flourish and border but no figure. Highlights is off everywhere
-by default. `mood` and `theme` are both empty by default, so `[MOOD_LINE]` and the
-theme-derived ornaments/highlights produce nothing unless set. Technique is on
-everywhere by default — every card keeps the pattern's linework/medium rendering AND
-its Finish lines (the two share one gate); turn it off per group to drop both
-entirely (e.g. an unstyled pip face with no medium or print-quality descriptor at
-all). Court layers are configurable via `--config` (see `references/CONFIG.md`) but
-default to fully on (except highlights), matching prior behavior.
+keep their ornamental flourish and border but no figure; Joker cards carry the full
+pattern with a figure (like Court cards) — a fully decorated single-figure card.
+Highlights is off everywhere by default. `mood` and `theme` are both empty by default,
+so `[MOOD_LINE]` and the theme-derived ornaments/highlights produce nothing unless set.
+Technique is on everywhere by default — every card keeps the pattern's linework/medium
+rendering AND its Finish lines (the two share one gate); turn it off per group to drop
+both entirely (e.g. an unstyled pip face with no medium or print-quality descriptor at
+all). Court and Joker layers are configurable via `--config` (see
+`references/CONFIG.md`) but default to fully on (except highlights), matching prior
+behavior.
 
 When generating multiple cards for the same deck, reuse the exact same resolved
 `[STYLE_BLOCK]` and `[FRAME_LINE]` for every card of the same group so the set stays
@@ -366,6 +368,44 @@ no watermark
 
 ---
 
+## JOKER template
+
+`[CHARACTER_NAME]` and `[CHARACTER_FEATURES]` are REQUIRED (at minimum a name).
+Resolve attributes the same way as COURT (see "Before filling the template" above).
+
+`[JOKER_ROLE]` is the Joker's role/variant designation plus its palette/tradition hint
+(per-card, from Step 4.1). Standard values:
+- `Big Joker, full-color vivid elaborate palette`
+- `Little Joker, simplified subdued monochrome palette`
+- `Wild Joker, European fool-card tradition, unpaired`
+- or any custom phrase the user provides.
+
+The Joker is a **non-reversible, full-card single-figure composition** — no central
+dividing line, no mirrored halves. `[STYLE_BLOCK]` and `[FRAME_LINE]` are resolved for
+the `joker` group (`index.type` is effectively `"joker"` for this card).
+
+`[INDEX_LINE]` is built from `assets/index/options.md` using **Menu D2** (Joker
+placement) + the symbol from `index.symbol`. Default (4-corner, standard size,
+`index.symbol = "star-in-circle"`):
+```
+four corner indices, each showing a star enclosed in a circle glyph,
+no rank letter, no suit symbol, standard small index size,
+upper indices upright, lower indices rotated 180 degrees,
+```
+When `index.count = "none"` (or `index.symbol = "none"`), replace `[INDEX_LINE]`
+entirely with: `no corner indices, full-bleed illustration,`
+
+```
+[ASPECT_RATIO] aspect ratio, playing card, Joker card ([JOKER_ROLE]),
+[INDEX_LINE]
+[FRAME_LINE]
+[STYLE_BLOCK]
+[CHARACTER_NAME], [CHARACTER_FEATURES], [RESOLVED_ATTRIBUTES],
+[NEGATIVE_LIST]
+```
+
+---
+
 ## ACE template (A)
 
 `[STYLE_BLOCK]` and `[FRAME_LINE]` are resolved per "Layers and `[STYLE_BLOCK]`
@@ -404,9 +444,11 @@ no watermark
 | J      | Jack      | from lettering system (J/V/B/В/Kn)| COURT    | —          |
 | Q      | Queen     | from lettering system (Q/D/V/Д)   | COURT    | —          |
 | K      | King      | from lettering system (K/R/H/К)   | COURT    | —          |
+| Jkr    | Joker     | `index.symbol` (star-in-circle default) | JOKER | —       |
 
 RANK_NAME is always the English word; RANK_LETTER is the localized printed index per
-`assets/lettering/systems.md`.
+`assets/lettering/systems.md` (for court cards) or the `index.symbol` glyph phrase
+(for the Joker — see the JOKER template above).
 
 ---
 
