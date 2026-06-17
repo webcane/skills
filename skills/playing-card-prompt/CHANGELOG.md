@@ -20,6 +20,21 @@ All notable changes to this skill. Released per skill as tag
   card, branded layout).
 - **`assets/special/_adding-a-special.md`** — guide for adding user-defined special card
   types; follows the same `_adding-a-*` convention as mood and frame guides.
+- **Back rank wizard path (Steps B1–B3)** — `Back → BACK` rank option in Step 3; three
+  design paths (suggested from style+mood / freeform / reference-image + modifications);
+  refinement step B2 for the suggested path; exclusions step B3.
+- **BACK template** — new prompt template in `references/REFERENCE.md` with
+  `[BACK_DESIGN]`, `[BACK_MODIFICATIONS]` placeholders; symmetry line always included.
+- **Special rank wizard path (Steps S1–S5)** — `Special → SPECIAL` rank option in Step 3;
+  display name (S1), type selection from `assets/special/` (S2), visual content description
+  (S3), named figure for prospect-type (S4, per-card, v1 no persistence), exclusions (S5).
+- **SPECIAL template** — new prompt template in `references/REFERENCE.md` with
+  `[CARD_NAME]`, `[SPECIAL_TYPE_LINE]`, `[FIGURE_DESCRIPTION]`, `[SPECIAL_ATTRIBUTES]`
+  placeholders; hardcoded `no corner indices, no standard rank letters, no suit symbols,`.
+- **`references/REFERENCE.md` Defaults table** — `back` and `special` columns added
+  documenting all 9 layer default values per group.
+- **`references/CONFIG.md`** — `<group>` footnote expanded to include `back` and
+  `special`; back and special group default notes added.
 
 ## [3.21.0] - 2026-06-17
 
