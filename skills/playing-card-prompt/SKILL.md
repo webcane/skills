@@ -44,7 +44,8 @@ Before asking any wizard questions, load the active profile's persistent setting
 (`deck`, `lettering`, `style`, `frame`, `aspect_ratio`, `image_generator`, `structure`,
 `index.symbol`, `index.*`, `layers.*`, `mood`, `theme`, `figure_scale`,
 `character_framing`) via `python3 scripts/manage_config.py show`. This also lists
-every saved profile and which one is active.
+every saved profile and which one is active. `layers.*` includes all card groups:
+`court`, `pip`, `ace`, `joker`, `back`, and `special`.
 Everything else — schema, profile concept, lookup order, field reference, and the
 full CLI — is in `references/CONFIG.md`; read it whenever you need to inspect,
 change, or validate `config.json`. Per-card fields (`rank`, `suit`,
@@ -157,6 +158,9 @@ Folders under `assets/`:
 - `assets/figure-proportion/` — legacy directory from pre-4.0; content is preserved
   for reference but superseded by `assets/character-framing/` (see migration notes in
   `references/CONFIG.md`)
+- `assets/back/` — one file: `symmetry.md`, holding the "Symmetry line" that is always
+  appended to `[STYLE_BLOCK]` for the `back` group (step 10 in "Resolving
+  `[STYLE_BLOCK]`" in `references/REFERENCE.md`)
 - `assets/index/options.md` — corner-index settings (advanced; NOT asked in the wizard)
 - `assets/engines/` — one file per image-generation engine, describing how to adapt
   the assembled prompt (negative-list placement, aspect-ratio syntax, extra
@@ -172,7 +176,7 @@ factory settings — it's the canonical source of defaults (see
 `references/CONFIG.md`). User edits add/switch profiles in the same file.
 
 Reference files under `references/`:
-- `references/REFERENCE.md` — COURT / PIP / ACE templates, rank table, aspect ratios
+- `references/REFERENCE.md` — COURT / PIP / ACE / JOKER / BACK templates, rank table, aspect ratios
 - `references/CONFIG.md` — config schema, profiles, lookup order, field reference
 - `references/example-court-king.md` — a fully assembled COURT example prompt for reference
 - `references/example-pip-two.md` — a fully assembled PIP example prompt (plain default and decorated variant)
@@ -234,13 +238,19 @@ Always ask. Offer only the ranks listed in the chosen `assets/decks/<deck>.md`
 - **Joker → JOKER** → auto-load `assets/courts/joker.md`; this card's group is
   `joker` (`layers.figure.joker` defaults to `"character"`). Skip Step 4 (no suit); run
   Steps 4.1 and 4.2 below instead.
+- **Back → BACK** → this card's group is `back` (`layers.figure.back` defaults to
+  `"false"`). Skip Step 4 (no suit); run Steps B1–B3 below instead of Steps 4.1–4.2.
+
+> If the deck has more than 4 standard rank groups, surface the 4 most common ranks as
+> explicit options; Back, Special, and Joker appear under "Other" unless the user is
+> generating one of those card types — in which case offer them prominently.
 
 Whether Steps 9–12 apply to this card depends on `layers.figure.<group>` for the group
 just set — see the check after Step 7.
 
-Set `RANK_NAME` (English word: Joker for the Joker) and `RANK_LETTER` (localized
-letter from Step 2 for courts; numeral for pips; `A` for Ace; `index.symbol` value for
-the Joker — see Steps 4.1–4.2).
+Set `RANK_NAME` (English word: Joker for the Joker; Back for the Back) and
+`RANK_LETTER` (localized letter from Step 2 for courts; numeral for pips; `A` for Ace;
+`index.symbol` value for the Joker; none for Back — see Steps 4.1–4.2 and B1–B3).
 
 ### Step 4 — Suit · _per-card_ (skipped for Joker — see Steps 4.1–4.2)
 
@@ -277,6 +287,43 @@ Ask two things for the Joker's corner indices (Menu D2 — see `assets/index/opt
 
 Save choices via `python3 scripts/manage_config.py set index.count <value>` and
 `python3 scripts/manage_config.py set index.symbol <value>`.
+
+### Steps B1–B3 — Back card only (run instead of Steps 4.1–4.2 when rank is Back)
+
+**Step B1 — Back design path · _per-card_**
+
+Offer three design paths (≤ 4 AskUserQuestion options):
+
+- **Suggested (default)** — derive a suggestion from the active style + mood profile.
+  Synthesize a back design phrase at prompt time: combine the style name, mood (if set),
+  primary colors/motifs from the active pattern, and the symmetry convention into a
+  descriptive sentence (e.g., "a mirrored Baroque foliate pattern in deep crimson and
+  gold, with ornate repeating motifs,"). Present the suggestion in a code block, then
+  proceed to Step B2.
+- **Freeform** — ask the user to describe the back design in free text. Use that text
+  verbatim as `[BACK_DESIGN]`. Skip Step B2.
+- **Reference image + modifications** — ask the user to describe the reference image
+  source (e.g., "a 19th-century French card back I have photographed"), then ask what
+  modifications to apply (e.g., "replace the blue with gold, simplify the center
+  motif"). Assemble as: `Based on [source description]: [modifications]`. The source
+  description fills `[BACK_DESIGN]`; the modifications list fills `[BACK_MODIFICATIONS]`.
+  Skip Step B2.
+
+**Step B2 — Suggested path refinement · _per-card (only for suggested path)_**
+
+After presenting the synthesized suggestion in a code block (from Step B1 Suggested
+path), offer:
+
+- **Use this** — fold the suggestion as-is into `[BACK_DESIGN]`. Leave
+  `[BACK_MODIFICATIONS]` empty (drop that line at assembly).
+- **Modify it** — switch to the freeform path: pre-fill the suggestion text as the
+  starting draft for the user to edit, then collect their edited version as
+  `[BACK_DESIGN]`. Leave `[BACK_MODIFICATIONS]` empty.
+
+**Step B3 — Back card exclusions · _per-card (optional)_**
+
+Ask what must NOT appear on the back (e.g., "no text", "no human figures"). Phrase each
+as "no <thing>" — merge into `[NEGATIVE_LIST]`. If nothing, skip.
 
 ### Step 5 — Visual style / pattern (REQUIRED) · _persistent_
 
@@ -412,16 +459,16 @@ on the court cards) is config-only, not asked here — set via
 
 ---
 
-**Check `layers.figure.<group>` for this card's group** (`court`/`pip`/`ace`/`joker`).
+**Check `layers.figure.<group>` for this card's group** (`court`/`pip`/`ace`/`joker`/`back`).
 The value is `"false"` (no figure) or a figure type (`"character"`, `"building"`,
 `"animal"`, `"custom"`), defaulting to `"character"` for court and joker, `"false"` for
-pip/ace unless previously configured via `--config`). If it's `"false"`, this card has
-no figure — **skip the entire figure block (Steps 8a–8e) and go straight to Step 13**
+pip/ace/back unless previously configured via `--config`). If it's `"false"`, this card
+has no figure — **skip the entire figure block (Steps 8a–8e) and go straight to Step 13**
 (Aspect ratio). Otherwise, the figure block (Steps 8a–8e) and Steps 9–12 apply: court
-and joker cards by default, plus any pip/ace card whose `layers.figure.<group>` was set
-to a type value for a transformation-style deck. Steps 8a–8c are persistent — skipped if
-already set or loaded from config; Steps 8d–8e are character-only persistent (skipped if
-`layers.figure.<group>` is not `"character"`); Steps 9–12 are per-card.
+and joker cards by default, plus any pip/ace/back card whose `layers.figure.<group>` was
+set to a type value. Steps 8a–8c are persistent — skipped if already set or loaded from
+config; Steps 8d–8e are character-only persistent (skipped if `layers.figure.<group>` is
+not `"character"`); Steps 9–12 are per-card.
 
 ---
 
@@ -630,11 +677,11 @@ Offer to save the choice to `config.json` like the other persistent settings.
 
 ## Assembling the prompt
 
-1. Pick the template (COURT / PIP / ACE / JOKER) from `references/REFERENCE.md`. If
-   `structure` is `illustration`, replace the template's opening line with the
-   illustration-only opening line from "`structure` setting" in
-   `references/REFERENCE.md` (otherwise use the template's default opening line
-   unchanged).
+1. Pick the template (COURT / PIP / ACE / JOKER / BACK) from `references/REFERENCE.md`.
+   If rank = Back, use the BACK template. If `structure` is `illustration`, replace the
+   template's opening line with the illustration-only opening line from "`structure`
+   setting" in `references/REFERENCE.md` (otherwise use the template's default opening
+   line unchanged).
 2. Build `[INDEX_LINE]` from `assets/index/options.md`:
    - **Standard cards** (`index.type = "standard"`): Menus A/B/C — rank+suit, silent
      defaults (4-Index, stacked, standard size).
@@ -642,6 +689,8 @@ Offer to save the choice to `config.json` like the other persistent settings.
      Symbol table — placement from `index.count`, symbol from `index.symbol`. When
      `index.count = "none"` (or `index.symbol = "none"`), emit only `no corner indices,
      full-bleed illustration,`.
+   - **Back cards**: `[INDEX_LINE]` is replaced by the fixed line `no corner indices, no
+     rank letters, no suit symbols,` — skip the `assets/index/options.md` lookup entirely.
    - If `structure` is `illustration`, skip this step entirely for all card types.
 3. For cards with a figure, fill `[CHARACTER_NAME]`/`[CHARACTER_FEATURES]` (required), then build
    `[RESOLVED_ATTRIBUTES]` and `[NEGATIVE_LIST]` by following the merge rules in
@@ -650,11 +699,11 @@ Offer to save the choice to `config.json` like the other persistent settings.
    If `structure` is `illustration`, append the fixed negative block from "`structure`
    setting" in `references/REFERENCE.md` (`no card border, no frame, no corner index
    letters or numbers, no corner suit symbols`) to `[NEGATIVE_LIST]`.
-4. Resolve `[STYLE_BLOCK]` and `[FRAME_LINE]` for this card's group (court/pip/ace) per
-   "Layers and `[STYLE_BLOCK]` assembly" and "Figure, face style & proportion" in
-   `references/REFERENCE.md`, using the `layers.*`, `frame`, `mood`, and `theme`
-   settings (deriving thematic ornaments/highlights/frame additions per
-   "Theme-derived ornaments/highlights/frame" where applicable, and including the
+4. Resolve `[STYLE_BLOCK]` and `[FRAME_LINE]` for this card's group
+   (court/pip/ace/joker/back) per "Layers and `[STYLE_BLOCK]` assembly" and "Figure,
+   face style & proportion" in `references/REFERENCE.md`, using the `layers.*`, `frame`,
+   `mood`, and `theme` settings (deriving thematic ornaments/highlights/frame additions
+   per "Theme-derived ornaments/highlights/frame" where applicable, and including the
    chosen pattern's Face Style line when `layers.figure.<group>` is on). `[FRAME_LINE]`
    is the chosen `frame` preset's "Frame line" from `assets/frame/<frame>.md` plus
    `layers.frame.g`'s addition if its cell is custom text, included only if
@@ -662,6 +711,9 @@ Offer to save the choice to `config.json` like the other persistent settings.
    drop a line from an enabled layer. If `structure` is `illustration`, drop
    `[FRAME_LINE]` from the template entirely regardless of `layers.frame.g` — leave
    `layers.frame.<group>` in `config.json` untouched, just don't emit the line.
+   For the `back` group, append the "Symmetry line" from `assets/back/symmetry.md` as
+   the final item of `[STYLE_BLOCK]` (step 10 in "Resolving `[STYLE_BLOCK]`" in
+   `references/REFERENCE.md`).
    When generating multiple cards for the same deck, reuse the exact same resolved
    `[STYLE_BLOCK]`/`[FRAME_LINE]`/derived theme phrases for every card of the same
    group so the set stays visually consistent.
