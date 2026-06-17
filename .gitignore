@@ -4,3 +4,5 @@ dist/*.skill
 dist/*.json
 dist/*.zip
 /.env
+/graphify-out/
+/.planning/
