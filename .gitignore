@@ -3,3 +3,4 @@
 dist/*.skill
 dist/*.json
 dist/*.zip
+/.env
