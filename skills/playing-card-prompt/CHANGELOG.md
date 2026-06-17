@@ -4,6 +4,23 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
+## [Unreleased]
+
+### Added
+- **Card back group** — `back` is a new card group (peer to court/pip/ace/joker) with
+  `layers.*.back` config entries in `manage_config.py` and `config.json`. Defaults:
+  figure off, split off, frame on, full decoration (background/decor/ornaments/mood/technique on).
+- **Special card group** — `special` is a new card group with `layers.*.special` config
+  entries. Defaults: figure off, frame off (non-standard layout), full decoration otherwise.
+- **`assets/back/symmetry.md`** — symmetry/repeat-pattern/frame-margin instruction for
+  the BACK group STYLE_BLOCK; always included when assembling a back card prompt.
+- **`assets/special/prospect.md`** — prospect special card type template (named
+  historical/thematic figure, portrait composition).
+- **`assets/special/marketing.md`** — marketing special card type template (promotional
+  card, branded layout).
+- **`assets/special/_adding-a-special.md`** — guide for adding user-defined special card
+  types; follows the same `_adding-a-*` convention as mood and frame guides.
+
 ## [3.21.0] - 2026-06-17
 
 ### Added
