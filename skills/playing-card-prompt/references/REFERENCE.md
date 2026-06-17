@@ -76,7 +76,7 @@ and whether "Figure detail" and "Face Style" are folded in is decided here via
 
 ### Resolving `[STYLE_BLOCK]` for a card group
 
-For the group `g` (`court`, `pip`, or `ace`), each `layers.<layer>.g` cell resolves to
+For the group `g` (`court`, `pip`, `ace`, `joker`, or `back`), each `layers.<layer>.g` cell resolves to
 **off** (cell is `"false"`), **on, no addition** (cell is `"true"`), or **on, with
 addition** (cell is any other text — that text is the addition). Build `[STYLE_BLOCK]`
 by concatenating, in this order, only the layers that are on:
@@ -156,6 +156,11 @@ Then:
    and `layers.highlights.pip` are all `"false"`, append the line `plain card face, no
    additional ornament beyond the pip symbols,` after Mood (a pip card with nothing
    else added should read as a plain number card).
+
+10. **Back-group symmetry** — only for the `back` group: append the "Symmetry line" text
+    from `assets/back/symmetry.md` as its own comma phrase after all other layers
+    (including Mood and Plain fallback). This applies regardless of which layers are on
+    or off for the back group — it is always present.
 
 `[FRAME_LINE]` is built from the chosen `frame` preset's "Frame line" in
 `assets/frame/<frame>.md` (default `boxed-index`: `thin single black border around the
@@ -269,17 +274,17 @@ don't force).
 `layers.figure.<group>` now stores the figure type, not a boolean. `"false"` = no
 figure; `"character"` / `"building"` / `"animal"` / `"custom"` = figure on + that type.
 
-| Layer        | court       | pip    | ace    | joker       |
-|--------------|-------------|--------|--------|-------------|
-| background   | true        | true   | true   | true        |
-| decor        | true        | false  | true   | true        |
-| ornaments    | true        | false  | true   | true        |
-| highlights   | false       | false  | false  | false       |
-| frame        | true        | true   | true   | true        |
-| figure       | "character" | false  | false  | "character" |
-| split        | false       | false  | false  | false       |
-| mood         | true        | true   | true   | true        |
-| technique    | true        | true   | true   | true        |
+| Layer        | court       | pip    | ace    | joker       | back   |
+|--------------|-------------|--------|--------|-------------|--------|
+| background   | true        | true   | true   | true        | true   |
+| decor        | true        | false  | true   | true        | true   |
+| ornaments    | true        | false  | true   | true        | true   |
+| highlights   | false       | false  | false  | false       | false  |
+| frame        | true        | true   | true   | true        | true   |
+| figure       | "character" | false  | false  | "character" | false  |
+| split        | false       | false  | false  | false       | false  |
+| mood         | true        | true   | true   | true        | true   |
+| technique    | true        | true   | true   | true        | true   |
 
 The `figure` row uses type enum values: `"character"` = portrait on + character type
 (default for court/joker); `false` = no figure (default for pip/ace). The `split` row
@@ -483,6 +488,38 @@ no watermark
 
 ---
 
+## BACK template
+
+Used when rank = Back. No suit, no character attributes, no corner indices (Back cards
+have no rank/suit letters — all four index areas are blank or absent). STYLE_BLOCK and
+FRAME_LINE are resolved for the `back` group per "Layers and [STYLE_BLOCK] assembly"
+above. The symmetry instruction from `assets/back/symmetry.md` is always appended to
+STYLE_BLOCK for the back group (per D-04), after the standard layer assembly — this is
+a back-group-specific STYLE_BLOCK addition that applies regardless of `layers.*` cell
+values.
+
+`[BACK_DESIGN]` is the assembled design description from the wizard:
+- **Suggested path (B1a):** a synthesized phrase derived from the active style + mood
+  profile (e.g., "a mirrored Baroque foliate pattern with dark, ornate coloring")
+- **Freeform path (B1b):** the user's own description verbatim
+- **Reference-image path (B1c):** "Based on [user's image source description]: [modifications list]"
+
+`[BACK_MODIFICATIONS]` — only present for the reference-image path; drop this line
+entirely when using the suggested or freeform paths (empty placeholder → drop line).
+
+```
+[ASPECT_RATIO] aspect ratio, full card visible, transparent background outside the card,
+playing card back design,
+[STYLE_BLOCK]
+[FRAME_LINE]
+no corner indices, no rank letters, no suit symbols,
+[BACK_DESIGN]
+[BACK_MODIFICATIONS]
+[NEGATIVE_LIST]
+```
+
+---
+
 ## Rank reference table
 
 | Choice | RANK_NAME | RANK_LETTER source                | Template | RANK_COUNT |
@@ -501,6 +538,10 @@ no watermark
 | Q      | Queen     | from lettering system (Q/D/V/Д)   | COURT    | —          |
 | K      | King      | from lettering system (K/R/H/К)   | COURT    | —          |
 | Jkr    | Joker     | `index.symbol` (star-in-circle default) | JOKER | —       |
+| Back   | Back      | — (no index letter)                     | BACK  | —       |
+
+> **Back cards** have no corner indices — `[INDEX_LINE]` is replaced by the literal
+> `no corner indices, no rank letters, no suit symbols,` in the BACK template.
 
 RANK_NAME is always the English word; RANK_LETTER is the localized printed index per
 `assets/lettering/systems.md` (for court cards) or the `index.symbol` glyph phrase
