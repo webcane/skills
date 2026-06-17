@@ -96,15 +96,15 @@ LEGACY_EXTRA_KEYS = {
 # shipped in config.json — that file is the human-readable copy; this dict is what
 # every profile falls back to for fields it doesn't override.
 LAYER_DEFAULTS = {
-    "background": {"court": "true", "pip": "true",  "ace": "true",  "joker": "true"},
-    "decor":      {"court": "true", "pip": "false", "ace": "true",  "joker": "true"},
-    "ornaments":  {"court": "true", "pip": "false", "ace": "true",  "joker": "true"},
-    "highlights": {"court": "false","pip": "false", "ace": "false", "joker": "false"},
-    "frame":      {"court": "true", "pip": "false", "ace": "true",  "joker": "true"},
-    "figure":     {"court": "true", "pip": "false", "ace": "false", "joker": "true"},
-    "mood":       {"court": "true", "pip": "true",  "ace": "true",  "joker": "true"},
-    "technique":  {"court": "true", "pip": "true",  "ace": "true",  "joker": "true"},
-    "split":      {"court": "false", "pip": "false", "ace": "false", "joker": "false"},
+    "background": {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true"},
+    "decor":      {"court": "true",      "pip": "false", "ace": "false", "joker": "true"},
+    "ornaments":  {"court": "true",      "pip": "false", "ace": "false", "joker": "true"},
+    "highlights": {"court": "false",     "pip": "false", "ace": "false", "joker": "false"},
+    "frame":      {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true"},
+    "figure":     {"court": "character", "pip": "false", "ace": "false", "joker": "character"},
+    "mood":       {"court": "true",      "pip": "false", "ace": "false", "joker": "true"},
+    "technique":  {"court": "true",      "pip": "false", "ace": "false", "joker": "true"},
+    "split":      {"court": "false",     "pip": "false", "ace": "false", "joker": "false"},
 }
 
 DEFAULTS = {
