@@ -21,55 +21,73 @@
           "court": "true",
           "pip": "true",
           "ace": "true",
-          "joker": "true"
+          "joker": "true",
+          "back": "true",
+          "special": "true"
         },
         "decor": {
           "court": "true",
           "pip": "false",
           "ace": "false",
-          "joker": "true"
+          "joker": "true",
+          "back": "true",
+          "special": "true"
         },
         "ornaments": {
           "court": "true",
           "pip": "false",
           "ace": "false",
-          "joker": "true"
+          "joker": "true",
+          "back": "true",
+          "special": "true"
         },
         "highlights": {
           "court": "false",
           "pip": "false",
           "ace": "false",
-          "joker": "false"
+          "joker": "false",
+          "back": "false",
+          "special": "false"
         },
         "frame": {
           "court": "true",
           "pip": "true",
           "ace": "true",
-          "joker": "true"
+          "joker": "true",
+          "back": "true",
+          "special": "false"
         },
         "figure": {
           "court": "character",
           "pip": "false",
           "ace": "false",
-          "joker": "character"
+          "joker": "character",
+          "back": "false",
+          "special": "false"
         },
         "mood": {
           "court": "true",
           "pip": "false",
           "ace": "false",
-          "joker": "true"
+          "joker": "true",
+          "back": "true",
+          "special": "true"
         },
         "technique": {
           "court": "true",
           "pip": "false",
           "ace": "false",
-          "joker": "true"
+          "joker": "true",
+          "back": "true",
+          "special": "true"
         },
         "split": {
           "court": "false",
           "pip": "false",
           "ace": "false",
-          "joker": "false"
+          "joker": "false",
+          "back": "false",
+          "special": "false"
         }
       },
       "mood": "",

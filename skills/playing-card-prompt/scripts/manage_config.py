@@ -28,7 +28,7 @@ Usage:
 
 Keys (within a profile): deck, lettering, style, frame, aspect_ratio, image_generator,
       structure, index.size, index.count, index.layout, index.symbol, index.type,
-      layers.<background|decor|ornaments|highlights|frame|figure|mood|technique|split>.<court|pip|ace|joker>,
+      layers.<background|decor|ornaments|highlights|frame|figure|mood|technique|split>.<court|pip|ace|joker|back|special>,
       mood, theme, figure_scale, character_framing
 
 Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
@@ -74,7 +74,7 @@ ASPECT_PRESETS = ["5:7", "9:14", "14:25", "7:12"]
 BOOL_VALUES = ["true", "false"]
 STRUCTURE = ["full", "illustration"]
 
-GROUPS = ("court", "pip", "ace", "joker")
+GROUPS = ("court", "pip", "ace", "joker", "back", "special")
 LAYERS = ("background", "decor", "ornaments", "highlights", "frame", "figure", "mood", "technique", "split")
 
 FIGURE_TYPE = ["character", "building", "animal", "custom"]
@@ -96,15 +96,15 @@ LEGACY_EXTRA_KEYS = {
 # shipped in config.json — that file is the human-readable copy; this dict is what
 # every profile falls back to for fields it doesn't override.
 LAYER_DEFAULTS = {
-    "background": {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true"},
-    "decor":      {"court": "true",      "pip": "false", "ace": "false", "joker": "true"},
-    "ornaments":  {"court": "true",      "pip": "false", "ace": "false", "joker": "true"},
-    "highlights": {"court": "false",     "pip": "false", "ace": "false", "joker": "false"},
-    "frame":      {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true"},
-    "figure":     {"court": "character", "pip": "false", "ace": "false", "joker": "character"},
-    "mood":       {"court": "true",      "pip": "false", "ace": "false", "joker": "true"},
-    "technique":  {"court": "true",      "pip": "false", "ace": "false", "joker": "true"},
-    "split":      {"court": "false",     "pip": "false", "ace": "false", "joker": "false"},
+    "background": {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true",      "back": "true",  "special": "true"},
+    "decor":      {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
+    "ornaments":  {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
+    "highlights": {"court": "false",     "pip": "false", "ace": "false", "joker": "false",     "back": "false", "special": "false"},
+    "frame":      {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true",      "back": "true",  "special": "false"},
+    "figure":     {"court": "character", "pip": "false", "ace": "false", "joker": "character", "back": "false", "special": "false"},
+    "mood":       {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
+    "technique":  {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
+    "split":      {"court": "false",     "pip": "false", "ace": "false", "joker": "false",     "back": "false", "special": "false"},
 }
 
 DEFAULTS = {
