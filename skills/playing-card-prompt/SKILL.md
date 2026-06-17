@@ -161,6 +161,9 @@ Folders under `assets/`:
 - `assets/back/` — one file: `symmetry.md`, holding the "Symmetry line" that is always
   appended to `[STYLE_BLOCK]` for the `back` group (step 10 in "Resolving
   `[STYLE_BLOCK]`" in `references/REFERENCE.md`)
+- `assets/special/` — one file per special card type (`prospect.md`, `marketing.md`,
+  etc.); each holds a "Special type line" used to fill `[SPECIAL_TYPE_LINE]` in the
+  SPECIAL template (see Steps S1–S5 and `assets/special/_adding-a-special.md`)
 - `assets/index/options.md` — corner-index settings (advanced; NOT asked in the wizard)
 - `assets/engines/` — one file per image-generation engine, describing how to adapt
   the assembled prompt (negative-list placement, aspect-ratio syntax, extra
@@ -176,7 +179,7 @@ factory settings — it's the canonical source of defaults (see
 `references/CONFIG.md`). User edits add/switch profiles in the same file.
 
 Reference files under `references/`:
-- `references/REFERENCE.md` — COURT / PIP / ACE / JOKER / BACK templates, rank table, aspect ratios
+- `references/REFERENCE.md` — COURT / PIP / ACE / JOKER / BACK / SPECIAL templates, rank table, aspect ratios
 - `references/CONFIG.md` — config schema, profiles, lookup order, field reference
 - `references/example-court-king.md` — a fully assembled COURT example prompt for reference
 - `references/example-pip-two.md` — a fully assembled PIP example prompt (plain default and decorated variant)
@@ -240,6 +243,8 @@ Always ask. Offer only the ranks listed in the chosen `assets/decks/<deck>.md`
   Steps 4.1 and 4.2 below instead.
 - **Back → BACK** → this card's group is `back` (`layers.figure.back` defaults to
   `"false"`). Skip Step 4 (no suit); run Steps B1–B3 below instead of Steps 4.1–4.2.
+- **Special → SPECIAL** → this card's group is `special` (`layers.figure.special` defaults to
+  `"false"`). Skip Step 4 (no suit); run Steps S1–S5 below instead of Steps 4.1–4.2.
 
 > If the deck has more than 4 standard rank groups, surface the 4 most common ranks as
 > explicit options; Back, Special, and Joker appear under "Other" unless the user is
@@ -248,9 +253,9 @@ Always ask. Offer only the ranks listed in the chosen `assets/decks/<deck>.md`
 Whether Steps 9–12 apply to this card depends on `layers.figure.<group>` for the group
 just set — see the check after Step 7.
 
-Set `RANK_NAME` (English word: Joker for the Joker; Back for the Back) and
+Set `RANK_NAME` (English word: Joker for the Joker; Back for the Back; Special for the Special) and
 `RANK_LETTER` (localized letter from Step 2 for courts; numeral for pips; `A` for Ace;
-`index.symbol` value for the Joker; none for Back — see Steps 4.1–4.2 and B1–B3).
+`index.symbol` value for the Joker; none for Back or Special — see Steps 4.1–4.2, B1–B3, and S1–S5).
 
 ### Step 4 — Suit · _per-card_ (skipped for Joker — see Steps 4.1–4.2)
 
@@ -324,6 +329,57 @@ path), offer:
 
 Ask what must NOT appear on the back (e.g., "no text", "no human figures"). Phrase each
 as "no <thing>" — merge into `[NEGATIVE_LIST]`. If nothing, skip.
+
+### Steps S1–S5 — Special card only (run instead of Step 4 when rank is Special)
+
+**Step S1 — Card display name · _per-card_**
+
+Ask the user to provide a display name for this special card. This becomes `[CARD_NAME]`.
+Examples: "King of Clubs", "The Oracle", "The Joker's Shadow". No default — required, always ask.
+
+**Step S2 — Special card type · _per-card_**
+
+Ask which type of special card this is. List the `*.md` files in `assets/special/` (ignore
+names starting with `_`) as options — same discovery pattern as `assets/frame/`. Offer
+(≤ 4 AskUserQuestion options):
+- **Prospect** — a named historical or thematic figure assigned to a court card slot.
+  Load `assets/special/prospect.md`; use its "Special type line" as `[SPECIAL_TYPE_LINE]`.
+- **Marketing** — a promotional or marketing card with custom branding.
+  Load `assets/special/marketing.md`; use its "Special type line" as `[SPECIAL_TYPE_LINE]`.
+- **Custom text** — user describes the special card type in free text. Use that text
+  verbatim as `[SPECIAL_TYPE_LINE]` (bypasses asset lookup).
+
+If a preset is named, load `assets/special/<name>.md` and use its "Special type line"
+text as `[SPECIAL_TYPE_LINE]`. If "Custom text", use the user's free text verbatim as
+`[SPECIAL_TYPE_LINE]`.
+
+**Step S3 — Visual content description · _per-card_**
+
+Ask the user to describe the visual content of the card. This provides the base
+`[FIGURE_DESCRIPTION]` for non-prospect types. For prospect types, this step is used for
+any additional description beyond the named figure (e.g., "shown in formal court dress").
+Optional for prospect types (Step S4 supplies the named figure).
+
+**Step S4 — Named figure · _per-card (Prospect type only)_**
+
+Only runs when the user selected "Prospect" in Step S2 (per D-13 in CONTEXT.md).
+
+Ask for the named figure to assign to this specific card slot. Example: for
+`[CARD_NAME] = "King of Clubs"`, ask "Who is the named figure for this card?" User
+answers "Peter the Great" or "Peter I, Emperor of Russia".
+
+Assemble `[FIGURE_DESCRIPTION]` for prospect cards as:
+`[named figure], [Step S3 description if any],`
+(e.g., `Peter the Great, Russian Emperor, shown in imperial regalia,`).
+
+Per D-14 in CONTEXT.md: v1 handles one card at a time — wizard asks per card. Do not
+attempt to collect all figures for a full deck in one session. Batch generation is out
+of scope for v1.
+
+**Step S5 — Special card exclusions · _per-card (optional)_**
+
+Ask what must NOT appear on the special card (e.g., "no playing card symbols", "no suit
+marks"). Phrase each as "no <thing>" — merged into `[NEGATIVE_LIST]`. If nothing, skip.
 
 ### Step 5 — Visual style / pattern (REQUIRED) · _persistent_
 
@@ -459,13 +515,13 @@ on the court cards) is config-only, not asked here — set via
 
 ---
 
-**Check `layers.figure.<group>` for this card's group** (`court`/`pip`/`ace`/`joker`/`back`).
+**Check `layers.figure.<group>` for this card's group** (`court`/`pip`/`ace`/`joker`/`back`/`special`).
 The value is `"false"` (no figure) or a figure type (`"character"`, `"building"`,
 `"animal"`, `"custom"`), defaulting to `"character"` for court and joker, `"false"` for
-pip/ace/back unless previously configured via `--config`). If it's `"false"`, this card
+pip/ace/back/special unless previously configured via `--config`). If it's `"false"`, this card
 has no figure — **skip the entire figure block (Steps 8a–8e) and go straight to Step 13**
 (Aspect ratio). Otherwise, the figure block (Steps 8a–8e) and Steps 9–12 apply: court
-and joker cards by default, plus any pip/ace/back card whose `layers.figure.<group>` was
+and joker cards by default, plus any pip/ace/back/special card whose `layers.figure.<group>` was
 set to a type value. Steps 8a–8c are persistent — skipped if already set or loaded from
 config; Steps 8d–8e are character-only persistent (skipped if `layers.figure.<group>` is
 not `"character"`); Steps 9–12 are per-card.
@@ -677,11 +733,11 @@ Offer to save the choice to `config.json` like the other persistent settings.
 
 ## Assembling the prompt
 
-1. Pick the template (COURT / PIP / ACE / JOKER / BACK) from `references/REFERENCE.md`.
-   If rank = Back, use the BACK template. If `structure` is `illustration`, replace the
-   template's opening line with the illustration-only opening line from "`structure`
-   setting" in `references/REFERENCE.md` (otherwise use the template's default opening
-   line unchanged).
+1. Pick the template (COURT / PIP / ACE / JOKER / BACK / SPECIAL) from `references/REFERENCE.md`.
+   If rank = Back, use the BACK template. If rank = Special, use the SPECIAL template.
+   If `structure` is `illustration`, replace the template's opening line with the
+   illustration-only opening line from "`structure` setting" in `references/REFERENCE.md`
+   (otherwise use the template's default opening line unchanged).
 2. Build `[INDEX_LINE]` from `assets/index/options.md`:
    - **Standard cards** (`index.type = "standard"`): Menus A/B/C — rank+suit, silent
      defaults (4-Index, stacked, standard size).
@@ -691,6 +747,9 @@ Offer to save the choice to `config.json` like the other persistent settings.
      full-bleed illustration,`.
    - **Back cards**: `[INDEX_LINE]` is replaced by the fixed line `no corner indices, no
      rank letters, no suit symbols,` — skip the `assets/index/options.md` lookup entirely.
+   - **Special cards**: `[INDEX_LINE]` is replaced by the fixed line `no corner indices,
+     no standard rank letters, no suit symbols,` hardcoded in the SPECIAL template —
+     skip the `assets/index/options.md` lookup entirely.
    - If `structure` is `illustration`, skip this step entirely for all card types.
 3. For cards with a figure, fill `[CHARACTER_NAME]`/`[CHARACTER_FEATURES]` (required), then build
    `[RESOLVED_ATTRIBUTES]` and `[NEGATIVE_LIST]` by following the merge rules in
@@ -700,7 +759,7 @@ Offer to save the choice to `config.json` like the other persistent settings.
    setting" in `references/REFERENCE.md` (`no card border, no frame, no corner index
    letters or numbers, no corner suit symbols`) to `[NEGATIVE_LIST]`.
 4. Resolve `[STYLE_BLOCK]` and `[FRAME_LINE]` for this card's group
-   (court/pip/ace/joker/back) per "Layers and `[STYLE_BLOCK]` assembly" and "Figure,
+   (court/pip/ace/joker/back/special) per "Layers and `[STYLE_BLOCK]` assembly" and "Figure,
    face style & proportion" in `references/REFERENCE.md`, using the `layers.*`, `frame`,
    `mood`, and `theme` settings (deriving thematic ornaments/highlights/frame additions
    per "Theme-derived ornaments/highlights/frame" where applicable, and including the
