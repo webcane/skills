@@ -54,12 +54,30 @@ unless the failure stems from missing/ambiguous information only they can resolv
   pattern's `assets/pattern/<style>.md` "Face Style" section verbatim. If that line
   describes an obscured or mask-like treatment, `[CHARACTER_FEATURES]` contains no
   separate facial description. Otherwise (figure off) the line is absent entirely.
-- [ ] **Figure proportion line** — if `figure_proportion` is non-empty and
-  `layers.figure.<group>` is on for this card's group, its text (from
-  `assets/figure-proportion/<name>.md` or custom) appears within `[STYLE_BLOCK]`
-  immediately after the Face Style line / `layers.figure.<group>`'s addition,
-  identical across all cards of the same group/deck. If `figure_proportion` is empty
-  or `layers.figure.<group>` is `"false"`, no such line appears.
+- [ ] **Figure type preamble** — if `layers.figure.<group>` is a non-`"false"` value
+  (character/building/animal/custom) for this card's group, the corresponding
+  `assets/figure-type/<type>.md` text appears within `[STYLE_BLOCK]` before Face Style
+  and character framing, identical across all cards of the same group/deck. If
+  `layers.figure.<group>` is `"false"`, no such text appears.
+- [ ] **Figure scale line** — if `layers.figure.<group>` is a non-`"false"` value and
+  `figure_scale` is non-empty, the figure_scale phrase (`figure_scale` config value)
+  appears within `[STYLE_BLOCK]` after the character-type sources (or after the
+  figure-type preamble for non-character types), identical across all cards of the
+  same deck. If `figure_scale` is empty or `layers.figure.<group>` is `"false"`, no
+  such phrase appears.
+- [ ] **Character framing line** — if `layers.figure.<group>` is `"character"` for this
+  card's group and `character_framing` is non-empty, the framing text (from
+  `assets/character-framing/<name>.md` or custom) appears within `[STYLE_BLOCK]`
+  immediately after the Face Style line / `layers.figure.<group>`'s addition, before
+  figure_scale, identical across all cards of the same group/deck. If
+  `character_framing` is empty, `layers.figure.<group>` is not `"character"`, or
+  `layers.figure.<group>` is `"false"`, no such line appears.
+- [ ] **Split line** — if `layers.figure.<group>` is a non-`"false"` value and
+  `layers.split.<group>` is `"horizontal-mirrored"` or `"angled-mirrored"`, the
+  corresponding `assets/split/<mode>.md` text appears as the last entry in the figure
+  block of `[STYLE_BLOCK]` (after figure_scale), identical across all cards of the same
+  group/deck. If `layers.split.<group>` is `"none"`, `"false"`, or the figure layer is
+  off, no split line appears.
 - [ ] **Theme-derived ornaments/highlights/frame** — if `theme` is set and a
   `layers.ornaments`/`layers.highlights`/`layers.frame` cell was exactly `"true"` (on,
   no explicit addition) for an enabled layer, the derived phrase reflects `theme` and

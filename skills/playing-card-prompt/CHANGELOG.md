@@ -7,6 +7,54 @@ All notable changes to this skill. Released per skill as tag
 ## [Unreleased]
 
 ### Added
+- **Figure type classification** — `layers.figure.<group>` values extended from
+  `true`/`false` to `false`/`character`/`building`/`animal`/`custom`. Non-`"false"`
+  value enables the figure layer AND encodes the figure type. New
+  `assets/figure-type/` directory with `character.md`, `building.md`, `animal.md`,
+  `custom.md` — each supplying the canonical prompt preamble for that figure type.
+  Character figures additionally include Face Style + character framing in
+  `[STYLE_BLOCK]`; building/animal/custom skip those character-specific sources
+  (see FIG-08 pattern).
+- **Figure scale** — new deck-wide persistent field `figure_scale` (values:
+  `full-bleed`, `inscribed-in-frame`, `small-centered`) replacing `figure_proportion`
+  for scale/cropping control. Applies to all figure types. Appears as Step 8a in the
+  wizard figure block.
+- **Character framing** — new deck-wide persistent field `character_framing`
+  (character-only; values: bust, waist-up, three-quarter, seven-eighths, full-body, or
+  custom text). Replaces the role of `figure_proportion` for character-type figures;
+  framing asset content moved to `assets/character-framing/`. Appears as Step 8e
+  (after face_style gate) in the wizard figure block.
+- **Split layout** — new per-group layer `layers.split.<group>` with values
+  `false`/`none`/`horizontal-mirrored`/`angled-mirrored`. Adds a compositional
+  split wrapper to `[STYLE_BLOCK]` as the outer layer after figure_scale. New
+  `assets/split/` directory with `horizontal-mirrored.md` and `angled-mirrored.md`.
+  Appears as Step 8b in the wizard figure block.
+- **Figure block wizard steps** — figure block reordered to: Step 8a (figure_scale)
+  → Step 8b (split) → Step 8c (figure_type) → Step 8d (face_style gate, character
+  only) → Step 8e (character_framing, character only) → Steps 9–12 (per-card). All
+  figure-block persistent fields are per-group (asked first time, skipped thereafter).
+- **`assets/character-framing/` directory** — five framing files (bust, waist-up,
+  three-quarter, seven-eighths, full-body) with prompt text; content sourced from the
+  prior `assets/figure-proportion/` files.
+
+### Changed
+- **`figure_proportion` removed** — replaced by `figure_scale` (deck-wide scale, all
+  figure types) and `character_framing` (character-only framing). A silent migration
+  read path in `manage_config.py` maps existing `figure_proportion` configs on first
+  load: `figure_proportion` value → `character_framing`; `figure_scale` set to
+  `"inscribed-in-frame"` as default; `layers.figure.<group> = "true"` →
+  `"character"`. The new schema is persisted on next write.
+- **`STYLE_BLOCK` figure-block assembly** rewritten: character type gets figure-type
+  preamble + Figure detail (pattern) + Face Style (pattern) + group addition +
+  character_framing + figure_scale + split; non-character types get figure-type
+  preamble + figure_scale + split only (FIG-08 + SPLT-03 patterns).
+- **Reference docs updated** — `references/WIZARD-STEP-MAP.md` maps the new figure
+  block steps (8a–8e) to components, layers, placeholders, and asset files;
+  `references/POST-VALIDATION.md` replaces the figure-proportion checklist item with
+  new checks for figure type preamble, figure scale, character framing, and split;
+  `references/STYLE-COMPONENTS.md` (#5 Composition/rhythm) updated to reference
+  `character_framing`, `figure_scale`, and `layers.split`.
+
 - **Joker card support** — new `joker` card group, available in all four deck systems
   (French, German, Swiss, Latin). Selecting Joker as the rank runs a JOKER-specific
   wizard flow: Step 4 is replaced by Step 4.1 (Joker color: Multicolor / Red / Black,

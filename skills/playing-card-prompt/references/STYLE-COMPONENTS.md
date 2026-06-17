@@ -15,10 +15,10 @@ the front-facing cards covered here.
 | 2  | Color palette | Covered | `style` pattern choice → Background/Decor sections, gated by `layers.background.<group>` / `layers.decor.<group>` |
 | 3  | Era / cultural context | Covered | `style` pattern presets (austrian, french, english, art-nouveau, japanese), each grounded in an era/culture per `assets/pattern/_adding-a-pattern.md` |
 | 4  | Mood / atmosphere | Covered | `mood` (preset from `assets/mood/`, picked or custom in Step 7) → `[MOOD_LINE]`, gated per group by `layers.mood.<group>` (also set in Step 7); a custom-text `layers.mood.<group>` cell adds a config-only per-group addition |
-| 5  | Composition / rhythm | Partial | Figure framing/cropping covered via `figure_proportion` (Step 8, `assets/figure-proportion/`), folded into `[STYLE_BLOCK]` when `layers.figure.<group>` is on. Beyond that, still indirect via `layers.<layer>.<group>` on/off toggles (decor/ornaments/frame density) and `index.layout`; no dedicated "rhythm" control independent of the chosen pattern |
+| 5  | Composition / rhythm | Partial | Figure framing/cropping covered via `character_framing` (Step 8e, `assets/character-framing/`, character-type figures only) and `figure_scale` (Step 8a, deck-wide, all figure types), both folded into `[STYLE_BLOCK]` when `layers.figure.<group>` is non-`"false"`. Split layout covered via `layers.split.<group>` (Step 8b, `assets/split/`, per-group, all figure types). Beyond that, still indirect via `layers.<layer>.<group>` on/off toggles (decor/ornaments/frame density) and `index.layout`; no dedicated "rhythm" control independent of the chosen pattern |
 | 6  | Line character / rendering | Covered | `style` pattern choice → "Technique" linework descriptors, gated by `layers.technique.<group>` |
 | 7  | Degree of stylization | Partial | Fixed by the `style` choice (e.g. chromolithographic vs. ukiyo-e), including each pattern's Figure detail and Face Style sections for figures; no standalone realistic↔abstract dial |
-| 8  | Figure proportions / plasticity | Not covered | No field or template slot addresses body proportions/anatomical exaggeration (distinct from `figure_proportion`, which addresses framing/cropping, see #5); open gap, not prioritized in this round |
+| 8  | Figure proportions / plasticity | Not covered | No field or template slot addresses body proportions/anatomical exaggeration (distinct from `character_framing`/`figure_scale`, which address framing/cropping, see #5); open gap, not prioritized in this round |
 | 9  | Poses / gestures | Covered (court) / Partial (pip, ace) | COURT: traditional attributes (`assets/courts/<rank>.md`) + Step 10 + Step 11, merged into `[RESOLVED_ATTRIBUTES]`. PIP/ACE figures (`layers.figure.<group> = true`) have no templated pose slot |
 | 10 | Costume / accessories | Covered (court) / N/A (pip, ace) | Same merge pipeline as #9, court-only |
 | 11 | Typage / facial expression | Covered | `style` pattern's "Figure detail" and "Face Style" sections, folded into `[STYLE_BLOCK]`, gated by `layers.figure.<group>` |
@@ -51,7 +51,7 @@ question.
 ## Open gaps
 
 - **#8 Figure proportions / plasticity** (anatomical body proportions/exaggeration —
-  NOT figure framing/cropping, which is covered by `figure_proportion`, #5) and the
+  NOT figure framing/cropping, which is covered by `character_framing`/`figure_scale`, #5) and the
   **partial** items above (#5's remaining non-framing aspects, #7, #9 for pip/ace, #12)
   are known gaps, not yet addressed. They're recorded here so future work can pick them
   up without re-auditing the whole skill.
