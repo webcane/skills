@@ -39,11 +39,13 @@ text):
 - **Frame** — the border/architectural framing (`[FRAME_LINE]`), its text drawn from
   the chosen `frame` preset in `assets/frame/`, plus this group's addition if the cell
   is custom text.
-- **Figure** — whether this group's center motif carries a figure/portrait at all.
-  Gates the pattern's Figure detail section, its Face Style section, this group's
-  addition if the cell is custom text, and the deck-wide `figure_proportion` if set.
-  On for `court` by default (the portrait); off for
-  `pip`/`ace` (no figure) — turn on for `pip`/`ace` only for transformation-style
+- **Figure** — the figure type for this group's center motif. The cell value is
+  the figure TYPE: `"false"` = no figure; `"character"` / `"building"` / `"animal"` /
+  `"custom"` = figure on + that type. The type selects which
+  `assets/figure-type/<type>.md` text is pulled into `[STYLE_BLOCK]`, and determines
+  whether character-only sources (Face Style, character_framing) apply. Default:
+  `"character"` for `court` and `joker` (the portrait); `"false"` for `pip`/`ace`
+  (no figure) — set to a type value for `pip`/`ace` only for transformation-style
   decks where number/ace cards carry small figures.
 - **Mood** — whether `[MOOD_LINE]` (the deck's overall atmosphere, from the `mood`
   setting) and this group's addition (a per-group mood addition, when the cell is
@@ -69,7 +71,8 @@ stylization). The pattern file itself never references `layers.*` or any other c
 whether "Technique" and "Finish" are folded into `[STYLE_BLOCK]` for a given group is
 decided here via a single `layers.technique.<group>` gate (see steps 5 and 7 below),
 and whether "Figure detail" and "Face Style" are folded in is decided here via
-`layers.figure.<group>` — independently of `layers.technique.<group>`.
+`layers.figure.<group>` (and only for the `character` type) — independently of
+`layers.technique.<group>`.
 
 ### Resolving `[STYLE_BLOCK]` for a card group
 
@@ -97,18 +100,40 @@ by concatenating, in this order, only the layers that are on:
 
 Then:
 
-6. **Figure detail & Face Style** — only if `layers.figure.g` is on (default: on for
-   `court`, off for `pip`/`ace`): append the pattern's "Figure detail" lines (skip
-   entirely if that section is `(none)`), then the pattern's "Face Style" line (how a
-   figure's face reads in this pattern — typage, expression, degree of stylization),
-   then `layers.figure.g`'s addition (free text, own comma phrase) if the cell is
-   custom text — a group-wide figure trait layered on top of the pattern's Face Style
-   for every card in this group (e.g. "all court figures shown with a slight hunch").
-   Then, if `figure_proportion` is non-empty, append it as its own comma phrase — a
-   deck-wide framing/crop description (e.g. `waist-up portrait, torso and arms
-   visible, hands free to hold attributes,`), reused across every card with a figure.
-   Figure detail, Face Style, the group-wide addition, and `figure_proportion` are all
-   dropped entirely if `layers.figure.g` is `"false"` (the default for `pip`/`ace`).
+6. **Figure block** — only if `layers.figure.g` is a type value (not `"false"`).
+   Read the type from `layers.figure.g` and append, in this exact order (D-15):
+
+   a. **Figure-type text** — the text from `assets/figure-type/<type>.md`, where
+      `<type>` is the `layers.figure.g` value (`character`, `building`, `animal`, or
+      `custom`). Applied to ALL figure types.
+
+   b. **Character-only sources** — ONLY when `layers.figure.g` is `"character"`:
+      append the pattern's "Figure detail" lines (skip entirely if that section is
+      `(none)`), then the pattern's "Face Style" line (how a figure's face reads in
+      this pattern — typage, expression, degree of stylization), then
+      `layers.figure.g`'s addition (free text, own comma phrase) if the cell is
+      custom text beyond the type keyword — a group-wide figure trait for every card
+      in this group (e.g. "all court figures shown with a slight hunch"). Then, if
+      `character_framing` is non-empty, append it as its own comma phrase (the
+      deck-wide character framing from `assets/character-framing/`, e.g.
+      `waist-up portrait, torso and arms visible, hands free to hold attributes,`).
+      **For `building`, `animal`, and `custom` figure types: skip the pattern's
+      "Figure detail" lines, Face Style line, the group-wide addition, and
+      `character_framing` entirely** (FIG-08, D-16). These types receive only items
+      a, c, and d.
+
+   c. **Figure scale** — the deck-wide `figure_scale` setting (values: `full-bleed`,
+      `inscribed-in-frame`, `small-centered`, or custom free text; set in Step 8a).
+      Append the `figure_scale` value as its own comma phrase. Applied to ALL figure
+      types. If `figure_scale` is empty or not set, omit this phrase.
+
+   d. **Split** — if `layers.split.g` is `"horizontal-mirrored"` or
+      `"angled-mirrored"`, append the text from
+      `assets/split/<layers.split.g value>.md` as its own comma phrase — the outer
+      compositional wrapper (SPLT-03). If `layers.split.g` is `"none"` or `"false"`,
+      no split text is added.
+
+   The entire figure block (a–d) is skipped when `layers.figure.g` is `"false"`.
    This is independent of `layers.technique.g` — a card can have Technique on with
    Figure off (e.g. plain pip with the pattern's linework but no portrait detail), or
    vice versa.
@@ -142,7 +167,7 @@ below if the cell is exactly `"true"` and `theme` is set. Included verbatim if
 slot, not inside `[STYLE_BLOCK]`. The same resolved `[FRAME_LINE]` is reused across all
 cards of the same group/deck, like `[STYLE_BLOCK]`.
 
-### Figure, face style & proportion (within `[STYLE_BLOCK]`)
+### Figure type, face style, framing & scale (within `[STYLE_BLOCK]`)
 
 There is no separate `[FACE_STYLE_LINE]` template slot and no `face_style` setting —
 how a figure's face reads is part of the pattern itself (step 6 above), so it stays
@@ -153,30 +178,50 @@ suit symbol alike — gated by `layers.technique.<group>`, step 5 above), "Figur
 detail" (additional rendering detail that only makes sense for a portrait, e.g. skin
 tones, or `(none)`), and "Face Style" (typage/expression/degree of stylization for a
 face). The pattern file never says when "Figure detail" or "Face Style" apply —
-`references/REFERENCE.md` alone decides that, via `layers.figure.<group>`. Keep these
-three as separate sections when adding or editing a pattern — don't fold Figure detail
-or Face Style into Technique or vice versa.
+`references/REFERENCE.md` alone decides that, via `layers.figure.<group>` and its type
+value. Keep these three as separate sections when adding or editing a pattern — don't
+fold Figure detail or Face Style into Technique or vice versa.
 
-**Four scopes of figure content**, broadest to narrowest:
-- **Deck-wide (pattern)** — the pattern's "Figure detail" lines (if not `(none)`) plus
-  its Face Style line (from `style`): additional portrait-only rendering detail (e.g.
-  skin tones) and how ANY figure's face reads in this pattern (typage, expression,
-  degree of stylization). No separate setting; baked into the chosen pattern.
-- **Deck-wide (framing)** — `figure_proportion` (free text, picked from
-  `assets/figure-proportion/` or typed in Step 8): how much of the figure is shown and
-  how it's cropped (e.g. "bust", "waist-up", "full body"), reused across every card
-  with a figure. Appended right after `layers.figure.<group>`'s addition.
-- **Group-wide** — `layers.figure.<group>`'s addition, when the cell is custom text
+**Figure type assembly** — `layers.figure.<group>` now carries the figure type (`"false"` / `"character"` / `"building"` / `"animal"` / `"custom"`):
+- For `character` type: figure block = `assets/figure-type/character.md` text + pattern's Figure detail + Face Style + group-wide addition + `character_framing` text (from `assets/character-framing/`) + `figure_scale` text + split text (D-17, FIG-07).
+- For `building` / `animal` / `custom`: figure block = `assets/figure-type/<type>.md` text + `figure_scale` text + split text. Pattern's Figure detail, Face Style, group-wide addition, and `character_framing` are all skipped (FIG-08, D-16).
+
+**Five scopes of figure content**, broadest to narrowest:
+- **Deck-wide (figure type)** — the `assets/figure-type/<type>.md` text for the group's
+  configured type: the canonical prompt phrase for that figure type (e.g. character
+  preamble, building description, animal phrase). Applied to all types.
+- **Deck-wide (pattern, character-only)** — the pattern's "Figure detail" lines (if not
+  `(none)`) plus its Face Style line (from `style`): additional portrait-only rendering
+  detail (e.g. skin tones) and how a character figure's face reads in this pattern
+  (typage, expression, degree of stylization). No separate setting; baked into the
+  chosen pattern. Applied ONLY when figure type is `character`.
+- **Deck-wide (character framing, character-only)** — `character_framing` (picked from
+  `assets/character-framing/` or free-text in Step 8e): how much of the character
+  figure is shown and how it is cropped (e.g. "waist-up portrait, torso and arms
+  visible, hands free to hold attributes,"), reused across every card whose group's
+  figure type is `character`. Applied ONLY when figure type is `character`; appended
+  right after the group-wide addition.
+- **Deck-wide (scale, all types)** — `figure_scale` (set in Step 8a, stored as
+  `full-bleed` / `inscribed-in-frame` / `small-centered`): how the figure sits in the
+  frame, applied to ALL figure types. Appended after `character_framing` (or right
+  after figure-type text for non-character types).
+- **Deck-wide (split, outer wrapper, all types)** — `layers.split.<group>` (`none`,
+  `horizontal-mirrored`, `angled-mirrored`): the compositional split layout from
+  `assets/split/<mode>.md`. Applied to all figure types; appended as the outermost
+  wrapper after `figure_scale`. No split text for `none`/`false`.
+- **Group-wide** — `layers.figure.<group>`'s addition beyond the type keyword, when
+  the cell contains custom text in addition to or instead of the type enum value
   (config-only): an optional trait shared by every figure in one group
-  (`court`/`pip`/`ace`) — e.g. "all court figures shown with a slight hunch" —
-  appended right after the pattern's Face Style line for that group.
+  (`court`/`pip`/`ace`/`joker`) — e.g. "all court figures shown with a slight hunch"
+  — appended right after the pattern's Face Style line for that group (character-only).
 - **Per-card** — `[CHARACTER_NAME]`/`[CHARACTER_FEATURES]` plus the Steps 10-12
   attributes/reference-transfers/exclusions: who this specific card's figure is,
   always supplied per card (from the user or a reference image).
 
-These four stack together rather than compete — each addresses a different question
-("how do faces render in this pattern" / "how is the figure framed in this deck" /
-"what's true of every figure in this group" / "who is this card's figure").
+These scopes stack together rather than compete — each addresses a different question
+("which figure type text" / "how do faces render in this pattern" / "how is the
+character framed in this deck" / "how is the figure scaled in the frame" / "what split
+layout" / "what's true of every figure in this group" / "who is this card's figure").
 
 **Source resolution — pattern vs. reference image.** The Face Style line governs *how*
 a face is rendered (stylization, linework, expression register); `[CHARACTER_FEATURES]`
@@ -188,10 +233,10 @@ description from `[CHARACTER_FEATURES]` (silhouette/costume only — see SKILL S
 the two don't contradict each other. Otherwise, no source-resolution step is needed —
 the pattern's Face Style line and the character's own features simply stack.
 
-For `pip`/`ace`, the pattern's "Figure detail" lines, its Face Style line,
-`layers.figure.<group>`'s addition, and `figure_proportion` only appear if
-`layers.figure.<group>` is on (transformation decks); otherwise they're part of step 6
-and simply not appended.
+For `pip`/`ace`, the entire figure block (figure-type text, character-only sources,
+figure_scale, and split) only appears if `layers.figure.<group>` is a type value (not
+`"false"`; transformation decks); otherwise they're part of step 6 and simply not
+appended.
 
 ### Theme-derived ornaments/highlights/frame
 
@@ -221,22 +266,33 @@ don't force).
 
 ### Defaults
 
-| Layer        | court | pip   | ace   | joker |
-|--------------|-------|-------|-------|-------|
-| background   | true  | true  | true  | true  |
-| decor        | true  | false | true  | true  |
-| ornaments    | true  | false | true  | true  |
-| highlights   | false | false | false | false |
-| frame        | true  | true  | true  | true  |
-| figure       | true  | false | false | true  |
-| mood         | true  | true  | true  | true  |
-| technique    | true  | true  | true  | true  |
+`layers.figure.<group>` now stores the figure type, not a boolean. `"false"` = no
+figure; `"character"` / `"building"` / `"animal"` / `"custom"` = figure on + that type.
+
+| Layer        | court       | pip    | ace    | joker       |
+|--------------|-------------|--------|--------|-------------|
+| background   | true        | true   | true   | true        |
+| decor        | true        | false  | true   | true        |
+| ornaments    | true        | false  | true   | true        |
+| highlights   | false       | false  | false  | false       |
+| frame        | true        | true   | true   | true        |
+| figure       | "character" | false  | false  | "character" |
+| split        | false       | false  | false  | false       |
+| mood         | true        | true   | true   | true        |
+| technique    | true        | true   | true   | true        |
+
+The `figure` row uses type enum values: `"character"` = portrait on + character type
+(default for court/joker); `false` = no figure (default for pip/ace). The `split` row
+defaults to `false` (not configured) for all groups — `"false"` means the wizard asks
+the first time a figure card in that group is generated; `"none"` means configured as
+no split; `"horizontal-mirrored"` / `"angled-mirrored"` means that split mode.
 
 These reproduce the traditional look out of the box: Court cards carry the full
-pattern including its Figure detail and Face Style sections; plain Pip cards show only
-background + technique/finish (no border, no extra accents, no figure); Aces
-keep their ornamental flourish and border but no figure; Joker cards carry the full
-pattern with a figure (like Court cards) — a fully decorated single-figure card.
+pattern including its Figure detail and Face Style sections (character type); plain Pip
+cards show only background + technique/finish (no border, no extra accents, no figure);
+Aces keep their ornamental flourish and border but no figure; Joker cards carry the
+full pattern with a figure (like Court cards, character type) — a fully decorated
+single-figure card.
 Highlights is off everywhere by default. `mood` and `theme` are both empty by default,
 so `[MOOD_LINE]` and the theme-derived ornaments/highlights produce nothing unless set.
 Technique is on everywhere by default — every card keeps the pattern's linework/medium
