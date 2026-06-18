@@ -6,6 +6,9 @@ All notable changes to this skill. Released per skill as tag
 
 ## [Unreleased]
 
+### Fixed
+- **Prospect card loop**: wizard now iterates over all 12 court card slots (King/Queen/Jack × 4 suits) when type = Prospect, collecting a named figure per slot before generating prompts in sequence. Previously the wizard stopped after generating one card's prompt instead of continuing to the next slot.
+
 ### Added
 - **Card back group** — `back` is a new card group (peer to court/pip/ace/joker) with
   `layers.*.back` config entries in `manage_config.py` and `config.json`. Defaults:

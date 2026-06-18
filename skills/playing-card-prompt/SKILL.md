@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.22.0
+  version: 3.22.1
   description_claudeai: Interactive wizard to build image-gen prompts for stylized playing cards. 4 deck patterns, 6 lettering systems, 3+ styles, court/pip/ace. Trigger on card design requests.
 ---
 
@@ -337,6 +337,13 @@ as "no <thing>" — merge into `[NEGATIVE_LIST]`. If nothing, skip.
 Ask the user to provide a display name for this special card. This becomes `[CARD_NAME]`.
 Examples: "King of Clubs", "The Oracle", "The Joker's Shadow". No default — required, always ask.
 
+**Prospect type — full deck loop:** If the user selects Prospect in Step S2, the wizard
+enters a loop over all 12 court card slots (King/Queen/Jack × ♠ ♥ ♦ ♣) for the active
+deck. For each slot, Step S1 provides the card name (default to the standard slot name,
+e.g. "King of Spades") and Step S4 collects the named figure. After collecting all 12 (or
+however many the user provides), generate prompts for each in sequence. The user can also
+skip remaining slots by saying "done" or "skip the rest."
+
 **Step S2 — Special card type · _per-card_**
 
 Ask which type of special card this is. List the `*.md` files in `assets/special/` (ignore
@@ -362,19 +369,28 @@ Optional for prospect types (Step S4 supplies the named figure).
 
 **Step S4 — Named figure · _per-card (Prospect type only)_**
 
-Only runs when the user selected "Prospect" in Step S2 (per D-13 in CONTEXT.md).
+Only runs when the user selected "Prospect" in Step S2.
 
-Ask for the named figure to assign to this specific card slot. Example: for
-`[CARD_NAME] = "King of Clubs"`, ask "Who is the named figure for this card?" User
+For each court card slot in the loop (see Step S1 Prospect note), ask: "Who is the
+named figure for [CARD_NAME]?" (e.g. "King of Spades — who is the named figure?"). User
 answers "Peter the Great" or "Peter I, Emperor of Russia".
 
 Assemble `[FIGURE_DESCRIPTION]` for prospect cards as:
 `[named figure], [Step S3 description if any],`
 (e.g., `Peter the Great, Russian Emperor, shown in imperial regalia,`).
 
-Per D-14 in CONTEXT.md: v1 handles one card at a time — wizard asks per card. Do not
-attempt to collect all figures for a full deck in one session. Batch generation is out
-of scope for v1.
+**Collection flow for a full Prospect deck:**
+1. Present the 12 court card slots upfront: King/Queen/Jack × ♠ ♥ ♦ ♣ (or the active
+   deck's equivalent ranks and suits). Offer to collect them in order or let the user
+   jump to any slot.
+2. For each slot, ask the named figure (one question per card). The user may say "skip"
+   to leave a slot blank for now.
+3. After collecting all (or the user says "done"), generate prompts for each populated
+   slot in sequence — output one prompt per card, clearly labelled (e.g.
+   `## King of Spades`).
+4. The user can call out any slot by name to redo it before final generation.
+
+Session only — figures are not persisted to config in v1.
 
 **Step S5 — Special card exclusions · _per-card (optional)_**
 
