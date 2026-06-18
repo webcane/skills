@@ -18,7 +18,7 @@ loads.
 | **B1** | Back design path *(Back only, per-card)* | #2 Color palette, #5 Composition/rhythm | — *(design description collected, not a layer toggle)* | `BACK_DESIGN` | — *(suggested: derived from active style+mood; freeform: user text; ref-image: user source + modifications)* |
 | **B2** | Suggested back refinement *(Back only, suggested path only, per-card)* | #2 Color palette, #5 Composition/rhythm | — | `BACK_DESIGN` (confirmed or replaced) | — |
 | **B3** | Back card exclusions *(Back only, per-card, optional)* | — *(negative constraints)* | — | `NEGATIVE_LIST` | — |
-| **S1** | Card display name *(Special only, per-card)* | — *(structural)* | — | `CARD_NAME` | — |
+| **S1** | Card title *(Special only, per-card)* | — *(structural)* | — | `CARD_NAME` | — |
 | **S2** | Special card type *(Special only, per-card)* | #5 Composition/rhythm | — | `SPECIAL_TYPE_LINE` | `assets/special/*.md` (excluding `_*`) |
 | **S3** | Visual content description *(Special only, per-card, optional for prospect)* | #9 Poses/gestures, #10 Costume/accessories | Center motif | `FIGURE_DESCRIPTION` (partial) | — |
 | **S4** | Named figure *(Special+Prospect only, per-card)* | #9 Poses/gestures | Center motif | `FIGURE_DESCRIPTION` (named figure + S3 description) | `assets/special/prospect.md` (type line only; figure name is per-card user input) |

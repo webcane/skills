@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.22.2
+  version: 3.22.3
   description_claudeai: Interactive wizard to build image-gen prompts for stylized playing cards. 4 deck patterns, 6 lettering systems, 3+ styles, court/pip/ace. Trigger on card design requests.
 ---
 
@@ -332,14 +332,13 @@ as "no <thing>" — merge into `[NEGATIVE_LIST]`. If nothing, skip.
 
 ### Steps S1–S5 — Special card only (run instead of Step 4 when rank is Special)
 
-**Step S1 — Card display name · _per-card_**
+**Step S1 — Card title · _per-card_**
 
-Ask the user to provide a display name for this special card. This becomes `[CARD_NAME]`.
-Examples: "The Oracle", "The Fool's Gambit". No default — required, always ask.
+Ask the user for the title of this special card. This becomes `[CARD_NAME]`.
+Examples: "The Oracle", "The Fool's Gambit", "Воронежские деятели культуры". No default — required, always ask.
 
-**Prospect type:** The card name is the title of the prospect sheet (e.g. "Воронежские
-деятели культуры"). This is the title of the ONE card that will depict all 12 figures
-together. Do NOT ask for individual court card names — the card title covers the whole set.
+**Prospect type:** the title is the name of the full prospect sheet (the ONE card depicting
+all 12 court figures). Do not ask for individual court card slot names here.
 
 **Step S2 — Special card type · _per-card_**
 

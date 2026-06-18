@@ -7,6 +7,7 @@ All notable changes to this skill. Released per skill as tag
 ## [3.22.0] - 2026-06-18
 
 ### Fixed
+- **Step S1 label**: renamed "Card display name" → "Card title" in wizard step and WIZARD-STEP-MAP.md.
 - **Prospect card concept**: a prospect card is now correctly implemented as ONE card showing all 12 court figures (King/Queen/Jack × 4 suits) in a single image. The wizard collects all 12 named figure assignments (with optional suit theme labels and layout preference) and generates ONE prompt. Previously the wizard generated 12 separate individual card prompts instead of one composite card prompt.
 
 ### Added
