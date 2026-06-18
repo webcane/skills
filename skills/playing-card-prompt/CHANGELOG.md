@@ -4,7 +4,7 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
-## [Unreleased]
+## [3.22.0] - 2026-06-18
 
 ### Fixed
 - **Prospect card loop**: wizard now iterates over all 12 court card slots (King/Queen/Jack × 4 suits) when type = Prospect, collecting a named figure per slot before generating prompts in sequence. Previously the wizard stopped after generating one card's prompt instead of continuing to the next slot.
