@@ -4,7 +4,7 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
-## [Unreleased]
+## [3.22.0] - 2026-06-18
 
 ### Added
 - **Card back group** — `back` is a new card group (peer to court/pip/ace/joker) with
