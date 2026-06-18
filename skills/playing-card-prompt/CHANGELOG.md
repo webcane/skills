@@ -4,10 +4,16 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
+## [Unreleased]
+
+### Added
+- **Prospect layout options** — Step S3 now uses `AskUserQuestion` with four explicit layout choices for prospect cards: 4 suits × 3 ranks grid (default), 12-row list (suit symbol · rank · named figure per row), 3 rows grouped by rank, and free-form collage. Previously the step only accepted free-text input with no guided options.
+
 ## [3.22.0] - 2026-06-18
 
 ### Fixed
 - **Step S1 label**: renamed "Card display name" → "Card title" in wizard step and WIZARD-STEP-MAP.md.
+- **Prospect card S4 scope note**: added explicit note that selecting the 12 named figures is a structural/content task outside this skill — the skill expects assignments to arrive pre-prepared.
 - **Prospect card concept**: a prospect card is now correctly implemented as ONE card showing all 12 court figures (King/Queen/Jack × 4 suits) in a single image. The wizard collects all 12 named figure assignments (with optional suit theme labels and layout preference) and generates ONE prompt. Previously the wizard generated 12 separate individual card prompts instead of one composite card prompt.
 
 ### Added

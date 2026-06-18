@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.22.3
+  version: 3.22.4
   description_claudeai: Interactive wizard to build image-gen prompts for stylized playing cards. 4 deck patterns, 6 lettering systems, 3+ styles, court/pip/ace. Trigger on card design requests.
 ---
 
@@ -361,10 +361,21 @@ text as `[SPECIAL_TYPE_LINE]`. If "Custom text", use the user's free text verbat
 For **non-prospect types**: ask the user to describe the visual content. This becomes
 the base `[FIGURE_DESCRIPTION]`.
 
-For **Prospect type**: ask how the 12 figures should be arranged on the card (e.g.
-"4 columns grouped by suit", "3 rows grouped by rank", "free-form collage"). This becomes
-`[SPECIAL_ATTRIBUTES]` — the layout instruction that wraps the figure list. If the user
-doesn't specify, default to "4 suits × 3 ranks grid, each figure a small portrait".
+For **Prospect type**: use `AskUserQuestion` to ask how the 12 figures should be
+arranged on the card. Offer these options (default first):
+- **4 suits × 3 ranks grid (default)** — a grid with each figure as a small portrait,
+  grouped by suit in columns. `[SPECIAL_ATTRIBUTES]` = `4 suits × 3 ranks grid, each figure a small portrait`
+- **12-row list** — one row per court card slot, each showing the suit symbol, rank, and
+  the named figure assigned to that slot (e.g. "♠ King — Peter I"). `[SPECIAL_ATTRIBUTES]` =
+  `12-row list, each row: suit symbol · rank · named figure`
+- **3 rows grouped by rank** — King / Queen / Jack rows, each spanning all four suits.
+  `[SPECIAL_ATTRIBUTES]` = `3 rows grouped by rank (King / Queen / Jack), spanning all suits`
+- **Free-form collage** — figures arranged freely without a fixed grid or list structure.
+  `[SPECIAL_ATTRIBUTES]` = `free-form collage of all 12 court figures`
+
+"Other" covers any custom layout description — use the user's text verbatim as
+`[SPECIAL_ATTRIBUTES]`. This value becomes the layout instruction that wraps the figure
+list in the assembled prompt. If the user doesn't specify, default to the grid.
 
 **Step S4 — Named figures table · _(Prospect type only)_**
 
@@ -397,6 +408,11 @@ suit arrangement (4 suits × 3 ranks):
 This entire block is `[FIGURE_DESCRIPTION]` in the SPECIAL template. Output: ONE prompt.
 
 Session only — figures are not persisted to config in v1.
+
+> **Note:** Deciding WHO the 12 figures are (research, thematic grouping, historical
+> selection) is a structural/content task — outside this skill's scope. The skill
+> expects the user to arrive with the figure assignments already prepared. Do not
+> attempt to suggest or fill in figures on behalf of the user.
 
 **Step S5 — Special card exclusions · _per-card (optional)_**
 
