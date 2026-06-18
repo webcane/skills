@@ -7,7 +7,7 @@ All notable changes to this skill. Released per skill as tag
 ## [3.22.0] - 2026-06-18
 
 ### Fixed
-- **Prospect card loop**: wizard now iterates over all 12 court card slots (King/Queen/Jack × 4 suits) when type = Prospect, collecting a named figure per slot before generating prompts in sequence. Previously the wizard stopped after generating one card's prompt instead of continuing to the next slot.
+- **Prospect card concept**: a prospect card is now correctly implemented as ONE card showing all 12 court figures (King/Queen/Jack × 4 suits) in a single image. The wizard collects all 12 named figure assignments (with optional suit theme labels and layout preference) and generates ONE prompt. Previously the wizard generated 12 separate individual card prompts instead of one composite card prompt.
 
 ### Added
 - **Card back group** — `back` is a new card group (peer to court/pip/ace/joker) with

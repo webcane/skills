@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.22.1
+  version: 3.22.2
   description_claudeai: Interactive wizard to build image-gen prompts for stylized playing cards. 4 deck patterns, 6 lettering systems, 3+ styles, court/pip/ace. Trigger on card design requests.
 ---
 
@@ -335,14 +335,11 @@ as "no <thing>" — merge into `[NEGATIVE_LIST]`. If nothing, skip.
 **Step S1 — Card display name · _per-card_**
 
 Ask the user to provide a display name for this special card. This becomes `[CARD_NAME]`.
-Examples: "King of Clubs", "The Oracle", "The Joker's Shadow". No default — required, always ask.
+Examples: "The Oracle", "The Fool's Gambit". No default — required, always ask.
 
-**Prospect type — full deck loop:** If the user selects Prospect in Step S2, the wizard
-enters a loop over all 12 court card slots (King/Queen/Jack × ♠ ♥ ♦ ♣) for the active
-deck. For each slot, Step S1 provides the card name (default to the standard slot name,
-e.g. "King of Spades") and Step S4 collects the named figure. After collecting all 12 (or
-however many the user provides), generate prompts for each in sequence. The user can also
-skip remaining slots by saying "done" or "skip the rest."
+**Prospect type:** The card name is the title of the prospect sheet (e.g. "Воронежские
+деятели культуры"). This is the title of the ONE card that will depict all 12 figures
+together. Do NOT ask for individual court card names — the card title covers the whole set.
 
 **Step S2 — Special card type · _per-card_**
 
@@ -360,35 +357,45 @@ If a preset is named, load `assets/special/<name>.md` and use its "Special type 
 text as `[SPECIAL_TYPE_LINE]`. If "Custom text", use the user's free text verbatim as
 `[SPECIAL_TYPE_LINE]`.
 
-**Step S3 — Visual content description · _per-card_**
+**Step S3 — Visual content / layout description · _per-card_**
 
-Ask the user to describe the visual content of the card. This provides the base
-`[FIGURE_DESCRIPTION]` for non-prospect types. For prospect types, this step is used for
-any additional description beyond the named figure (e.g., "shown in formal court dress").
-Optional for prospect types (Step S4 supplies the named figure).
+For **non-prospect types**: ask the user to describe the visual content. This becomes
+the base `[FIGURE_DESCRIPTION]`.
 
-**Step S4 — Named figure · _per-card (Prospect type only)_**
+For **Prospect type**: ask how the 12 figures should be arranged on the card (e.g.
+"4 columns grouped by suit", "3 rows grouped by rank", "free-form collage"). This becomes
+`[SPECIAL_ATTRIBUTES]` — the layout instruction that wraps the figure list. If the user
+doesn't specify, default to "4 suits × 3 ranks grid, each figure a small portrait".
+
+**Step S4 — Named figures table · _(Prospect type only)_**
 
 Only runs when the user selected "Prospect" in Step S2.
 
-For each court card slot in the loop (see Step S1 Prospect note), ask: "Who is the
-named figure for [CARD_NAME]?" (e.g. "King of Spades — who is the named figure?"). User
-answers "Peter the Great" or "Peter I, Emperor of Russia".
+A prospect card is ONE card showing ALL 12 court figures in a single image. The wizard
+collects all 12 assignments before generating ONE prompt — not one prompt per figure.
 
-Assemble `[FIGURE_DESCRIPTION]` for prospect cards as:
-`[named figure], [Step S3 description if any],`
-(e.g., `Peter the Great, Russian Emperor, shown in imperial regalia,`).
+**Collection:**
+1. Present the 12 slots as a table (or accept the table from the user if they provide it
+   upfront). Slots: King/Queen/Jack × ♠ ♥ ♦ ♣ (or active deck equivalents).
+2. For each slot ask (or accept in bulk): the named figure and an optional short
+   description (title, era, role). Accept grouped input (e.g. "♠: Peter I, Catherine II,
+   Menshikov") or one-by-one.
+3. The user may optionally group suits under a thematic label (e.g. "♣ Music & Folk Art")
+   — include these labels in `[FIGURE_DESCRIPTION]` if provided.
+4. After all 12 (or user says "done"), confirm the table, then proceed to generate.
 
-**Collection flow for a full Prospect deck:**
-1. Present the 12 court card slots upfront: King/Queen/Jack × ♠ ♥ ♦ ♣ (or the active
-   deck's equivalent ranks and suits). Offer to collect them in order or let the user
-   jump to any slot.
-2. For each slot, ask the named figure (one question per card). The user may say "skip"
-   to leave a slot blank for now.
-3. After collecting all (or the user says "done"), generate prompts for each populated
-   slot in sequence — output one prompt per card, clearly labelled (e.g.
-   `## King of Spades`).
-4. The user can call out any slot by name to redo it before final generation.
+**Assembly:**
+`[FIGURE_DESCRIPTION]` for prospect cards is a structured list of all collected figures:
+
+```
+suit arrangement (4 suits × 3 ranks):
+  ♠ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack),
+  ♥ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack),
+  ♦ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack),
+  ♣ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack),
+```
+
+This entire block is `[FIGURE_DESCRIPTION]` in the SPECIAL template. Output: ONE prompt.
 
 Session only — figures are not persisted to config in v1.
 
