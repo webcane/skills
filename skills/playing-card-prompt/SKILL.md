@@ -677,26 +677,38 @@ Save via `python3 scripts/manage_config.py set character_framing <value>`.
 
 ### Step 9 — Character / figure description (REQUIRED for cards with a figure) · _per-card_
 
-Every card with a figure must have a figure description — **at minimum a name**. Two paths:
+Every card with a figure must have a figure description — **at minimum a name or label**. Two paths:
 
 **A) A reference image is attached.** Derive the description from it. If subagents are
-available, spawn one with this exact English prompt; otherwise do it yourself by looking
-at the image with the same prompt:
+available, spawn one with the prompt below; otherwise do it yourself by looking at the
+image with the same prompt. **Use the prompt that matches the figure type:**
 
-> Describe the person in the attached image in English: facial features, pose, what they
-> are wearing, which era it suggests, and characteristic elements/details of the outfit.
+- **Character** — > Describe the person in the attached image in English: facial features,
+  pose, what they are wearing, which era it suggests, and characteristic elements/details
+  of the outfit.
+
+- **Building** — > Describe the architectural structure in the attached image in English:
+  building type, era/style, key structural features, materials, state of preservation,
+  and any characteristic decorative elements.
+
+- **Animal** — > Describe the animal in the attached image in English: species, posture,
+  coat/plumage, prominent features, and characteristic details.
+
+- **Custom** — describe the central subject in concrete visual terms suitable for an
+  image-generation prompt.
 
 Use the resulting description verbatim as `[CHARACTER_FEATURES]`. Then confirm the
-character's **name** with the user (e.g. "Use 'Peter the Great' as the name?") and set
-`[CHARACTER_NAME]`.
+subject's **name or label** with the user (e.g. "Use 'Peter the Great' as the name?")
+and set `[CHARACTER_NAME]`.
 
-**B) No reference image.** Ask the user for the character: at minimum a name (required),
-plus any physical description / pose / costume they want. Set `[CHARACTER_NAME]` and
-`[CHARACTER_FEATURES]`. If they give only a name, you may draft a short feature
-description from it and let them edit.
+**B) No reference image.** Ask the user for the subject: at minimum a name or label
+(required), plus any physical description / pose / details they want. Set
+`[CHARACTER_NAME]` and `[CHARACTER_FEATURES]`. If they give only a name, you may draft
+a short feature description from it and let them edit.
 
-> If the figure is a real, identifiable public figure: keep it a neutral descriptive
-> depiction (appearance, costume, pose). Don't fabricate quotes or claims.
+> If the figure is a real, identifiable public figure or recognizable real-world subject:
+> keep it a neutral descriptive depiction (appearance, details, pose). Don't fabricate
+> quotes or claims.
 
 How the figure's face should read (typage, expression, degree of stylization) comes
 from the chosen pattern's own "Face Style" section — folded into `[STYLE_BLOCK]`
