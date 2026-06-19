@@ -40,5 +40,7 @@ bold simplified facial features in the iconic stylized French court-card traditi
 ```
 even matte finish,
 crisp lithographic print quality,
+flat graphic design, vector style,
+centered on a clean transparent background,
 highly detailed French-style playing card,
 ```

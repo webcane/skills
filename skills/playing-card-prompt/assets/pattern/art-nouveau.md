@@ -46,5 +46,7 @@ idealized serene facial features with a dreamlike, elegant expression in the Muc
 ```
 smooth matte finish,
 delicate decorative print quality,
+flat graphic design, vector style,
+centered on a clean transparent background,
 highly detailed Art Nouveau-style playing card,
 ```

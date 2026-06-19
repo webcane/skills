@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.22.4
+  version: 3.22.5
   description_claudeai: Interactive wizard to build image-gen prompts for stylized playing cards. 4 deck patterns, 6 lettering systems, 3+ styles, court/pip/ace. Trigger on card design requests.
 ---
 
@@ -818,6 +818,15 @@ Offer to save the choice to `config.json` like the other persistent settings.
 6. Keep phrasing as short, comma-separated visual phrases (general → specific: card
    type/style, then layout, then the portrait, then technical finish, then negatives
    last) — avoid full sentences, section headers, or restating the same detail twice.
+   Always include two finish guardrails immediately before the negatives:
+   - **Style**: `flat graphic design, vector style,` — prevents unwanted 3D shadows,
+     photorealistic surface lighting, and added textures that clash with a card's
+     graphic look.
+   - **Background**: `centered on a clean transparent background,` — if the user has
+     said they plan to composite the figure into their own card template or cut it out
+     separately, use `isolated on a solid black background,` instead (image generators
+     rarely produce true alpha transparency natively; black is a reliable matte for
+     masking).
 7. **Engine-aware prompt formatting** — apply the deltas from the
    `assets/engines/<engine>.md` chosen in Step 14 to the otherwise-finished prompt:
    - **Negative handling** — if the engine moves negatives out of the main body
