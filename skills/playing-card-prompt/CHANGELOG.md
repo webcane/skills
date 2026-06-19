@@ -4,7 +4,7 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
-## [Unreleased]
+## [3.24.0] - 2026-06-19
 
 ### Added
 - **Prospect layout options** — Step S3 now uses `AskUserQuestion` with four explicit layout choices for prospect cards: 4 suits × 3 ranks grid (default), 12-row list (suit symbol · rank · named figure per row), 3 rows grouped by rank, and free-form collage. Previously the step only accepted free-text input with no guided options.
