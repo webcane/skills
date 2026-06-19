@@ -546,7 +546,9 @@ user chose "Custom text" in the wizard (Step S2). Drop this line if empty.
 - For **other types**: the user's visual content description from Step S3.
 Drop this line if empty.
 
-`[SPECIAL_ATTRIBUTES]` is any additional attributes or props the user provides in Step S5. Drop if empty.
+`[SPECIAL_ATTRIBUTES]` is the layout arrangement chosen in Step S3 (for prospect-type
+cards, the grid/list/row/collage layout; for other types, any additional attributes or
+visual instructions the user provides). Drop if empty.
 
 ```
 [ASPECT_RATIO] aspect ratio, special playing card,

@@ -20,7 +20,7 @@ loads.
 | **B3** | Back card exclusions *(Back only, per-card, optional)* | — *(negative constraints)* | — | `NEGATIVE_LIST` | — |
 | **S1** | Card title *(Special only, per-card)* | — *(structural)* | — | `CARD_NAME` | — |
 | **S2** | Special card type *(Special only, per-card)* | #5 Composition/rhythm | — | `SPECIAL_TYPE_LINE` | `assets/special/*.md` (excluding `_*`) |
-| **S3** | Visual content description *(Special only, per-card, optional for prospect)* | #9 Poses/gestures, #10 Costume/accessories | Center motif | `FIGURE_DESCRIPTION` (partial) | — |
+| **S3** | Visual content description *(Special only, per-card, optional for prospect)* | #9 Poses/gestures, #10 Costume/accessories | Center motif | `FIGURE_DESCRIPTION` (partial), `SPECIAL_ATTRIBUTES` | — |
 | **S4** | Named figure *(Special+Prospect only, per-card)* | #9 Poses/gestures | Center motif | `FIGURE_DESCRIPTION` (named figure + S3 description) | `assets/special/prospect.md` (type line only; figure name is per-card user input) |
 | **S5** | Special card exclusions *(Special only, per-card, optional)* | — *(negative constraints)* | — | `NEGATIVE_LIST` | — |
 | **5** | Visual style/pattern | #1 Medium/technique, #2 Color palette, #3 Era/cultural context, #6 Line character, #7 Degree of stylization *(partial)*, #11 Typage/facial expression | Background, Decor, Ornaments, Highlights, Technique, Finish, Figure detail, Face Style — supplies the TEXT for all of them | feeds `[STYLE_BLOCK]` (layer text, incl. Technique and Finish — sharing one gate — when `layers.technique.<group>` is on, and Figure detail/Face Style when `layers.figure.<group>` is on) | `assets/pattern/<style>.md`, `assets/pattern/_adding-a-pattern.md` (if custom) |
