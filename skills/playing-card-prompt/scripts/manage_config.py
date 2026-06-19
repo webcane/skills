@@ -216,9 +216,12 @@ def options_for(key: str):
             # an "Other (free text)" option that saves via cmd_set, so strict=False.
             return (allowed_splits(), False)
         if layer == "figure":
-            # figure layer accepts type enum (false/character/building/animal/custom)
-            # plus free-text additions (non-strict, preserving existing behavior).
-            return (["false"] + allowed_figure_types(), False)
+            # figure layer is strict: only "false" or a discovered figure-type stem.
+            # "true" was the pre-4.0 boolean and is no longer valid — it breaks
+            # STYLE_BLOCK assembly (no assets/figure-type/true.md). Reject it here
+            # so cmd_set never persists it; _migrate_figure_true_to_character()
+            # upgrades any existing "true" values on load.
+            return (["false"] + allowed_figure_types(), True)
         # All other layers: "true"/"false" toggle; any other text enables + adds.
         return (BOOL_VALUES, False)
     return None
@@ -334,6 +337,29 @@ def _migrate_figure_proportion(profile: dict) -> bool:
     return changed
 
 
+def _migrate_figure_true_to_character(profile: dict) -> bool:
+    """Upgrade pre-4.0 layers.figure.<group>='true' → 'character'. Runs unconditionally.
+
+    A config written by pre-4.0 code (or by a user running `set layers.figure.X true`
+    before that cmd_set was made strict) may have 'true' stored for a figure cell.
+    'true' is no longer a valid value: STYLE_BLOCK assembly would attempt to load
+    assets/figure-type/true.md (which does not exist). Promoting it to 'character'
+    restores the pre-4.0 intent (portraits enabled, character type).
+
+    This migration is intentionally separate from _migrate_figure_proportion so it
+    runs on every profile regardless of whether figure_proportion is present.
+
+    Returns True if any cell was changed.
+    """
+    changed = False
+    fig = profile.get("layers", {}).get("figure", {})
+    for group in GROUPS:
+        if fig.get(group) == "true":
+            fig[group] = "character"
+            changed = True
+    return changed
+
+
 def load_raw() -> dict:
     """Load config.json, migrating a pre-3.0 flat file, pre-3.6 *_extra fields, a
     pre-3.13 extras.<layer>.<group> namespace, and a pre-4.0 figure_proportion field."""
@@ -360,6 +386,9 @@ def load_raw() -> dict:
     if any(_migrate_figure_proportion(prof) for prof in cfg["profiles"].values()):
         migrated = True
         print("note: migrated figure_proportion to figure_scale + character_framing", file=sys.stderr)
+    if any(_migrate_figure_true_to_character(prof) for prof in cfg["profiles"].values()):
+        migrated = True
+        print("note: migrated layers.figure.<group>='true' to 'character'", file=sys.stderr)
     if migrated:
         save_raw(cfg)
     return cfg
