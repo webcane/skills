@@ -89,10 +89,10 @@ unless the failure stems from missing/ambiguous information only they can resolv
   `[CHARACTER_FEATURES]` are both present and non-empty; if derived from a reference
   image (Step 9-A), the description reflects what was actually returned, not a
   generic placeholder.
-- [ ] **Negative list** — the negative content (from Step 11) contains only "no …"
+- [ ] **Negative list** — the negative content (from Step 12) contains only "no …"
   exclusion phrases (or the engine's equivalent), deduplicated, with no positive
   attributes leaking in.
-- [ ] **Aspect ratio** — the aspect ratio is a concrete `W:H` ratio (from Step 12 or
+- [ ] **Aspect ratio** — the aspect ratio is a concrete `W:H` ratio (from Step 13 or
   the user's custom value) or its engine-specific equivalent (pixel size, `--ar`,
   fixed size), not descriptive text.
 - [ ] **Template match** — the COURT/PIP/ACE/JOKER template matches the resolved rank,
@@ -105,7 +105,7 @@ unless the failure stems from missing/ambiguous information only they can resolv
   `assets/index/options.md` (symbol-only, `no rank letter, no suit symbol`), or
   replaced entirely by `no corner indices, full-bleed illustration,` when
   `index.count = "none"`.
-- [ ] **Engine formatting** — the chosen `image_generator` (Step 13)'s negative
+- [ ] **Engine formatting** — the chosen `image_generator` (Step 14)'s negative
   handling, aspect-ratio syntax, and extra parameters from
   `assets/engines/<engine>.md` are all applied; for `nanobanana` the prompt matches
   the base template unchanged.
