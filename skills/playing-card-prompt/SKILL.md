@@ -308,7 +308,9 @@ Save choices via `python3 scripts/manage_config.py set index.count <value>` and
 ### Steps B1–B7 — Back card only (run instead of Steps 4.1–4.2 when rank is Back)
 
 Steps B1–B6 are **persistent** (deck-wide): each step checks if the config field is
-already set; if so, display the saved value and skip. Step B7 is **per-card**.
+already set; if so, silently skip it (no per-step value display, no consolidated
+settings summary — go straight to the next unset step or to B7). Step B7 is
+**per-card** and always runs.
 
 **Step B1 — Back purpose · _persistent_**
 
