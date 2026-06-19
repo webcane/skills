@@ -274,17 +274,17 @@ don't force).
 `layers.figure.<group>` now stores the figure type, not a boolean. `"false"` = no
 figure; `"character"` / `"building"` / `"animal"` / `"custom"` = figure on + that type.
 
-| Layer        | court       | pip    | ace    | joker       | back   | special |
-|--------------|-------------|--------|--------|-------------|--------|---------|
-| background   | true        | true   | true   | true        | true   | true    |
-| decor        | true        | false  | true   | true        | true   | true    |
-| ornaments    | true        | false  | true   | true        | true   | true    |
-| highlights   | false       | false  | false  | false       | false  | false   |
-| frame        | true        | true   | true   | true        | true   | false   |
-| figure       | "character" | false  | false  | "character" | false  | false   |
-| split        | false       | false  | false  | false       | false  | false   |
-| mood         | true        | true   | true   | true        | true   | true    |
-| technique    | true        | true   | true   | true        | true   | true    |
+| Layer        | court       | pip    | ace    | joker       | back  | special |
+|--------------|-------------|--------|--------|-------------|-------|---------|
+| background   | true        | true   | true   | true        | false | true    |
+| decor        | true        | false  | true   | true        | false | true    |
+| ornaments    | true        | false  | true   | true        | false | true    |
+| highlights   | false       | false  | false  | false       | false | false   |
+| frame        | true        | true   | true   | true        | true  | false   |
+| figure       | "character" | false  | false  | "character" | false | false   |
+| split        | false       | false  | false  | false       | false | false   |
+| mood         | true        | true   | true   | true        | false | true    |
+| technique    | true        | true   | true   | true        | false | true    |
 
 The `figure` row uses type enum values: `"character"` = portrait on + character type
 (default for court/joker); `false` = no figure (default for pip/ace/back/special). The `split` row

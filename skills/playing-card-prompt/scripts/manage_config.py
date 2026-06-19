@@ -96,14 +96,14 @@ LEGACY_EXTRA_KEYS = {
 # shipped in config.json — that file is the human-readable copy; this dict is what
 # every profile falls back to for fields it doesn't override.
 LAYER_DEFAULTS = {
-    "background": {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true",      "back": "true",  "special": "true"},
-    "decor":      {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
-    "ornaments":  {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
+    "background": {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true",      "back": "false",  "special": "true"},
+    "decor":      {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "false",  "special": "true"},
+    "ornaments":  {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "false",  "special": "true"},
     "highlights": {"court": "false",     "pip": "false", "ace": "false", "joker": "false",     "back": "false", "special": "false"},
     "frame":      {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true",      "back": "true",  "special": "false"},
     "figure":     {"court": "character", "pip": "false", "ace": "false", "joker": "character", "back": "false", "special": "false"},
-    "mood":       {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
-    "technique":  {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
+    "mood":       {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "false",  "special": "true"},
+    "technique":  {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "false",  "special": "true"},
     "split":      {"court": "false",     "pip": "false", "ace": "false", "joker": "false",     "back": "false", "special": "false"},
 }
 
