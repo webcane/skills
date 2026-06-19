@@ -36,8 +36,8 @@ Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
 used as that group's addition on top of the layer's own pattern/preset text).
 
 `layers.figure.<group>` extends this with type-encoding: "false" (off), "character",
-"building", "animal", "custom" (on + figure type). `layers.split.<group>` accepts
-"false" (not configured), "none" (no split), "horizontal-mirrored", "angled-mirrored".
+"building", "animal", "custom" (on + figure type). `layers.split.<group>` accepts "false" (not configured), "none" (no split),
+"horizontal-mirrored", "angled-mirrored", or any custom free-text split description.
 
 A pre-4.0 config.json may still have `figure_proportion` — it is migrated automatically
 to `character_framing` on load (figure_proportion value → character_framing; figure_scale
@@ -211,8 +211,10 @@ def options_for(key: str):
         if layer not in LAYERS or group not in GROUPS:
             return None
         if layer == "split":
-            # Split values are strict to the four defined modes.
-            return (allowed_splits(), True)
+            # Split values include the four defined modes plus custom free-text
+            # descriptions (e.g. "diagonal-split"). The wizard's Step 8b offers
+            # an "Other (free text)" option that saves via cmd_set, so strict=False.
+            return (allowed_splits(), False)
         if layer == "figure":
             # figure layer accepts type enum (false/character/building/animal/custom)
             # plus free-text additions (non-strict, preserving existing behavior).
