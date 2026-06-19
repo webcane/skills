@@ -5,9 +5,9 @@ palette, era, mood, and so on. This table maps each component to the config
 field / layer / template mechanism that addresses it, so coverage is as explicit
 as the layer matrix in `references/REFERENCE.md`.
 
-**Card-back design is intentionally excluded** — it will be implemented as a
-separate card type alongside `court` / `pip` / `ace`, not as a style component of
-the front-facing cards covered here.
+Card-back design is covered by the `back` card group (rank = Back), added in v3.22.0.
+Back cards share all style layers (background, decor, ornaments, mood, technique, frame)
+with front-facing cards and are assembled using the same STYLE_BLOCK mechanism.
 
 | #  | Component | Status | Mechanism |
 |----|-----------|--------|-----------|
