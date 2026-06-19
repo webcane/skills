@@ -22,7 +22,7 @@
           "pip": "true",
           "ace": "true",
           "joker": "true",
-          "back": "false",
+          "back": "true",
           "special": "true"
         },
         "decor": {
@@ -30,7 +30,7 @@
           "pip": "false",
           "ace": "false",
           "joker": "true",
-          "back": "false",
+          "back": "true",
           "special": "true"
         },
         "ornaments": {
@@ -38,7 +38,7 @@
           "pip": "false",
           "ace": "false",
           "joker": "true",
-          "back": "false",
+          "back": "true",
           "special": "true"
         },
         "highlights": {
@@ -70,7 +70,7 @@
           "pip": "false",
           "ace": "false",
           "joker": "true",
-          "back": "false",
+          "back": "true",
           "special": "true"
         },
         "technique": {
@@ -78,7 +78,7 @@
           "pip": "false",
           "ace": "false",
           "joker": "true",
-          "back": "false",
+          "back": "true",
           "special": "true"
         },
         "split": {

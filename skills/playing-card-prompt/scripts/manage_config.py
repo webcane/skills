@@ -89,21 +89,18 @@ LEGACY_EXTRA_KEYS = {
     "frame_extra": "frame",
 }
 
-# Defaults reproduce the traditional look: courts get every layer including a
-# portrait, plain pips get only background + center motif + finish, aces keep their
-# ornamental flourish but no figure. `mood` is on everywhere (but inert until the
-# free-text `mood` field is set). This dict mirrors the `profiles.default` entry
-# shipped in config.json — that file is the human-readable copy; this dict is what
-# every profile falls back to for fields it doesn't override.
+# LAYER_DEFAULTS is the fallback for blank profiles (profile_create with no --from).
+# config.json ships these same values as the 'default' profile — keep both in sync with
+# the Defaults table in references/REFERENCE.md, which is the authoritative spec.
 LAYER_DEFAULTS = {
-    "background": {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true",      "back": "false",  "special": "true"},
-    "decor":      {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "false",  "special": "true"},
-    "ornaments":  {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "false",  "special": "true"},
+    "background": {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true",      "back": "true",  "special": "true"},
+    "decor":      {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
+    "ornaments":  {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
     "highlights": {"court": "false",     "pip": "false", "ace": "false", "joker": "false",     "back": "false", "special": "false"},
     "frame":      {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true",      "back": "true",  "special": "false"},
     "figure":     {"court": "character", "pip": "false", "ace": "false", "joker": "character", "back": "false", "special": "false"},
-    "mood":       {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "false",  "special": "true"},
-    "technique":  {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "false",  "special": "true"},
+    "mood":       {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
+    "technique":  {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
     "split":      {"court": "false",     "pip": "false", "ace": "false", "joker": "false",     "back": "false", "special": "false"},
 }
 
