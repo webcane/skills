@@ -93,7 +93,12 @@
       "mood": "",
       "theme": "",
       "figure_scale": "inscribed-in-frame",
-      "character_framing": ""
+      "character_framing": "",
+      "back_purpose": "classic",
+      "back_design": "geometric",
+      "back_pattern": "diamond",
+      "back_palette": "classic-blue",
+      "back_symmetry": "rotational-180"
     }
   }
 }
