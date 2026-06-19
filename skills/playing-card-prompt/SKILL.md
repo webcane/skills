@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.23.0
+  version: 3.24.0
   description_claudeai: Interactive wizard to build image-gen prompts for stylized playing cards. 4 deck patterns, 6 lettering systems, 3+ styles, court/pip/ace. Trigger on card design requests.
 ---
 
@@ -43,7 +43,8 @@ the shell's current working directory.
 Before asking any wizard questions, load the active profile's persistent settings
 (`deck`, `lettering`, `style`, `frame`, `aspect_ratio`, `image_generator`, `structure`,
 `index.symbol`, `index.*`, `layers.*`, `mood`, `theme`, `figure_scale`,
-`character_framing`) via `python3 scripts/manage_config.py show`. This also lists
+`character_framing`, `back_purpose`, `back_design`, `back_pattern`, `back_palette`,
+`back_symmetry`) via `python3 scripts/manage_config.py show`. This also lists
 every saved profile and which one is active. `layers.*` includes all card groups:
 `court`, `pip`, `ace`, `joker`, `back`, and `special`.
 Everything else — schema, profile concept, lookup order, field reference, and the
@@ -158,9 +159,20 @@ Folders under `assets/`:
 - `assets/figure-proportion/` — legacy directory from pre-4.0; content is preserved
   for reference but superseded by `assets/character-framing/` (see migration notes in
   `references/CONFIG.md`)
-- `assets/back/` — one file: `symmetry.md`, holding the "Symmetry line" that is always
-  appended to `[STYLE_BLOCK]` for the `back` group (step 10 in "Resolving
-  `[STYLE_BLOCK]`" in `references/REFERENCE.md`)
+- `assets/back/` — back card design asset directories:
+  - `purpose/` — one file per purpose preset (`classic.md`, `designer.md`, `casino.md`);
+    each holds a "Purpose line" loaded in Step B1
+  - `design/<category>/` — four pattern files per design category (`geometric/`,
+    `botanical/`, `abstract/`, `illustrated/`); each holds a "Pattern line" loaded in
+    Step B3 based on B2 category choice
+  - `palette/` — one file per palette preset (`classic-red.md`, `classic-blue.md`,
+    `dark.md`, `gold.md`); each holds a "Palette line" loaded in Step B4
+  - `symmetry/` — one file per symmetry type (`rotational-180.md`, `bilateral.md`,
+    `asymmetric.md`); each holds a "Symmetry line" always appended to `[STYLE_BLOCK]`
+    for the `back` group (step 10 in "Resolving `[STYLE_BLOCK]`" in
+    `references/REFERENCE.md`), selected via `back_symmetry` config field
+  - `symmetry.md` — legacy single-file symmetry entry (superseded by `symmetry/`
+    subdirectory; kept for reference)
 - `assets/special/` — one file per special card type (`prospect.md`, `marketing.md`,
   etc.); each holds a "Special type line" used to fill `[SPECIAL_TYPE_LINE]` in the
   SPECIAL template (see Steps S1–S5 and `assets/special/_adding-a-special.md`)
@@ -242,7 +254,7 @@ Always ask. Offer only the ranks listed in the chosen `assets/decks/<deck>.md`
   `joker` (`layers.figure.joker` defaults to `"character"`). Skip Step 4 (no suit); run
   Steps 4.1 and 4.2 below instead.
 - **Back → BACK** → this card's group is `back` (`layers.figure.back` defaults to
-  `"false"`). Skip Step 4 (no suit); run Steps B1–B3 below instead of Steps 4.1–4.2.
+  `"false"`). Skip Step 4 (no suit); run Steps B1–B7 below instead of Steps 4.1–4.2.
 - **Special → SPECIAL** → this card's group is `special` (`layers.figure.special` defaults to
   `"false"`). Skip Step 4 (no suit); run Steps S1–S5 below instead of Steps 4.1–4.2.
 
@@ -255,7 +267,7 @@ just set — see the check after Step 7.
 
 Set `RANK_NAME` (English word: Joker for the Joker; Back for the Back; Special for the Special) and
 `RANK_LETTER` (localized letter from Step 2 for courts; numeral for pips; `A` for Ace;
-`index.symbol` value for the Joker; none for Back or Special — see Steps 4.1–4.2, B1–B3, and S1–S5).
+`index.symbol` value for the Joker; none for Back or Special — see Steps 4.1–4.2, B1–B7, and S1–S5).
 
 ### Step 4 — Suit · _per-card_ (skipped for Joker — see Steps 4.1–4.2)
 
@@ -293,42 +305,93 @@ Ask two things for the Joker's corner indices (Menu D2 — see `assets/index/opt
 Save choices via `python3 scripts/manage_config.py set index.count <value>` and
 `python3 scripts/manage_config.py set index.symbol <value>`.
 
-### Steps B1–B3 — Back card only (run instead of Steps 4.1–4.2 when rank is Back)
+### Steps B1–B7 — Back card only (run instead of Steps 4.1–4.2 when rank is Back)
 
-**Step B1 — Back design path · _per-card_**
+Steps B1–B6 are **persistent** (deck-wide): each step checks if the config field is
+already set; if so, display the saved value and skip. Step B7 is **per-card**.
 
-Offer three design paths (≤ 4 AskUserQuestion options):
+**Step B1 — Back purpose · _persistent_**
 
-- **Suggested (default)** — derive a suggestion from the active style + mood profile.
-  Synthesize a back design phrase at prompt time: combine the style name, mood (if set),
-  primary colors/motifs from the active pattern, and the symmetry convention into a
-  descriptive sentence (e.g., "a mirrored Baroque foliate pattern in deep crimson and
-  gold, with ornate repeating motifs,"). Present the suggestion in a code block, then
-  proceed to Step B2.
-- **Freeform** — ask the user to describe the back design in free text. Use that text
-  verbatim as `[BACK_DESIGN]`. Skip Step B2.
-- **Reference image + modifications** — ask the user to describe the reference image
-  source (e.g., "a 19th-century French card back I have photographed"), then ask what
-  modifications to apply (e.g., "replace the blue with gold, simplify the center
-  motif"). Assemble as: `Based on [source description]: [modifications]`. The source
-  description fills `[BACK_DESIGN]`; the modifications list fills `[BACK_MODIFICATIONS]`.
-  Skip Step B2.
+_Skipped if `back_purpose` is already set in config._ Ask: "What is this deck back
+designed for?" Options (4):
+- **Classic** — load `assets/back/purpose/classic.md` → save `back_purpose = "classic"`
+- **Designer** — load `assets/back/purpose/designer.md` → save `back_purpose = "designer"`
+- **Casino** — load `assets/back/purpose/casino.md` → save `back_purpose = "casino"`
+- **Custom text** — ask for free text → save `back_purpose = "<user text>"`
 
-**Step B2 — Suggested path refinement · _per-card (only for suggested path)_**
+**Step B2 — Back design category · _persistent_**
 
-After presenting the synthesized suggestion in a code block (from Step B1 Suggested
-path), offer:
+_Skipped if `back_design` is already set in config._ Ask: "What type of back design?"
+Options (4): Geometric | Botanical | Abstract | Illustrated.
+Save `back_design = "<choice>"`. No asset loaded at this step — choice determines B3
+options.
 
-- **Use this** — fold the suggestion as-is into `[BACK_DESIGN]`. Leave
-  `[BACK_MODIFICATIONS]` empty (drop that line at assembly).
-- **Modify it** — switch to the freeform path: pre-fill the suggestion text as the
-  starting draft for the user to edit, then collect their edited version as
-  `[BACK_DESIGN]`. Leave `[BACK_MODIFICATIONS]` empty.
+**Step B3 — Back pattern · _persistent_**
 
-**Step B3 — Back card exclusions · _per-card (optional)_**
+_Skipped if `back_pattern` is already set in config._ Ask: "Choose a specific pattern:"
+— show 3 named options from `assets/back/design/<back_design>/` based on B2, plus
+"Custom text" (4th option):
 
-Ask what must NOT appear on the back (e.g., "no text", "no human figures"). Phrase each
-as "no <thing>" — merge into `[NEGATIVE_LIST]`. If nothing, skip.
+- **Geometric** → Diamond / Cross-hatch / Hexgrid + Custom text
+- **Botanical** → Vine / Floral / Leaf + Custom text
+- **Abstract** → Interlacing / Color-field / Paint-stroke + Custom text
+- **Illustrated** → Thematic / Portrait / Landscape + Custom text
+
+Load `assets/back/design/<back_design>/<choice>.md` → save `back_pattern = "<choice>"`.
+Custom text → ask for freeform description → save `back_pattern = "<user text>"`.
+
+> **D-21 fallback:** If `back_design` is custom text (not a known category alias —
+> `geometric`, `botanical`, `abstract`, `illustrated`), B3 defaults to showing the
+> `geometric` category's 3 named options + "Custom text". The custom `back_design` value
+> is still saved; only the B3 option list falls back to geometric.
+
+**Step B4 — Back palette · _persistent_**
+
+_Skipped if `back_palette` is already set in config._ Ask: "Color palette for the
+back?" Options (4):
+- **Classic red** — load `assets/back/palette/classic-red.md` → save `back_palette = "classic-red"`
+- **Classic blue** — load `assets/back/palette/classic-blue.md` → save `back_palette = "classic-blue"`
+- **Dark** — load `assets/back/palette/dark.md` → save `back_palette = "dark"`
+- **Gold** — load `assets/back/palette/gold.md` → save `back_palette = "gold"`
+
+Custom palette: if user wants a different palette, accept free text → save `back_palette = "<user text>"`.
+
+**Step B5 — Back symmetry · _persistent_**
+
+_Skipped if `back_symmetry` is already set in config._ Ask: "Symmetry type?"
+Options (4):
+- **180° rotational** — load `assets/back/symmetry/rotational-180.md` → save `back_symmetry = "rotational-180"`
+- **Bilateral** — load `assets/back/symmetry/bilateral.md` → save `back_symmetry = "bilateral"`
+- **Asymmetric** — load `assets/back/symmetry/asymmetric.md` → save `back_symmetry = "asymmetric"`
+- **Custom text** — ask for free text → save `back_symmetry = "<user text>"`
+
+This value is used in STYLE_BLOCK step 10 (see `references/REFERENCE.md` — back-group
+symmetry is always appended from `assets/back/symmetry/<back_symmetry>.md`).
+
+**Step B6 — Back frame · _persistent_**
+
+_Skipped if `layers.frame.back` is already explicitly set._ Ask: "Include a frame
+border on the back card?"
+- **Yes, use active frame preset** — confirm `layers.frame.back = "true"` (default; no
+  change needed if already `"true"`)
+- **No frame** — set `layers.frame.back = "false"`
+
+**Step B7 — Back exclusions · _per-card (optional)_**
+
+Ask: "Anything to exclude from this back design?" Freeform. Phrase each as "no <thing>"
+and append to `[NEGATIVE_LIST]`. If nothing, skip.
+
+---
+
+**Assembling `[BACK_DESIGN]`:**
+Concatenate in order, dropping any empty/unset field:
+1. Purpose line from `assets/back/purpose/<back_purpose>.md` (or custom text verbatim)
+2. Pattern line from `assets/back/design/<back_design>/<back_pattern>.md` (or custom text verbatim)
+3. Palette line from `assets/back/palette/<back_palette>.md` (or custom text verbatim)
+
+Symmetry is NOT included in `[BACK_DESIGN]` — it is added by STYLE_BLOCK step 10 (see
+`references/REFERENCE.md`). Frame is NOT included in `[BACK_DESIGN]` — it is included
+in `[FRAME_LINE]` via `layers.frame.back`.
 
 ### Steps S1–S5 — Special card only (run instead of Step 4 when rank is Special)
 
