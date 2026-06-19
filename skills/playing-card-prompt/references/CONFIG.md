@@ -154,8 +154,39 @@ Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
 
 **Back group defaults** — `layers.figure.back` = `"false"`, `layers.split.back` = `"false"`;
 all other layers default `"true"` except highlights (`"false"`). Back cards always include
-the symmetry instruction from `assets/back/symmetry.md` in their STYLE_BLOCK regardless of
-layer settings (see REFERENCE.md).
+the symmetry instruction from `assets/back/symmetry/<back_symmetry>.md` in their
+STYLE_BLOCK regardless of layer settings (step 10 in REFERENCE.md).
+
+### Back design criteria fields
+
+Five persistent fields control the structured B1–B6 back card wizard steps. All allow
+custom free text in addition to the listed preset aliases:
+
+| Field | Values | Default | Asset path |
+|-------|--------|---------|------------|
+| `back_purpose` | `classic`, `designer`, `casino` (or custom text) | `classic` | `assets/back/purpose/<back_purpose>.md` |
+| `back_design` | `geometric`, `botanical`, `abstract`, `illustrated` (or custom text) | `geometric` | — (filter for B3 options; no asset loaded) |
+| `back_pattern` | alias within chosen design category (or custom text) | `diamond` | `assets/back/design/<back_design>/<back_pattern>.md` |
+| `back_palette` | `classic-red`, `classic-blue`, `dark`, `gold` (or custom text) | `classic-blue` | `assets/back/palette/<back_palette>.md` |
+| `back_symmetry` | `rotational-180`, `bilateral`, `asymmetric` (or custom text) | `rotational-180` | `assets/back/symmetry/<back_symmetry>.md` |
+
+Pattern aliases per design category:
+- `geometric`: `diamond`, `cross-hatch`, `hexgrid`, `wave`
+- `botanical`: `vine`, `floral`, `leaf`, `branch`
+- `abstract`: `interlacing`, `color-field`, `paint-stroke`, `fractal`
+- `illustrated`: `thematic`, `portrait`, `landscape`, `heraldic`
+
+`back_purpose`, `back_pattern`, and `back_palette` contribute their asset "Purpose
+line", "Pattern line", and "Palette line" (respectively) to `[BACK_DESIGN]` in the BACK
+template — concatenated in that order.
+
+`back_symmetry` controls STYLE_BLOCK step 10 for the `back` group — its "Symmetry
+line" is always appended to STYLE_BLOCK regardless of `layers.*` cell values.
+
+`back_design` is a category selector only; its value is not loaded as an asset —
+instead it determines which pattern aliases are shown in Step B3. If `back_design` is
+set to custom text (not a known category alias), B3 falls back to the `geometric`
+category's options.
 
 **Special group defaults** — `layers.frame.special` = `"false"` (no standard card border),
 `layers.figure.special` = `"false"` (no figure by default), `layers.split.special` = `"false"`.
@@ -226,7 +257,8 @@ like Pip/Ace, can be tuned per layer via `--config`.
 **Persistent** (saved per profile — rarely change between cards):
 `deck`, `lettering`, `style`, `frame`, `aspect_ratio`, `image_generator`, `structure`,
 `index.*` (including `index.symbol` and `index.type`), `layers.*`, `mood`, `theme`,
-`figure_proportion`
+`figure_proportion`, `figure_scale`, `character_framing`,
+`back_purpose`, `back_design`, `back_pattern`, `back_palette`, `back_symmetry`
 
 **Per-card** (always asked in the wizard — never saved):
 `rank`, `suit` (or `joker_color` for Joker cards), `character_name`,

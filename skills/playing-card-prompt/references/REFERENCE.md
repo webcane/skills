@@ -158,9 +158,10 @@ Then:
    else added should read as a plain number card).
 
 10. **Back-group symmetry** — only for the `back` group: append the "Symmetry line" text
-    from `assets/back/symmetry.md` as its own comma phrase after all other layers
-    (including Mood and Plain fallback). This applies regardless of which layers are on
-    or off for the back group — it is always present.
+    from `assets/back/symmetry/<back_symmetry>.md` as its own comma phrase after all
+    other layers (including Mood and Plain fallback). `back_symmetry` defaults to
+    `rotational-180` if not set. This applies regardless of which layers are on or off
+    for the back group — it is always present.
 
 `[FRAME_LINE]` is built from the chosen `frame` preset's "Frame line" in
 `assets/frame/<frame>.md` (default `boxed-index`: `thin single black border around the
@@ -498,19 +499,22 @@ no watermark
 Used when rank = Back. No suit, no character attributes, no corner indices (Back cards
 have no rank/suit letters — all four index areas are blank or absent). STYLE_BLOCK and
 FRAME_LINE are resolved for the `back` group per "Layers and [STYLE_BLOCK] assembly"
-above. The symmetry instruction from `assets/back/symmetry.md` is always appended to
-STYLE_BLOCK for the back group (per D-04), after the standard layer assembly — this is
-a back-group-specific STYLE_BLOCK addition that applies regardless of `layers.*` cell
-values.
+above. The symmetry instruction from `assets/back/symmetry/<back_symmetry>.md` is
+always appended to STYLE_BLOCK for the back group (step 10, per D-04), after the
+standard layer assembly — this is a back-group-specific STYLE_BLOCK addition that
+applies regardless of `layers.*` cell values.
 
-`[BACK_DESIGN]` is the assembled design description from the wizard:
-- **Suggested path (B1a):** a synthesized phrase derived from the active style + mood
-  profile (e.g., "a mirrored Baroque foliate pattern with dark, ornate coloring")
-- **Freeform path (B1b):** the user's own description verbatim
-- **Reference-image path (B1c):** "Based on [user's image source description]: [modifications list]"
+`[BACK_DESIGN]` is assembled from three asset lines concatenated in order (drop any
+empty/unset field):
+1. **Purpose line** from `assets/back/purpose/<back_purpose>.md` (or custom text if `back_purpose` is free text)
+2. **Pattern line** from `assets/back/design/<back_design>/<back_pattern>.md` (or custom text if `back_pattern` is free text)
+3. **Palette line** from `assets/back/palette/<back_palette>.md` (or custom text if `back_palette` is free text)
 
-`[BACK_MODIFICATIONS]` — only present for the reference-image path; drop this line
-entirely when using the suggested or freeform paths (empty placeholder → drop line).
+Symmetry is NOT in `[BACK_DESIGN]` — it goes through STYLE_BLOCK step 10.
+Frame is NOT in `[BACK_DESIGN]` — it goes through `[FRAME_LINE]` via `layers.frame.back`.
+
+Per-card exclusions (Step B7) go to `[NEGATIVE_LIST]` only — there is no
+`[BACK_MODIFICATIONS]` placeholder in this template.
 
 ```
 [ASPECT_RATIO] aspect ratio, full card visible, transparent background outside the card,
@@ -519,7 +523,6 @@ playing card back design,
 [FRAME_LINE]
 no corner indices, no rank letters, no suit symbols,
 [BACK_DESIGN]
-[BACK_MODIFICATIONS]
 [NEGATIVE_LIST]
 ```
 

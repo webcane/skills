@@ -81,6 +81,15 @@ FIGURE_TYPE = ["character", "building", "animal", "custom"]
 SPLIT_VALUES = ["false", "none", "horizontal-mirrored", "angled-mirrored"]
 FIGURE_SCALE = ["full-bleed", "inscribed-in-frame", "small-centered"]
 
+BACK_PURPOSE = ["classic", "designer", "casino"]
+BACK_DESIGN = ["geometric", "botanical", "abstract", "illustrated"]
+BACK_PATTERN_GEOMETRIC = ["diamond", "cross-hatch", "hexgrid", "wave"]
+BACK_PATTERN_BOTANICAL = ["vine", "floral", "leaf", "branch"]
+BACK_PATTERN_ABSTRACT = ["interlacing", "color-field", "paint-stroke", "fractal"]
+BACK_PATTERN_ILLUSTRATED = ["thematic", "portrait", "landscape", "heraldic"]
+BACK_PALETTE = ["classic-red", "classic-blue", "dark", "gold"]
+BACK_SYMMETRY = ["rotational-180", "bilateral", "asymmetric"]
+
 # Pre-3.6 field names that are migrated into extras.<layer>.<group> (and from there,
 # on a later load, into layers.<layer>.<group> — see _migrate_layers_extras) on load.
 LEGACY_EXTRA_KEYS = {
@@ -118,6 +127,11 @@ DEFAULTS = {
     "theme": "",
     "figure_scale": "inscribed-in-frame",
     "character_framing": "",
+    "back_purpose": "classic",
+    "back_design": "geometric",
+    "back_pattern": "diamond",
+    "back_palette": "classic-blue",
+    "back_symmetry": "rotational-180",
 }
 
 # Top-level field names of a profile — used to detect a pre-3.0 flat config.json
@@ -131,7 +145,8 @@ BUILTIN_CONFIG = {
 
 PERSISTENT_KEYS = {"deck", "lettering", "style", "frame", "aspect_ratio", "image_generator",
                    "structure", "index.size", "index.count", "index.layout", "index.symbol",
-                   "index.type", "mood", "theme", "figure_scale", "character_framing"}
+                   "index.type", "mood", "theme", "figure_scale", "character_framing",
+                   "back_purpose", "back_design", "back_pattern", "back_palette", "back_symmetry"}
 PERSISTENT_KEYS |= {f"layers.{layer}.{g}" for layer in LAYERS for g in GROUPS}
 
 
@@ -203,6 +218,11 @@ def options_for(key: str):
         "theme": (None, False),   # free text deck-wide theme/symbolism
         "figure_scale": (FIGURE_SCALE, False),       # custom crop text allowed
         "character_framing": (allowed_character_framings(), False),  # custom allowed; "" = not set
+        "back_purpose": (BACK_PURPOSE, False),       # custom text allowed
+        "back_design": (BACK_DESIGN, False),         # custom text allowed (D-21 fallback to geometric)
+        "back_pattern": (None, False),               # free text; valid aliases depend on back_design category
+        "back_palette": (BACK_PALETTE, False),       # custom text allowed
+        "back_symmetry": (BACK_SYMMETRY, False),     # custom text allowed
     }.get(key)
     if fixed is not None:
         return fixed
