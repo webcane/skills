@@ -4,7 +4,7 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
-## [Unreleased]
+## [3.24.0] - 2026-06-19
 
 ### Added
 - **Back card group** — `back` is a full peer card group (alongside court/pip/ace/joker/special) with `layers.*.back` config entries in `manage_config.py` and `config.json`. Defaults: figure off, split off, frame on, full decoration (background/decor/ornaments/mood/technique on). Selecting Back as rank in Step 3 skips Step 4 (suit) and enters the Back design wizard (Steps B1–B7).
