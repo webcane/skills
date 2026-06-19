@@ -7,6 +7,9 @@ All notable changes to this skill. Released per skill as tag
 ## [Unreleased]
 
 ### Added
+- **figure-scale asset files** — added `assets/figure-scale/` with four named presets (`inscribed-in-frame`, `full-bleed`, `small-centered`, `cross-a-frame`) and an `_adding-a-figure-scale.md` authoring guide. Each preset file defines the exact comma-terminated prompt phrase for that scale mode (FIG-10).
+
+### Added
 - **Prospect layout options** — Step S3 now uses `AskUserQuestion` with four explicit layout choices for prospect cards: 4 suits × 3 ranks grid (default), 12-row list (suit symbol · rank · named figure per row), 3 rows grouped by rank, and free-form collage. Previously the step only accepted free-text input with no guided options.
 - **Finish guardrails** — every assembled prompt now ends with `flat graphic design, vector style,` and `centered on a clean transparent background,` (or `isolated on a solid black background,` for users compositing into their own template) immediately before the negative list. Prevents unwanted 3D shading, photorealistic surface lighting, and texture artifacts. Applied to all card types including back cards (added to the symmetry line in `assets/back/symmetry.md`). Additionally embedded in the Finish sections of the French and Art Nouveau patterns (where the flat/vector descriptor is consistent with their existing style intent); Austrian, English, and Japanese patterns intentionally excluded — their engraving, cross-hatching, and woodblock-texture aesthetics would conflict.
 
