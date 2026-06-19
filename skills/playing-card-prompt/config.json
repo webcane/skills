@@ -22,7 +22,7 @@
           "pip": "true",
           "ace": "true",
           "joker": "true",
-          "back": "true",
+          "back": "false",
           "special": "true"
         },
         "decor": {
@@ -30,7 +30,7 @@
           "pip": "false",
           "ace": "false",
           "joker": "true",
-          "back": "true",
+          "back": "false",
           "special": "true"
         },
         "ornaments": {
@@ -38,7 +38,7 @@
           "pip": "false",
           "ace": "false",
           "joker": "true",
-          "back": "true",
+          "back": "false",
           "special": "true"
         },
         "highlights": {
@@ -78,7 +78,7 @@
           "pip": "false",
           "ace": "false",
           "joker": "true",
-          "back": "true",
+          "back": "false",
           "special": "true"
         },
         "split": {
