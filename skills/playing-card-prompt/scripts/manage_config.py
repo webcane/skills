@@ -328,11 +328,15 @@ def _migrate_layers_extras(profile: dict) -> bool:
     so dropping it preserves the old resolved output); a layer that was "true" (or
     unset, defaulting to "true") becomes its extras text if that text is non-empty.
 
-    Returns True if an `extras` namespace was found and removed.
+    Returns True only if a `layers.*` cell was actually mutated (WR-05) — an `extras`
+    key that is `{}` or contains only falsy/empty group values is still removed from
+    the profile (it's stale data) but does not by itself count as a migration, so
+    callers don't print a misleading "migrated" note or write the file unnecessarily.
     """
     extras = profile.pop("extras", None)
     if not isinstance(extras, dict):
         return False
+    changed = False
     layers = profile.setdefault("layers", {})
     for layer, groups in extras.items():
         if not isinstance(groups, dict):
@@ -343,7 +347,8 @@ def _migrate_layers_extras(profile: dict) -> bool:
             current = layers.get(layer, {}).get(group, LAYER_DEFAULTS.get(layer, {}).get(group, "true"))
             if current != "false":
                 layers.setdefault(layer, {})[group] = extra
-    return True
+                changed = True
+    return changed
 
 
 def _migrate_figure_proportion(profile: dict) -> bool:
