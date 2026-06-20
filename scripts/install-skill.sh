@@ -9,14 +9,14 @@ SKILL_NAME="${1:-}"
 VERSION="${2:-latest}"
 INSTALL_DIR="${INSTALL_DIR:-.}"
 GITHUB_REPO="${GITHUB_REPO:-webcane/skills}"
-BRANCH="${BRANCH:-main}"
+BRANCH="${BRANCH:-master}"
 
 [ -z "$SKILL_NAME" ] && echo "Usage: $0 <skill-name> [version]" && exit 1
 
 if [ "$VERSION" = "latest" ]; then
   URL="https://raw.githubusercontent.com/$GITHUB_REPO/$BRANCH/dist/${SKILL_NAME}.skill"
 else
-  URL="https://github.com/$GITHUB_REPO/releases/download/v${VERSION}/${SKILL_NAME}-${VERSION}.skill"
+  URL="https://github.com/$GITHUB_REPO/releases/download/${SKILL_NAME}%2Fv${VERSION}/${SKILL_NAME}-${VERSION}.skill"
 fi
 
 echo "Downloading $SKILL_NAME ($VERSION)..."
