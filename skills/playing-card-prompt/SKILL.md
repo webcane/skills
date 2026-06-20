@@ -460,17 +460,46 @@ collects all 12 assignments before generating ONE prompt — not one prompt per 
 4. After all 12 (or user says "done"), confirm the table, then proceed to generate.
 
 **Assembly:**
-`[FIGURE_DESCRIPTION]` for prospect cards is a structured list of all collected figures:
+`[FIGURE_DESCRIPTION]` for prospect cards is a structured list of all collected figures,
+structured to match the Step S3 layout choice so the figure data and the layout
+instruction in `[SPECIAL_ATTRIBUTES]` agree:
 
-```
-suit arrangement (4 suits × 3 ranks):
-  ♠ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack),
-  ♥ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack),
-  ♦ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack),
-  ♣ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack),
-```
+- **4 suits × 3 ranks grid (default):**
+  ```
+  suit arrangement (4 suits × 3 ranks):
+    ♠ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack)
+    ♥ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack)
+    ♦ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack)
+    ♣ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack)
+  ```
+- **12-row list:**
+  ```
+  named figures, one row per slot:
+    ♠ King — [King figure], ♠ Queen — [Queen figure], ♠ Jack — [Jack figure],
+    ♥ King — [King figure], ♥ Queen — [Queen figure], ♥ Jack — [Jack figure],
+    ♦ King — [King figure], ♦ Queen — [Queen figure], ♦ Jack — [Jack figure],
+    ♣ King — [King figure], ♣ Queen — [Queen figure], ♣ Jack — [Jack figure]
+  ```
+- **3 rows grouped by rank:**
+  ```
+  named figures grouped by rank, spanning all suits:
+    King row: ♠ [King figure], ♥ [King figure], ♦ [King figure], ♣ [King figure]
+    Queen row: ♠ [Queen figure], ♥ [Queen figure], ♦ [Queen figure], ♣ [Queen figure]
+    Jack row: ♠ [Jack figure], ♥ [Jack figure], ♦ [Jack figure], ♣ [Jack figure]
+  ```
+- **Free-form collage:**
+  ```
+  named figures (no fixed arrangement):
+    ♠ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack)
+    ♥ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack)
+    ♦ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack)
+    ♣ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack)
+  ```
 
-This entire block is `[FIGURE_DESCRIPTION]` in the SPECIAL template. Output: ONE prompt.
+Use the block matching the Step S3 layout selection (or the "Other" custom layout's
+nearest structural match) so the resulting text never restates a layout that
+contradicts `[SPECIAL_ATTRIBUTES]`. This entire block is `[FIGURE_DESCRIPTION]` in the
+SPECIAL template. Output: ONE prompt.
 
 Session only — figures are not persisted to config in v1.
 
