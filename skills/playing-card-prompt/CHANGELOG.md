@@ -4,7 +4,7 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
-## [Unreleased]
+## [3.25.0] - 2026-06-20
 
 ### Fixed
 - B1-B6 skip behavior now matches v1 scope (D-17): skipping an already-configured persistent back-wizard step is silent, with no consolidated summary printed.
