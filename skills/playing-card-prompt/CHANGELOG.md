@@ -9,6 +9,14 @@ All notable changes to this skill. Released per skill as tag
 ### Fixed
 - B1-B6 skip behavior now matches v1 scope (D-17): skipping an already-configured persistent back-wizard step is silent, with no consolidated summary printed.
 - Stale duplicate reference to the deprecated singular `assets/back/symmetry.md` in SKILL.md's "Assembling the prompt" step 4 corrected to the alias-based `assets/back/symmetry/<back_symmetry>.md` path (canonical instructions in Step B5 and REFERENCE.md step 10 were already correct).
+- **Duplicated finish guardrail** — removed the redundant `flat graphic design, vector style, centered on a clean transparent background,` phrase from the default `back_symmetry` asset (`assets/back/symmetry/rotational-180.md`); it was already appended unconditionally by the assembly step, so default-config back prompts contained it twice.
+- **Prospect card layout hardcoding** — `assets/special/prospect.md` and SKILL.md's Step S4 assembly no longer hardcode a "4 suits × 3 ranks grid" layout into `[SPECIAL_TYPE_LINE]`/`[FIGURE_DESCRIPTION]`; the user's actual layout choice from Step S3 (12-row list, rank-grouped rows, free-form collage, or grid) is now honored.
+- **Step B3 missing pattern options** — all 4 on-disk pattern files per back-design category are now surfaced as `AskUserQuestion` options (previously only 3 of 4 were reachable without typing the exact filename as custom text).
+- **Step 8c figure-type guidance** — clarified that the persisted `layers.figure.<group>` value must be the enum keyword, not free text, matching `manage_config.py`'s strict validation (previously caused CLI rejection on the documented custom path).
+- **`back_pattern` validation** — `manage_config.py` now validates `back_pattern` against the options for its configured `back_design` category instead of accepting any string.
+- **Missing negative-list seed** — added `no watermark` to the BACK/SPECIAL `[NEGATIVE_LIST]` seed in `references/REFERENCE.md`, matching the COURT template.
+- **Stale CONFIG.md schema example** — synced the schema example and figure-content prose in `references/CONFIG.md` with the shipped schema.
+- **`_migrate_layers_extras` false-positive** — `manage_config.py` no longer reports a migration as having occurred when no fields actually changed.
 
 ## [3.24.0] - 2026-06-19
 
