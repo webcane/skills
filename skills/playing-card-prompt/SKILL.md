@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.26.0
+  version: 3.27.0
   description_claudeai: Interactive wizard to build image-gen prompts for stylized playing cards. 4 deck patterns, 6 lettering systems, 3+ styles, court/pip/ace. Trigger on card design requests.
 ---
 
@@ -504,19 +504,11 @@ Offer to save the choice to `config.json` like the other persistent settings.
    If `structure` is `illustration`, replace the template's opening line with the
    illustration-only opening line from "`structure` setting" in `references/REFERENCE.md`
    (otherwise use the template's default opening line unchanged).
-2. Build `[INDEX_LINE]` from `assets/index/options.md`:
-   - **Standard cards** (`index.type = "standard"`): Menus A/B/C — rank+suit, silent
-     defaults (4-Index, stacked, standard size).
-   - **Joker cards** (`index.type = "joker"`, always for the `joker` group): Menu D2 +
-     Symbol table — placement from `index.count`, symbol from `index.symbol`. When
-     `index.count = "none"` (or `index.symbol = "none"`), emit only `no corner indices,
-     full-bleed illustration,`.
-   - **Back cards**: `[INDEX_LINE]` is replaced by the fixed line `no corner indices, no
-     rank letters, no suit symbols,` — skip the `assets/index/options.md` lookup entirely.
-   - **Special cards**: `[INDEX_LINE]` is replaced by the fixed line `no corner indices,
-     no standard rank letters, no suit symbols,` hardcoded in the SPECIAL template —
-     skip the `assets/index/options.md` lookup entirely.
-   - If `structure` is `illustration`, skip this step entirely for all card types.
+2. Build `[INDEX_LINE]` from `assets/index/options.md` per the card's `index.type` and
+   group (Menus A/B/C for standard cards, Menu D2 + Symbol table for Joker — see
+   `assets/index/options.md` for the menu detail). Back and Special cards use their
+   template's fixed no-index line instead (skip the `assets/index/options.md` lookup
+   entirely for those two). Skip this step entirely if `structure` is `illustration`.
 3. For cards with a figure, fill `[CHARACTER_NAME]`/`[CHARACTER_FEATURES]` (required), then build
    `[RESOLVED_ATTRIBUTES]` and `[NEGATIVE_LIST]` by following the merge rules in
    `references/REFERENCE.md` (resolve conflicts down to one final, deduplicated,
@@ -524,25 +516,14 @@ Offer to save the choice to `config.json` like the other persistent settings.
    If `structure` is `illustration`, append the fixed negative block from "`structure`
    setting" in `references/REFERENCE.md` (`no card border, no frame, no corner index
    letters or numbers, no corner suit symbols`) to `[NEGATIVE_LIST]`.
-4. Resolve `[STYLE_BLOCK]` and `[FRAME_LINE]` for this card's group
-   (court/pip/ace/joker/back/special) per "Layers and `[STYLE_BLOCK]` assembly" and "Figure,
-   face style & proportion" in `references/REFERENCE.md`, using the `layers.*`, `frame`,
-   `mood`, and `theme` settings (deriving thematic ornaments/highlights/frame additions
-   per "Theme-derived ornaments/highlights/frame" where applicable, and including the
-   chosen pattern's Face Style line when `layers.figure.<group>` is on). `[FRAME_LINE]`
-   is the chosen `frame` preset's "Frame line" from `assets/frame/<frame>.md` plus
-   `layers.frame.g`'s addition if its cell is custom text, included only if
-   `layers.frame.g` is on. Splice the result **in full** — never summarize, reorder, or
-   drop a line from an enabled layer. If `structure` is `illustration`, drop
-   `[FRAME_LINE]` from the template entirely regardless of `layers.frame.g` — leave
-   `layers.frame.<group>` in `config.json` untouched, just don't emit the line.
-   For the `back` group, append the "Symmetry line" from
-   `assets/back/symmetry/<back_symmetry>.md` (default `rotational-180`) as
-   the final item of `[STYLE_BLOCK]` (step 10 in "Resolving `[STYLE_BLOCK]`" in
-   `references/REFERENCE.md`).
-   When generating multiple cards for the same deck, reuse the exact same resolved
-   `[STYLE_BLOCK]`/`[FRAME_LINE]`/derived theme phrases for every card of the same
-   group so the set stays visually consistent.
+4. Resolve `[STYLE_BLOCK]` and `[FRAME_LINE]` for this card's group per "Layers and
+   `[STYLE_BLOCK]` assembly" and "Figure, face style & proportion" in
+   `references/REFERENCE.md`, using `layers.*`, `frame`, `mood`, and `theme`. Splice in
+   **full** — never summarize, reorder, or drop an enabled layer's line. Drop
+   `[FRAME_LINE]` entirely when `structure` is `illustration`. For the `back` group,
+   append the symmetry line per "Resolving `[STYLE_BLOCK]`" step 10 in
+   `references/REFERENCE.md`. Reuse the identical resolved `[STYLE_BLOCK]`/`[FRAME_LINE]`
+   across every card of the same group so the set stays visually consistent.
 5. **Drop any line whose placeholder is empty** — never output a literal `[PLACEHOLDER]`.
 6. Keep phrasing as short, comma-separated visual phrases (general → specific: card
    type/style, then layout, then the portrait, then technical finish, then negatives
