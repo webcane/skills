@@ -331,21 +331,23 @@ options.
 **Step B3 — Back pattern · _persistent_**
 
 _Skipped if `back_pattern` is already set in config._ Ask: "Choose a specific pattern:"
-— show 3 named options from `assets/back/design/<back_design>/` based on B2, plus
-"Custom text" (4th option):
+— show all 4 named options from `assets/back/design/<back_design>/` based on B2 (the
+`AskUserQuestion` 4-option limit is fully consumed by these 4 named presets; the tool's
+automatic "Other" slot covers freeform input, matching the pattern used in Step 7's
+mood options):
 
-- **Geometric** → Diamond / Cross-hatch / Hexgrid + Custom text
-- **Botanical** → Vine / Floral / Leaf + Custom text
-- **Abstract** → Interlacing / Color-field / Paint-stroke + Custom text
-- **Illustrated** → Thematic / Portrait / Landscape + Custom text
+- **Geometric** → Diamond / Cross-hatch / Hexgrid / Wave
+- **Botanical** → Vine / Floral / Leaf / Branch
+- **Abstract** → Interlacing / Color-field / Paint-stroke / Fractal
+- **Illustrated** → Thematic / Portrait / Landscape / Heraldic
 
 Load `assets/back/design/<back_design>/<choice>.md` → save `back_pattern = "<choice>"`.
-Custom text → ask for freeform description → save `back_pattern = "<user text>"`.
+"Other" → ask for freeform description → save `back_pattern = "<user text>"`.
 
 > **D-21 fallback:** If `back_design` is custom text (not a known category alias —
 > `geometric`, `botanical`, `abstract`, `illustrated`), B3 defaults to showing the
-> `geometric` category's 3 named options + "Custom text". The custom `back_design` value
-> is still saved; only the B3 option list falls back to geometric.
+> `geometric` category's 4 named options. The custom `back_design` value is still
+> saved; only the B3 option list falls back to geometric.
 
 **Step B4 — Back palette · _persistent_**
 
