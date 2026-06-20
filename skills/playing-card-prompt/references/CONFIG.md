@@ -89,21 +89,30 @@ profile holds the fields below:
       "index": {
         "size": "standard",
         "count": "4-index",
-        "layout": "stacked"
+        "layout": "stacked",
+        "symbol": "star-in-circle",
+        "type": "standard"
       },
       "layers": {
-        "background": {"court": "true",  "pip": "true",  "ace": "true"},
-        "decor":      {"court": "true",  "pip": "false", "ace": "true"},
-        "ornaments":  {"court": "true",  "pip": "false", "ace": "true"},
-        "highlights": {"court": "false", "pip": "false", "ace": "false"},
-        "frame":      {"court": "true",  "pip": "false", "ace": "true"},
-        "figure":     {"court": "true",  "pip": "false", "ace": "false"},
-        "mood":       {"court": "true",  "pip": "true",  "ace": "true"},
-        "technique":  {"court": "true",  "pip": "true",  "ace": "true"}
+        "background": {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true",      "back": "true",  "special": "true"},
+        "decor":      {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
+        "ornaments":  {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
+        "highlights": {"court": "false",     "pip": "false", "ace": "false", "joker": "false",     "back": "false", "special": "false"},
+        "frame":      {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true",      "back": "true",  "special": "false"},
+        "figure":     {"court": "character", "pip": "false", "ace": "false", "joker": "character", "back": "false", "special": "false"},
+        "mood":       {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
+        "technique":  {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
+        "split":      {"court": "false",     "pip": "false", "ace": "false", "joker": "false",     "back": "false", "special": "false"}
       },
       "mood": "",
       "theme": "",
-      "figure_proportion": ""
+      "figure_scale": "inscribed-in-frame",
+      "character_framing": "",
+      "back_purpose": "classic",
+      "back_design": "geometric",
+      "back_pattern": "diamond",
+      "back_palette": "classic-blue",
+      "back_symmetry": "rotational-180"
     }
   }
 }
@@ -141,12 +150,14 @@ Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
 | `layers.ornaments.<group>`  | `true`, `false`, or custom text (addition)                    | court/ace `true`, pip `false` |
 | `layers.highlights.<group>` | `true`, `false`, or custom text (addition)                    | all `false`        |
 | `layers.frame.<group>`      | `true`, `false`, or custom text (addition)                    | court/ace `true`, pip `false` |
-| `layers.figure.<group>`     | `true`, `false`, or custom text (group-wide figure trait, layered on top of the pattern's Face Style) | court `true`, pip/ace `false` |
+| `layers.figure.<group>`     | `false`, `character`, `building`, `animal`, `custom` — the value IS the figure type, keeping the layer on while recording the type (D-02) | court/joker `character`, pip/ace/back/special `false` |
 | `layers.mood.<group>`       | `true`, `false`, or custom text (per-group mood addition, on top of deck-wide `mood`) | all `true` |
 | `layers.technique.<group>`  | `true`, `false`, or custom text (addition)                    | all `true`         |
+| `layers.split.<group>`      | `false`, `none`, `horizontal-mirrored`, `angled-mirrored`, or custom text | all `false`        |
 | `mood`                      | free text (deck-wide atmosphere, e.g. `gothic and brooding atmosphere,`); see `assets/mood/` for presets | `""` |
 | `theme`                     | free text (deck-wide concept/symbolism, e.g. `celestial mythology`) | `""` |
-| `figure_proportion`         | `bust`, `waist-up`, `three-quarter`, `seven-eighths`, `full-body` (or any custom framing/crop description); see `assets/figure-proportion/` for presets | `""` |
+| `figure_scale`              | `full-bleed`, `inscribed-in-frame`, `small-centered` (or custom crop text); applies to ALL figure types when `layers.figure.<group>` is on | `inscribed-in-frame` |
+| `character_framing`         | `waist-up` (or any custom framing/crop description); see `assets/character-framing/` for presets — applies ONLY when figure type is `character` | `""` |
 | `index.symbol`              | `star-in-circle`, `star`, `Jkr`, `J`, `crown`, `jester-face`, `none` (or custom); the glyph shown in Joker corner indices (see `assets/index/options.md` Symbol table for the phrase each value produces) | `star-in-circle` |
 | `index.type`                | `standard` (rank+suit index), `joker` (symbol-only index via Menu D2); auto-derived from card group during assembly — set explicitly only to force joker-style indices on all cards | `standard` |
 
@@ -220,32 +231,48 @@ deck-wide `mood`. `frame` picks the preset from `assets/frame/` whose "Frame lin
 supplies `[FRAME_LINE]` (any custom string is also accepted). `mood` is a deck-wide
 free-text atmosphere description, either picked from a preset in `assets/mood/` or
 typed as custom text in Step 7, which also sets `layers.mood.<group>` per card group.
-When `layers.figure.<group>` is on, the chosen pattern's own "Figure detail" and "Face
-Style" sections are folded into `[STYLE_BLOCK]` automatically — additional
-portrait-only rendering detail (e.g. skin tones) and how a figure's face reads are
-part of the `style` pattern, not a separate setting. `layers.figure.<group>`'s
-addition (when the
-cell is neither `"false"` nor `"true"`) is appended after the pattern's Face Style
-line — a group-wide figure trait (e.g. "all court figures shown with a slight hunch")
+`layers.figure.<group>` now carries the figure type — `"false"` (off), or one of
+`"character"`/`"building"`/`"animal"`/`"custom"` (on + figure type, D-02). For
+`character` type, the chosen pattern's own "Figure detail" and "Face Style" sections
+are folded into `[STYLE_BLOCK]` automatically — additional portrait-only rendering
+detail (e.g. skin tones) and how a figure's face reads are part of the `style`
+pattern, not a separate setting; these are skipped entirely for `building`/`animal`/
+`custom` (FIG-08, D-16). `layers.figure.<group>`'s addition (free text appended after
+the type keyword) is appended after the pattern's Face Style line for `character`
+type — a group-wide figure trait (e.g. "all court figures shown with a slight hunch")
 layered on top of the pattern's Face Style for every card in that group, distinct from
 the per-card `[CHARACTER_FEATURES]` (Steps 9-12).
 
-`figure_proportion` is folded into `[STYLE_BLOCK]` right after `layers.figure.<group>`'s
-addition (i.e. after the pattern's Face Style line and its group-wide addition), also
-only when `layers.figure.<group>` is on — a deck-wide framing/crop description (e.g.
-`waist-up portrait, torso and arms visible, hands free to hold attributes,`) reused
-across every card with a figure so the set reads as consistently framed. Picked from a
-preset in `assets/figure-proportion/` or typed as custom text in Step 8. There is no
-per-group equivalent for `figure_proportion` — it's a single deck-wide phrase, gated
-entirely by `layers.figure.<group>` like Face Style.
+`character_framing` is folded into `[STYLE_BLOCK]` right after `layers.figure.<group>`'s
+addition, ONLY when figure type is `character` — a deck-wide framing/crop description
+(e.g. `waist-up portrait, torso and arms visible, hands free to hold attributes,`)
+reused across every character figure so the set reads as consistently framed. Picked
+from a preset in `assets/character-framing/` or typed as custom text in Step 8e.
 
-**Three scopes of figure content**, from broadest to narrowest:
-- **Deck-wide** — the pattern's Face Style line (from `style`) plus `figure_proportion`:
-  how ANY figure's face reads in this pattern (typage, expression, degree of
-  stylization), and how much of the figure is shown/cropped.
-- **Group-wide** — `layers.figure.<group>`'s addition (when the cell is custom text):
-  an optional trait shared by every figure in one group (`court`/`pip`/`ace`), layered
-  on top of the pattern's Face Style for that group.
+`figure_scale` is folded into `[STYLE_BLOCK]` right after `character_framing` (or
+right after the figure-type text for non-character types) — applies to ALL figure
+types whenever `layers.figure.<group>` is on. Picked from `full-bleed` /
+`inscribed-in-frame` / `small-centered` or typed as custom text in Step 8a. There is
+no per-group equivalent for `figure_scale` or `character_framing` — both are single
+deck-wide phrases.
+
+**Five scopes of figure content**, from broadest to narrowest (see "Figure type, face
+style, framing & scale" in `references/REFERENCE.md` for the full assembly order):
+- **Deck-wide (figure type)** — the `assets/figure-type/<type>.md` text for the
+  group's configured type: the canonical prompt phrase for that figure type. Applied
+  to all types.
+- **Deck-wide (pattern, character-only)** — the pattern's Figure detail and Face Style
+  lines (from `style`): how ANY character figure's face reads in this pattern (typage,
+  expression, degree of stylization). Applied only when figure type is `character`.
+- **Deck-wide (character framing, character-only)** — `character_framing`: how much of
+  the character figure is shown and how it is cropped. Applied only when figure type
+  is `character`.
+- **Deck-wide (scale, all types)** — `figure_scale`: how the figure sits in the frame,
+  applied to ALL figure types.
+- **Group-wide** — `layers.figure.<group>`'s addition (when the cell carries custom
+  text beyond the type keyword): an optional trait shared by every figure in one group
+  (`court`/`pip`/`ace`/`joker`), layered on top of the pattern's Face Style for that
+  group (character-only).
 - **Per-card** — `[CHARACTER_NAME]`/`[CHARACTER_FEATURES]` and the Step 10-12
   attributes/transfers/exclusions: who this specific card's figure is, always
   supplied per card (from the user or a reference image).
@@ -257,7 +284,7 @@ like Pip/Ace, can be tuned per layer via `--config`.
 **Persistent** (saved per profile — rarely change between cards):
 `deck`, `lettering`, `style`, `frame`, `aspect_ratio`, `image_generator`, `structure`,
 `index.*` (including `index.symbol` and `index.type`), `layers.*`, `mood`, `theme`,
-`figure_proportion`, `figure_scale`, `character_framing`,
+`figure_scale`, `character_framing`,
 `back_purpose`, `back_design`, `back_pattern`, `back_palette`, `back_symmetry`
 
 **Per-card** (always asked in the wizard — never saved):

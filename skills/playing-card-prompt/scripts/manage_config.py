@@ -187,6 +187,18 @@ def allowed_character_framings() -> list[str]:
     return _discover("character-framing") or ["waist-up"]
 
 
+def allowed_back_patterns(category: str) -> list[str]:
+    # back_pattern's valid aliases depend on the current profile's back_design
+    # category. Falls back to "geometric" for unknown/custom categories (D-21),
+    # mirroring B3's wizard-side fallback in SKILL.md.
+    return {
+        "geometric": BACK_PATTERN_GEOMETRIC,
+        "botanical": BACK_PATTERN_BOTANICAL,
+        "abstract": BACK_PATTERN_ABSTRACT,
+        "illustrated": BACK_PATTERN_ILLUSTRATED,
+    }.get(category, BACK_PATTERN_GEOMETRIC)
+
+
 def allowed_splits() -> list[str]:
     # Split values are the on-disk stems plus "false" and "none" (which have no file).
     on_disk = _discover("split")
@@ -200,7 +212,12 @@ def allowed_engines() -> list[str]:
     return _discover("engines") or ["nanobanana", "stable-diffusion", "midjourney", "dalle", "kaze"]
 
 
-def options_for(key: str):
+def options_for(key: str, profile: dict | None = None):
+    if key == "back_pattern":
+        # Valid aliases depend on the current profile's back_design category
+        # (D-21 fallback to "geometric" when back_design is custom/unset).
+        category = (profile or {}).get("back_design", "geometric")
+        return (allowed_back_patterns(category), False)  # custom allowed
     fixed = {
         "deck": (allowed_decks(), True),
         "lettering": (LETTERING, True),
@@ -220,7 +237,6 @@ def options_for(key: str):
         "character_framing": (allowed_character_framings(), False),  # custom allowed; "" = not set
         "back_purpose": (BACK_PURPOSE, False),       # custom text allowed
         "back_design": (BACK_DESIGN, False),         # custom text allowed (D-21 fallback to geometric)
-        "back_pattern": (None, False),               # free text; valid aliases depend on back_design category
         "back_palette": (BACK_PALETTE, False),       # custom text allowed
         "back_symmetry": (BACK_SYMMETRY, False),     # custom text allowed
     }.get(key)
@@ -249,8 +265,8 @@ def options_for(key: str):
 
 # --- validation ------------------------------------------------------------
 
-def validate_value(key: str, value: str) -> tuple[bool, str]:
-    opt = options_for(key)
+def validate_value(key: str, value: str, profile: dict | None = None) -> tuple[bool, str]:
+    opt = options_for(key, profile)
     if opt is None:
         return False, f"unknown key '{key}' (valid: {', '.join(sorted(PERSISTENT_KEYS))})"
     allowed, strict = opt
@@ -312,11 +328,15 @@ def _migrate_layers_extras(profile: dict) -> bool:
     so dropping it preserves the old resolved output); a layer that was "true" (or
     unset, defaulting to "true") becomes its extras text if that text is non-empty.
 
-    Returns True if an `extras` namespace was found and removed.
+    Returns True only if a `layers.*` cell was actually mutated (WR-05) — an `extras`
+    key that is `{}` or contains only falsy/empty group values is still removed from
+    the profile (it's stale data) but does not by itself count as a migration, so
+    callers don't print a misleading "migrated" note or write the file unnecessarily.
     """
     extras = profile.pop("extras", None)
     if not isinstance(extras, dict):
         return False
+    changed = False
     layers = profile.setdefault("layers", {})
     for layer, groups in extras.items():
         if not isinstance(groups, dict):
@@ -327,7 +347,8 @@ def _migrate_layers_extras(profile: dict) -> bool:
             current = layers.get(layer, {}).get(group, LAYER_DEFAULTS.get(layer, {}).get(group, "true"))
             if current != "false":
                 layers.setdefault(layer, {})[group] = extra
-    return True
+                changed = True
+    return changed
 
 
 def _migrate_figure_proportion(profile: dict) -> bool:
@@ -499,13 +520,16 @@ def cmd_set(args):
     if len(args) < 2:
         sys.exit("usage: set <key> <value> [--profile <name>]")
     key, value = args[0], args[1]
-    ok, msg = validate_value(key, value)
-    if not ok:
-        sys.exit(f"error: {msg}")
     cfg = load_raw()
     name = profile or active_profile_name(cfg)
     if name not in cfg["profiles"]:
         sys.exit(f"error: unknown profile '{name}' (see: profile list)")
+    # Use the effective (defaults + overrides) profile so category-aware
+    # validation (e.g. back_pattern against back_design) sees the active
+    # back_design even when it has never been explicitly set (WR-01).
+    ok, msg = validate_value(key, value, effective(cfg, name))
+    if not ok:
+        sys.exit(f"error: {msg}")
     node = cfg["profiles"][name]
     parts = key.split(".")
     for part in parts[:-1]:
@@ -570,11 +594,12 @@ def cmd_validate(_args):
     if active not in cfg.get("profiles", {}):
         errors.append(f"active_profile '{active}' is not a defined profile")
     for name, prof in cfg.get("profiles", {}).items():
+        eff = effective(cfg, name)
         for k, v in _flatten(prof).items():
             if k not in PERSISTENT_KEYS:
                 errors.append(f"profile '{name}': unknown key '{k}'")
                 continue
-            ok, msg = validate_value(k, str(v))
+            ok, msg = validate_value(k, str(v), eff)
             if not ok:
                 errors.append(f"profile '{name}': {msg}")
             elif msg:
@@ -593,8 +618,9 @@ def cmd_path(_args):
 
 def cmd_options(args):
     keys = [args[0]] if args else sorted(PERSISTENT_KEYS)
+    eff = effective() if CONFIG_PATH.exists() else DEFAULTS
     for k in keys:
-        opt = options_for(k)
+        opt = options_for(k, eff)
         if opt is None:
             sys.exit(f"error: unknown key '{k}'")
         allowed, strict = opt

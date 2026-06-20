@@ -331,21 +331,23 @@ options.
 **Step B3 — Back pattern · _persistent_**
 
 _Skipped if `back_pattern` is already set in config._ Ask: "Choose a specific pattern:"
-— show 3 named options from `assets/back/design/<back_design>/` based on B2, plus
-"Custom text" (4th option):
+— show all 4 named options from `assets/back/design/<back_design>/` based on B2 (the
+`AskUserQuestion` 4-option limit is fully consumed by these 4 named presets; the tool's
+automatic "Other" slot covers freeform input, matching the pattern used in Step 7's
+mood options):
 
-- **Geometric** → Diamond / Cross-hatch / Hexgrid + Custom text
-- **Botanical** → Vine / Floral / Leaf + Custom text
-- **Abstract** → Interlacing / Color-field / Paint-stroke + Custom text
-- **Illustrated** → Thematic / Portrait / Landscape + Custom text
+- **Geometric** → Diamond / Cross-hatch / Hexgrid / Wave
+- **Botanical** → Vine / Floral / Leaf / Branch
+- **Abstract** → Interlacing / Color-field / Paint-stroke / Fractal
+- **Illustrated** → Thematic / Portrait / Landscape / Heraldic
 
 Load `assets/back/design/<back_design>/<choice>.md` → save `back_pattern = "<choice>"`.
-Custom text → ask for freeform description → save `back_pattern = "<user text>"`.
+"Other" → ask for freeform description → save `back_pattern = "<user text>"`.
 
 > **D-21 fallback:** If `back_design` is custom text (not a known category alias —
 > `geometric`, `botanical`, `abstract`, `illustrated`), B3 defaults to showing the
-> `geometric` category's 3 named options + "Custom text". The custom `back_design` value
-> is still saved; only the B3 option list falls back to geometric.
+> `geometric` category's 4 named options. The custom `back_design` value is still
+> saved; only the B3 option list falls back to geometric.
 
 **Step B4 — Back palette · _persistent_**
 
@@ -460,17 +462,46 @@ collects all 12 assignments before generating ONE prompt — not one prompt per 
 4. After all 12 (or user says "done"), confirm the table, then proceed to generate.
 
 **Assembly:**
-`[FIGURE_DESCRIPTION]` for prospect cards is a structured list of all collected figures:
+`[FIGURE_DESCRIPTION]` for prospect cards is a structured list of all collected figures,
+structured to match the Step S3 layout choice so the figure data and the layout
+instruction in `[SPECIAL_ATTRIBUTES]` agree:
 
-```
-suit arrangement (4 suits × 3 ranks):
-  ♠ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack),
-  ♥ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack),
-  ♦ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack),
-  ♣ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack),
-```
+- **4 suits × 3 ranks grid (default):**
+  ```
+  suit arrangement (4 suits × 3 ranks):
+    ♠ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack)
+    ♥ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack)
+    ♦ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack)
+    ♣ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack)
+  ```
+- **12-row list:**
+  ```
+  named figures, one row per slot:
+    ♠ King — [King figure], ♠ Queen — [Queen figure], ♠ Jack — [Jack figure],
+    ♥ King — [King figure], ♥ Queen — [Queen figure], ♥ Jack — [Jack figure],
+    ♦ King — [King figure], ♦ Queen — [Queen figure], ♦ Jack — [Jack figure],
+    ♣ King — [King figure], ♣ Queen — [Queen figure], ♣ Jack — [Jack figure]
+  ```
+- **3 rows grouped by rank:**
+  ```
+  named figures grouped by rank, spanning all suits:
+    King row: ♠ [King figure], ♥ [King figure], ♦ [King figure], ♣ [King figure]
+    Queen row: ♠ [Queen figure], ♥ [Queen figure], ♦ [Queen figure], ♣ [Queen figure]
+    Jack row: ♠ [Jack figure], ♥ [Jack figure], ♦ [Jack figure], ♣ [Jack figure]
+  ```
+- **Free-form collage:**
+  ```
+  named figures (no fixed arrangement):
+    ♠ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack)
+    ♥ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack)
+    ♦ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack)
+    ♣ [suit label if any]: [King figure] (King), [Queen figure] (Queen), [Jack figure] (Jack)
+  ```
 
-This entire block is `[FIGURE_DESCRIPTION]` in the SPECIAL template. Output: ONE prompt.
+Use the block matching the Step S3 layout selection (or the "Other" custom layout's
+nearest structural match) so the resulting text never restates a layout that
+contradicts `[SPECIAL_ATTRIBUTES]`. This entire block is `[FIGURE_DESCRIPTION]` in the
+SPECIAL template. Output: ONE prompt.
 
 Session only — figures are not persisted to config in v1.
 
@@ -684,11 +715,15 @@ Offer (default first, per 4-option AskUserQuestion limit):
   `layers.figure.<group> = "building"`.
 - **Animal** — a creature or beast. Sets `layers.figure.<group> = "animal"`.
 - **Custom** — user-described figure type (free text). Sets
-  `layers.figure.<group> = "custom"` (or the user's description).
+  `layers.figure.<group> = "custom"` — the CLI only accepts the literal keyword
+  `"custom"` here (see `manage_config.py`'s `strict=True` validation for this key); the
+  user's actual free-text description is captured separately as part of the per-card
+  figure description in Steps 9–12, not stored in this config cell.
 
 Save via `python3 scripts/manage_config.py set layers.figure.<group> <type>` (replace
-`<group>` with the actual group). Note that this both keeps the figure layer on for
-this group and records the figure type.
+`<group>` with the actual group — `<type>` must be one of `false`/`character`/
+`building`/`animal`/`custom`). Note that this both keeps the figure layer on for this
+group and records the figure type category; it does not store free-text descriptions.
 
 **Steps 8d–8e apply ONLY when the group's figure type is `"character"`.** For
 `building`, `animal`, and `custom` figure types, skip Steps 8d–8e and proceed directly
