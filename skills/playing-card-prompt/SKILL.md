@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.27.0
+  version: 3.28.0
   description_claudeai: Interactive wizard to build image-gen prompts for stylized playing cards. 4 deck patterns, 6 lettering systems, 3+ styles, court/pip/ace. Trigger on card design requests.
 ---
 
@@ -86,8 +86,13 @@ Load the active profile. Then run the card wizard with this logic:
   French deck, Anglo-American letters, Austrian style, 9:14, NanoBanana") and go
   straight to per-card steps (rank → suit → figure details if this card's group has a
   figure). Mention the user can run `--config` to change settings or switch profiles.
-- **No config found** → run the full wizard (all steps), then offer to save the
-  persistent settings to the active (`default`) profile in `config.json` for next time.
+- **No valid config found** (`config.json` is absent, or was just reset via
+  `manage_config.py reset` — treat both identically, no separate messaging) → do NOT
+  start card generation with empty/default state. Redirect into the Config wizard: run
+  the same flow documented in `references/CONFIG-WIZARD.md` (the 11-step persistent-
+  settings flow used by `--config`) to set deck type, lettering system, and the other
+  persistent settings, and save them to the active `default` profile. Only then continue
+  to per-card steps.
 
 ---
 
