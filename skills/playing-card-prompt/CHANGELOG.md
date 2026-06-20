@@ -4,6 +4,12 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
+## [Unreleased]
+
+### Fixed
+- B1-B6 skip behavior now matches v1 scope (D-17): skipping an already-configured persistent back-wizard step is silent, with no consolidated summary printed.
+- Stale duplicate reference to the deprecated singular `assets/back/symmetry.md` in SKILL.md's "Assembling the prompt" step 4 corrected to the alias-based `assets/back/symmetry/<back_symmetry>.md` path (canonical instructions in Step B5 and REFERENCE.md step 10 were already correct).
+
 ## [3.24.0] - 2026-06-19
 
 ### Added

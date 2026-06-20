@@ -885,7 +885,8 @@ Offer to save the choice to `config.json` like the other persistent settings.
    drop a line from an enabled layer. If `structure` is `illustration`, drop
    `[FRAME_LINE]` from the template entirely regardless of `layers.frame.g` — leave
    `layers.frame.<group>` in `config.json` untouched, just don't emit the line.
-   For the `back` group, append the "Symmetry line" from `assets/back/symmetry.md` as
+   For the `back` group, append the "Symmetry line" from
+   `assets/back/symmetry/<back_symmetry>.md` (default `rotational-180`) as
    the final item of `[STYLE_BLOCK]` (step 10 in "Resolving `[STYLE_BLOCK]`" in
    `references/REFERENCE.md`).
    When generating multiple cards for the same deck, reuse the exact same resolved
