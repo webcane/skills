@@ -513,8 +513,10 @@ empty/unset field):
 Symmetry is NOT in `[BACK_DESIGN]` — it goes through STYLE_BLOCK step 10.
 Frame is NOT in `[BACK_DESIGN]` — it goes through `[FRAME_LINE]` via `layers.frame.back`.
 
-Per-card exclusions (Step B7) go to `[NEGATIVE_LIST]` only — there is no
-`[BACK_MODIFICATIONS]` placeholder in this template.
+Build `[NEGATIVE_LIST]` the same way as COURT: start with `no watermark`, then append
+the Step B7 exclusions (if any), each phrased as `no <thing>`. Per-card exclusions
+(Step B7) go to `[NEGATIVE_LIST]` only — there is no `[BACK_MODIFICATIONS]` placeholder
+in this template.
 
 ```
 [ASPECT_RATIO] aspect ratio, full card visible, transparent background outside the card,
@@ -552,6 +554,9 @@ Drop this line if empty.
 `[SPECIAL_ATTRIBUTES]` is the layout arrangement chosen in Step S3 (for prospect-type
 cards, the grid/list/row/collage layout; for other types, any additional attributes or
 visual instructions the user provides). Drop if empty.
+
+Build `[NEGATIVE_LIST]` the same way as COURT: start with `no watermark`, then append
+the Step S5 exclusions (if any), each phrased as `no <thing>`.
 
 ```
 [ASPECT_RATIO] aspect ratio, special playing card,
