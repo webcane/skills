@@ -715,11 +715,15 @@ Offer (default first, per 4-option AskUserQuestion limit):
   `layers.figure.<group> = "building"`.
 - **Animal** — a creature or beast. Sets `layers.figure.<group> = "animal"`.
 - **Custom** — user-described figure type (free text). Sets
-  `layers.figure.<group> = "custom"` (or the user's description).
+  `layers.figure.<group> = "custom"` — the CLI only accepts the literal keyword
+  `"custom"` here (see `manage_config.py`'s `strict=True` validation for this key); the
+  user's actual free-text description is captured separately as part of the per-card
+  figure description in Steps 9–12, not stored in this config cell.
 
 Save via `python3 scripts/manage_config.py set layers.figure.<group> <type>` (replace
-`<group>` with the actual group). Note that this both keeps the figure layer on for
-this group and records the figure type.
+`<group>` with the actual group — `<type>` must be one of `false`/`character`/
+`building`/`animal`/`custom`). Note that this both keeps the figure layer on for this
+group and records the figure type category; it does not store free-text descriptions.
 
 **Steps 8d–8e apply ONLY when the group's figure type is `"character"`.** For
 `building`, `animal`, and `custom` figure types, skip Steps 8d–8e and proceed directly
