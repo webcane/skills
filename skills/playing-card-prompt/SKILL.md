@@ -211,10 +211,7 @@ via `layers.<layer>.<group>` (defaults and full resolution rules are in "Layers 
    load `assets/frame/<name>.md` and use its "Frame line" verbatim as `frame`. If the
    user gives custom text instead, save it as `frame`, phrased as its own
    comma-terminated phrase. If skipped, leave `frame` at its default
-   (`boxed-index`). Per-group additions on top of the chosen frame (e.g. "gold
-   foil edging" only on court cards) are config-only, not asked here — set via
-   `python3 scripts/manage_config.py set layers.frame.<group> "<text>"` (this also
-   turns the frame on for that group if it was off).
+   (`boxed-index`).
 
 3. **Highlights / overlays (optional, all cards)** — ask, free text, whether to add
    any gilding, lacquer, glow, or shine accents (e.g. "gold leaf highlights along the
@@ -223,11 +220,6 @@ via `layers.<layer>.<group>` (defaults and full resolution rules are in "Layers 
    `layers.highlights.joker` to that text (this both turns the highlights layer on and
    supplies the addition for all groups). If skipped, leave the highlights layer off
    everywhere (the default).
-
-   Per-group additions to the background or background pattern/accents (e.g. "faint
-   marbling on the court cards only") are likewise config-only, not asked here — set
-   via `python3 scripts/manage_config.py set layers.background.<group> "<text>"` /
-   `layers.decor.<group> "<text>"` (also turns that layer on for that group if off).
 
 4. **Theme / symbolism (optional, deck-wide)** — ask, free text, for an overarching
    concept tying the deck together (e.g. "celestial mythology", "botanical garden",
@@ -242,22 +234,11 @@ Court and Ace keep their other layers on by default (see the Defaults table in
 layers.<layer>.<group> false/true` (e.g. `layers.figure.pip true` for a
 transformation-style deck where number cards carry small figures).
 
-A group-wide figure trait shared by every figure in a group (e.g. "all court figures
-shown with a slight hunch"), layered on top of the chosen pattern's Face Style, is
-config-only — not asked here — set via `python3 scripts/manage_config.py set
-layers.figure.<group> "<text>"` (see "Figure, face style & proportion" in
-`references/REFERENCE.md`). For `pip`/`ace`, this also turns figures on for that group
-(transformation-style deck) — the trait only makes sense if the group has a figure.
-
 The chosen pattern's "Technique" lines (its linework/rendering medium — see "Layers
 and `[STYLE_BLOCK]` assembly" in `references/REFERENCE.md`) apply to every group by
 default, independently of whether that group has a figure. The pattern's "Finish"
 lines (print-quality/final-rendering descriptor) share this same gate, so dropping
-Technique drops Finish too. Dropping the pattern's illustration technique (and finish)
-for one group only (e.g. an unstyled plain pip face) or adding a group-specific
-rendering note is config-only — set via `python3 scripts/manage_config.py set
-layers.technique.<group> false` (or `"<text>"` for a Technique addition; Finish has no
-separate addition slot).
+Technique drops Finish too.
 
 ---
 
@@ -292,11 +273,6 @@ Pip, Ace, Joker; default: all four selected, matching the current `layers.mood.<
 defaults). Set `layers.mood.<group>` to `true` for selected groups and `false` for any
 deselected ones.
 
-A per-group mood addition on top of the deck-wide `mood` (e.g. extra atmosphere only
-on the court cards) is config-only, not asked here — set via
-`python3 scripts/manage_config.py set layers.mood.<group> "<text>"` (see "Resolving
-`[STYLE_BLOCK]`" step 8 in `references/REFERENCE.md` for how it's appended).
-
 ---
 
 **Check `layers.figure.<group>` for this card's group** (`court`/`pip`/`ace`/`joker`/`back`/`special`).
@@ -307,7 +283,7 @@ has no figure — **skip the entire figure block (Steps 8a–8e) and go straight
 (Aspect ratio). Otherwise, the figure block (Steps 8a–8e) and Steps 9–12 apply: court
 and joker cards by default, plus any pip/ace/back/special card whose `layers.figure.<group>` was
 set to a type value. Steps 8a–8c are persistent — skipped if already set or loaded from
-config; Steps 8d–8e are character-only persistent (skipped if `layers.figure.<group>` is
+config; Step 8e is character-only persistent (skipped if `layers.figure.<group>` is
 not `"character"`); Steps 9–12 are per-card.
 
 ---
@@ -375,25 +351,15 @@ Save via `python3 scripts/manage_config.py set layers.figure.<group> <type>` (re
 `building`/`animal`/`custom`). Note that this both keeps the figure layer on for this
 group and records the figure type category; it does not store free-text descriptions.
 
-**Steps 8d–8e apply ONLY when the group's figure type is `"character"`.** For
-`building`, `animal`, and `custom` figure types, skip Steps 8d–8e and proceed directly
+**Step 8e applies ONLY when the group's figure type is `"character"`.** For
+`building`, `animal`, and `custom` figure types, skip Step 8e and proceed directly
 to Steps 9–12 (character description steps, adapted for the figure type). Building,
 animal, and custom figures still benefit from figure_scale (Step 8a) and split
 (Step 8b) — only the character-specific face_style and character_framing are skipped
-(FIG-08).
-
-### Step 8d — Face style (character-only gate)
-
-_Applies ONLY when `layers.figure.<group>` is `"character"`._ For `building`,
-`animal`, and `custom` figure types, face_style is not applied — skip this step.
-
-For character type: how a figure's face reads (typage, expression, degree of
-stylization) comes from the chosen pattern's own "Face Style" section, folded into
-`[STYLE_BLOCK]` automatically whenever the figure type is `character`. There is no
-separate question for this — the pattern supplies it. State this gate explicitly so
-the user understands: **Face Style from the pattern applies only when figure type is
-character**; building/animal/custom figures receive the figure-type text and figure
-scale, but not the pattern's Face Style line.
+(FIG-08). Face Style — how a figure's face reads (typage, expression, degree of
+stylization) — comes from the chosen pattern's own "Face Style" section, folded into
+`[STYLE_BLOCK]` automatically whenever the figure type is `character`; there is no
+separate question for it, and building/animal/custom figures don't receive it.
 
 ### Step 8e — Character framing · _character-only persistent_
 
