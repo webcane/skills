@@ -4,6 +4,12 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
+## [Unreleased]
+
+### Changed
+- **SKILL.md size optimization (OPT-01)** — extracted five self-contained instruction blocks into lazy-loaded `references/` files, each replaced in `SKILL.md` by a 1-line trigger pointer: File map → `references/FILE-MAP.md`, Config-wizard 11-step block → `references/CONFIG-WIZARD.md`, Joker Steps 4.1–4.2 → `references/JOKER-WIZARD.md`, Back Steps B1–B7 → `references/WIZARD-BACK.md`, Special Steps S1–S5 → `references/WIZARD-SPECIAL.md`. Pure relocation — no wizard behavior changed. `SKILL.md` shrinks from 986 to 636 lines, reducing what's loaded in full on every invocation.
+- `references/WIZARD-STEP-MAP.md` documents the new Joker-steps file location with a footer note matching the existing Back/Special rank-group notes (DOCS-02).
+
 ## [3.25.0] - 2026-06-20
 
 ### Fixed
