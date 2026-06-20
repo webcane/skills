@@ -18,6 +18,7 @@ jobs:
           mkdir -p dist
           for skill_dir in skills/*/; do
             name=$(basename "$skill_dir")
+            [ -f "skills/$name/SKILL.md" ] || continue
             tar -czf "dist/${name}.skill" -C skills "$name"
           done
       - name: Upload artifacts

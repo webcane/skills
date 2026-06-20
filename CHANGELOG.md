@@ -23,6 +23,14 @@ and each skill is versioned and released independently.
 - CI (`package-skills.yml`) parses the release tag, packages and uploads only the tagged skill, and promotes that skill's `[Unreleased]` CHANGELOG section to a versioned one
 - Synced `README.md`, `QUICK_START.md`, and `CLAUDE.md` to the per-skill release workflow
 
+### Fixed
+- `scripts/install-skill.sh`: pinned-version download URL built a bare `v${VERSION}` tag that never exists; now uses the namespaced `${SKILL_NAME}%2Fv${VERSION}` release tag so versioned installs resolve instead of 404ing
+- `scripts/install-skill.sh`: `BRANCH` defaulted to `main`; now defaults to `master` (the repo's actual default branch)
+- `package-skills.yml`: `package-all` job's loop now skips `skills/*` directories that have no `SKILL.md` (via `|| continue`) instead of failing the bulk-package job on a stub dir
+
+### Removed
+- Deleted the stray `.github/workflows/asd` file (a non-workflow garbage file in the workflows dir)
+
 ## Versioning
 
 We follow [Semantic Versioning](https://semver.org/) **per skill**:
