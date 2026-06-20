@@ -69,6 +69,8 @@ a fixed block to `[NEGATIVE_LIST]` (step 12). See "`structure` setting" in
 - **Turning on figure for pip/ace** (`layers.figure.pip`/`.ace`) — only available via `--config`; once on, the figure block (Steps 8–12) runs for that group like court.
 - **Back symmetry line** — the "Symmetry line" from `assets/back/symmetry/<back_symmetry>.md` is appended to `[STYLE_BLOCK]` automatically for the `back` group (step 10 in "Resolving `[STYLE_BLOCK]`" in `REFERENCE.md`); chosen via Step B5 (persistent).
 
+**Joker rank group** (`rank = Joker`): Steps 4.1–4.2 (role, index placement + symbol) are documented in references/JOKER-WIZARD.md.
+
 **Back rank group** (`rank = Back`): Steps B1–B7 run instead of Steps 4.1–4.2. B1–B6 are persistent (skipped if already set in config); B7 exclusions are per-card. Steps 4 (Suit) and 8a–12 (figure block) are skipped unless `layers.figure.back` is explicitly set to a non-false type value in config. The `back` group enters the mood check (Step 7) and the aspect ratio / generator steps (Steps 13–14) like all other groups.
 
 **Special rank group** (`rank = Special`): Steps S1–S5 run instead of Steps 4.1–4.2 (and Step 4 suit is skipped). Steps 8a–12 (figure block) are skipped unless `layers.figure.special` is explicitly set to a non-false type value. The `special` group enters the mood check (Step 7) and the aspect ratio / generator steps (Steps 13–14) like all other groups. Step S4 (named figure) only runs for prospect-type special cards.
