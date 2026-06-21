@@ -93,6 +93,7 @@ truncated to fit, with a warning.
 |-------|-------------|
 | [content-writer-linkedin](skills/content-writer-linkedin/) | Write authentic LinkedIn articles |
 | [playing-card-prompt](skills/playing-card-prompt/) | Interactive wizard that builds stylized playing card image prompts |
+| [thesis-to-text](skills/thesis-to-text/) | Interactive wizard that turns raw theses/notes into a finished, audience-ready text |
 
 ## Installation URLs
 
