@@ -26,6 +26,7 @@ and each skill is versioned and released independently.
 ### Fixed
 - `scripts/install-skill.sh`: pinned-version download URL built a bare `v${VERSION}` tag that never exists; now uses the namespaced `${SKILL_NAME}%2Fv${VERSION}` release tag so versioned installs resolve instead of 404ing
 - `scripts/install-skill.sh`: `BRANCH` defaulted to `main`; now defaults to `master` (the repo's actual default branch)
+- `scripts/install-skill.sh`: `SKILL_NAME` argument was used unsanitized in `mkdir`/`tar -C` paths, allowing path traversal (e.g. `../../../etc`); now validated against a `[A-Za-z0-9_-]+` allowlist before use
 - `package-skills.yml`: `package-all` job's loop now skips `skills/*` directories that have no `SKILL.md` (via `|| continue`) instead of failing the bulk-package job on a stub dir
 
 ### Removed
