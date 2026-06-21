@@ -146,7 +146,7 @@ Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
 | `layers.ornaments.<group>`  | `true`, `false`, or custom text (addition)                    | court/ace `true`, pip `false` |
 | `layers.highlights.<group>` | `true`, `false`, or custom text (addition)                    | all `false`        |
 | `layers.frame.<group>`      | `true`, `false`, or custom text (addition)                    | court/ace `true`, pip `false` |
-| `layers.figure.<group>`     | `false` \| `alias` \| `alias addition_text` — `alias` is one of `character`/`building`/`animal`/`custom`; bare `"true"` is still accepted on read for backward compatibility but is migrated to the group's default alias (`"character"`) on load via `_migrate_figure_true_to_character` — do not write `"true"` directly | court/joker `character`, pip/ace `false` |
+| `layers.figure.<group>`     | `false`, `character`, `building`, `animal`, `custom` — strict, no free-text addition (unlike other `layers.<layer>.<group>` cells); bare `"true"` is still accepted on read for backward compatibility but is migrated to the group's default alias (`"character"`) on load via `_migrate_figure_true_to_character` — do not write `"true"` directly | court/joker `character`, pip/ace `false` |
 | `layers.mood.<group>`       | `true` \| `false` \| `mood_line` — the unified mood schema; when the cell holds free text, that text IS the mood line for this group (no separate deck-wide mood field) | all `true` |
 | `layers.technique.<group>`  | `true`, `false`, or custom text (addition)                    | all `true`         |
 | `layers.split.<group>`      | `false`, `none`, `horizontal-mirrored`, `angled-mirrored`, or custom text | all `false`        |
@@ -238,22 +238,21 @@ IS the `[MOOD_LINE]` for this group). There is no separate deck-wide `mood` fiel
 a preset can still be picked from `assets/mood/` or typed as custom text in Step 7,
 which sets the chosen mood line into every group's `layers.mood.<group>` cell.
 `layers.figure.<group>` now carries the figure type — `"false"` (off), or one of
-`"character"`/`"building"`/`"animal"`/`"custom"` (on + figure type, D-02). For
-`character` type, the chosen pattern's own "Figure detail" and "Face Style" sections
-are folded into `[STYLE_BLOCK]` automatically — additional portrait-only rendering
-detail (e.g. skin tones) and how a figure's face reads are part of the `style`
-pattern, not a separate setting; these are skipped entirely for `building`/`animal`/
-`custom` (FIG-08, D-16). `layers.figure.<group>`'s addition (free text appended after
-the type keyword) is appended after the pattern's Face Style line for `character`
-type — a group-wide figure trait (e.g. "all court figures shown with a slight hunch")
-layered on top of the pattern's Face Style for every card in that group, distinct from
-the per-card `[CHARACTER_FEATURES]` (Steps 9-12).
+`"character"`/`"building"`/`"animal"`/`"custom"` (on + figure type, D-02). This cell
+is strict (unlike other `layers.<layer>.<group>` cells) and does not accept a
+free-text addition — `manage_config.py set layers.figure.<group> "<text>"` only
+accepts the five literal tokens above. For `character` type, the chosen pattern's own
+"Figure detail" and "Face Style" sections are folded into `[STYLE_BLOCK]`
+automatically — additional portrait-only rendering detail (e.g. skin tones) and how a
+figure's face reads are part of the `style` pattern, not a separate setting; these are
+skipped entirely for `building`/`animal`/`custom` (FIG-08, D-16).
 
-`character_framing` is folded into `[STYLE_BLOCK]` right after `layers.figure.<group>`'s
-addition, ONLY when figure type is `character` — a deck-wide framing/crop description
-(e.g. `waist-up portrait, torso and arms visible, hands free to hold attributes,`)
-reused across every character figure so the set reads as consistently framed. Picked
-from a preset in `assets/character-framing/` or typed as custom text in Step 8e.
+`character_framing` is folded into `[STYLE_BLOCK]` right after the pattern's Face
+Style line, ONLY when figure type is `character` — a deck-wide framing/crop
+description (e.g. `waist-up portrait, torso and arms visible, hands free to hold
+attributes,`) reused across every character figure so the set reads as consistently
+framed. Picked from a preset in `assets/character-framing/` or typed as custom text in
+Step 8e.
 
 `figure_scale` is folded into `[STYLE_BLOCK]` right after `character_framing` (or
 right after the figure-type text for non-character types) — applies to ALL figure
@@ -262,7 +261,7 @@ types whenever `layers.figure.<group>` is on. Picked from `full-bleed` /
 no per-group equivalent for `figure_scale` or `character_framing` — both are single
 deck-wide phrases.
 
-**Five scopes of figure content**, from broadest to narrowest (see "Figure type, face
+**Four scopes of figure content**, from broadest to narrowest (see "Figure type, face
 style, framing & scale" in `references/REFERENCE.md` for the full assembly order):
 - **Deck-wide (figure type)** — the `assets/figure-type/<type>.md` text for the
   group's configured type: the canonical prompt phrase for that figure type. Applied
@@ -275,10 +274,6 @@ style, framing & scale" in `references/REFERENCE.md` for the full assembly order
   is `character`.
 - **Deck-wide (scale, all types)** — `figure_scale`: how the figure sits in the frame,
   applied to ALL figure types.
-- **Group-wide** — `layers.figure.<group>`'s addition (when the cell carries custom
-  text beyond the type keyword): an optional trait shared by every figure in one group
-  (`court`/`pip`/`ace`/`joker`), layered on top of the pattern's Face Style for that
-  group (character-only).
 - **Per-card** — `[CHARACTER_NAME]`/`[CHARACTER_FEATURES]` and the Step 10-12
   attributes/transfers/exclusions: who this specific card's figure is, always
   supplied per card (from the user or a reference image).
