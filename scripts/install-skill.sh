@@ -12,6 +12,9 @@ GITHUB_REPO="${GITHUB_REPO:-webcane/skills}"
 BRANCH="${BRANCH:-master}"
 
 [ -z "$SKILL_NAME" ] && echo "Usage: $0 <skill-name> [version]" && exit 1
+case "$SKILL_NAME" in
+  */*|*..*) echo "Error: invalid skill name '$SKILL_NAME'" && exit 1 ;;
+esac
 
 if [ "$VERSION" = "latest" ]; then
   URL="https://raw.githubusercontent.com/$GITHUB_REPO/$BRANCH/dist/${SKILL_NAME}.skill"
