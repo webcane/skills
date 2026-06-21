@@ -29,11 +29,14 @@ Usage:
 Keys (within a profile): deck, lettering, style, frame, aspect_ratio, image_generator,
       structure, index.size, index.count, index.layout, index.symbol, index.type,
       layers.<background|decor|ornaments|highlights|frame|figure|mood|technique|split>.<court|pip|ace|joker|back|special>,
-      mood, theme, figure_scale, character_framing
+      theme, figure_scale, character_framing
 
 Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
 "false" (layer off), "true" (layer on, no addition), or any other text (layer on,
 used as that group's addition on top of the layer's own pattern/preset text).
+`layers.mood.<group>` follows this same three-way schema and is the ONLY mood
+setting — there is no separate deck-wide `mood` field; the mood line, when on, is
+the cell's own value.
 
 `layers.figure.<group>` extends this with type-encoding: "false" (off), "character",
 "building", "animal", "custom" (on + figure type). `layers.split.<group>` accepts "false" (not configured), "none" (no split),
@@ -42,6 +45,11 @@ used as that group's addition on top of the layer's own pattern/preset text).
 A pre-4.0 config.json may still have `figure_proportion` — it is migrated automatically
 to `character_framing` on load (figure_proportion value → character_framing; figure_scale
 defaults to "inscribed-in-frame"; layers.figure.<group>="true" → "character").
+
+A pre-MOOD-01 config.json may still have a root `mood` field — it is migrated
+automatically on load: the root value replaces any `layers.mood.<group>` cell that
+is exactly "true" (custom per-group text already present is left untouched), then
+the root key is removed.
 
 A pre-3.6 config.json may still have the old per-layer `ornaments_extra.<group>`,
 `highlights_extra.<group>`, and `frame_extra.<group>` fields, and a pre-3.13
@@ -123,7 +131,6 @@ DEFAULTS = {
     "structure": "full",
     "index": {"size": "standard", "count": "4-index", "layout": "stacked", "symbol": "star-in-circle", "type": "standard"},
     "layers": {layer: dict(groups) for layer, groups in LAYER_DEFAULTS.items()},
-    "mood": "",
     "theme": "",
     "figure_scale": "inscribed-in-frame",
     "character_framing": "",
@@ -145,7 +152,7 @@ BUILTIN_CONFIG = {
 
 PERSISTENT_KEYS = {"deck", "lettering", "style", "frame", "aspect_ratio", "image_generator",
                    "structure", "index.size", "index.count", "index.layout", "index.symbol",
-                   "index.type", "mood", "theme", "figure_scale", "character_framing",
+                   "index.type", "theme", "figure_scale", "character_framing",
                    "back_purpose", "back_design", "back_pattern", "back_palette", "back_symmetry"}
 PERSISTENT_KEYS |= {f"layers.{layer}.{g}" for layer in LAYERS for g in GROUPS}
 
@@ -231,7 +238,6 @@ def options_for(key: str, profile: dict | None = None):
         "index.layout": (INDEX_LAYOUT, True),
         "index.symbol": (INDEX_SYMBOL, False),   # custom glyph/text allowed
         "index.type": (INDEX_TYPE, True),
-        "mood": (None, False),    # free text deck-wide atmosphere
         "theme": (None, False),   # free text deck-wide theme/symbolism
         "figure_scale": (FIGURE_SCALE, False),       # custom crop text allowed
         "character_framing": (allowed_character_framings(), False),  # custom allowed; "" = not set
@@ -401,6 +407,38 @@ def _migrate_figure_true_to_character(profile: dict) -> bool:
     return changed
 
 
+def _migrate_root_mood(profile: dict) -> bool:
+    """Migrate a pre-MOOD-01 profile that has a root `mood` field into the unified
+    `layers.mood.<group>` schema.
+
+    The old two-level model was: a deck-wide root `mood` (free text) plus a
+    per-group `layers.mood.<group>` on/off/addition cell. MOOD-01 collapses
+    this into one level: `layers.mood.<group>` alone is `"false"` (no mood),
+    `"true"` (on, no specific line), or `<mood_line>` text (the atmosphere
+    phrase itself).
+
+    Mapping: pop the root `mood` value. If it is non-empty, for each group
+    whose `layers.mood.<group>` cell is exactly `"true"`, replace that cell
+    with the old root `mood` text (custom text already in the cell wins —
+    it is left untouched; `"false"` cells stay `"false"`). If the root
+    `mood` was empty, the pop still removes the dead key.
+
+    Returns True if anything was changed (the root key is always removed
+    when present, so this always returns True when called on a profile that
+    has the key).
+    """
+    if "mood" not in profile:
+        return False
+    old = profile.pop("mood")
+    if old:
+        layers = profile.get("layers", {})
+        mood = layers.get("mood", {})
+        for group in GROUPS:
+            if mood.get(group) == "true":
+                mood[group] = old
+    return True
+
+
 def load_raw() -> dict:
     """Load config.json, migrating a pre-3.0 flat file, pre-3.6 *_extra fields, a
     pre-3.13 extras.<layer>.<group> namespace, and a pre-4.0 figure_proportion field."""
@@ -430,6 +468,9 @@ def load_raw() -> dict:
     if any(_migrate_figure_true_to_character(prof) for prof in cfg["profiles"].values()):
         migrated = True
         print("note: migrated layers.figure.<group>='true' to 'character'", file=sys.stderr)
+    if any(_migrate_root_mood(prof) for prof in cfg["profiles"].values()):
+        migrated = True
+        print("note: migrated root mood into layers.mood.<group>", file=sys.stderr)
     if migrated:
         save_raw(cfg)
     return cfg

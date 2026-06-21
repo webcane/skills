@@ -42,7 +42,8 @@ the shell's current working directory.
 
 Before asking any wizard questions, load the active profile's persistent settings
 (`deck`, `lettering`, `style`, `frame`, `aspect_ratio`, `image_generator`, `structure`,
-`index.symbol`, `index.*`, `layers.*`, `mood`, `theme`, `figure_scale`,
+`index.symbol`, `index.*`, `layers.*` (including `layers.mood.<group>`, the deck's
+only mood setting), `theme`, `figure_scale`,
 `character_framing`, `back_purpose`, `back_design`, `back_pattern`, `back_palette`,
 `back_symmetry`) via `python3 scripts/manage_config.py show`. This also lists
 every saved profile and which one is active. `layers.*` includes all card groups:

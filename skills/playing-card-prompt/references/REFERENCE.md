@@ -47,10 +47,11 @@ text):
   `"character"` for `court` and `joker` (the portrait); `"false"` for `pip`/`ace`
   (no figure) — set to a type value for `pip`/`ace` only for transformation-style
   decks where number/ace cards carry small figures.
-- **Mood** — whether `[MOOD_LINE]` (the deck's overall atmosphere, from the `mood`
-  setting) and this group's addition (a per-group mood addition, when the cell is
-  custom text) apply to this group. On for every group by default; both are empty
-  (and dropped) unless `mood` and/or this group's addition are set.
+- **Mood** — the cell `layers.mood.<group>` is the deck's only mood setting:
+  `"false"` (no mood line), `"true"` (on, no specific line — nothing to add), or
+  any other text (`[MOOD_LINE]`, the atmosphere phrase itself, e.g. "gothic and
+  brooding atmosphere"). On for every group by default; produces no line unless
+  the cell holds custom text.
 - **Technique** — the rendering technique/medium applied to whatever sits in the
   center (portrait, pip layout, or suit symbol alike) — linework, tonal/area-fill
   rendering, painterly treatment, collage, and so on — plus this group's addition if
@@ -145,12 +146,10 @@ Then:
    Style). `layers.technique.g`'s addition (if any) was already appended in step 5 —
    Finish doesn't get its own addition slot.
 
-8. **Mood** — if `layers.mood.g` is on: if `mood` is non-empty, append `[MOOD_LINE]`
-   — the `mood` text as its own comma phrase (e.g. `gothic and brooding atmosphere,`);
-   then, if `layers.mood.g`'s addition is non-empty (the cell is custom text), append
-   it as its own comma phrase too — a per-group mood addition layered on top of (or in
-   place of) the deck-wide `mood`. If both `mood` and `layers.mood.g`'s addition are
-   empty, no mood line is added for this group, regardless of `layers.mood.g`.
+8. **Mood** — `layers.mood.g` is the deck's only mood setting: if the cell is
+   `"false"`, no mood line. If `"true"`, also no mood line (on, but nothing to
+   show). If the cell holds any other text, append it verbatim as `[MOOD_LINE]`
+   — its own comma phrase (e.g. `gothic and brooding atmosphere,`).
 
 9. **Plain fallback** — if `g` is `pip` and `layers.decor.pip`, `layers.ornaments.pip`,
    and `layers.highlights.pip` are all `"false"`, append the line `plain card face, no
@@ -301,8 +300,10 @@ technique; Joker cards carry the full pattern with a figure (like Court cards, c
 type) — a fully decorated single-figure card. Back cards are fully decorated
 (background, decor, ornaments, mood, technique all on) with frame on but no figure —
 designed to carry the pattern's repeat motif and finish.
-Highlights is off everywhere by default. `mood` and `theme` are both empty by default,
-so `[MOOD_LINE]` and the theme-derived ornaments/highlights produce nothing unless set.
+Highlights is off everywhere by default. `layers.mood.<group>` cells are `"true"`
+(on, no line) where listed above and `theme` is empty by default, so `[MOOD_LINE]`
+and the theme-derived ornaments/highlights produce nothing unless a mood cell holds
+custom text or `theme` is set.
 Technique is on for Court, Joker, Back, and Special cards by default; Pip and Ace
 cards default to technique off (no linework/medium descriptor, no finish lines). Court
 and Joker layers are configurable via `--config` (see `references/CONFIG.md`) but
