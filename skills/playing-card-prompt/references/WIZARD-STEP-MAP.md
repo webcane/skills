@@ -32,9 +32,8 @@ loads.
 | **7** | Mood / atmosphere | #4 Mood/atmosphere | Mood.\* (per-group toggle via `layers.mood.<group>`); `mood` (preset or custom text); `layers.mood.<group>`'s addition (config-only per-group addition) | feeds `[STYLE_BLOCK]` (`[MOOD_LINE]` + per-group addition) | `assets/mood/<name>.md`, `assets/mood/_adding-a-mood.md` (if custom) |
 | **8a** | Figure scale | #5 Composition/rhythm *(figure framing/cropping — scale)* | Figure *(deck-wide `figure_scale`)* | feeds `[STYLE_BLOCK]` (figure_scale phrase, appended after character framing / non-character figure-type text) | — *(config value phrase, no asset file lookup)* |
 | **8b** | Split layout | #5 Composition/rhythm *(split compositional wrapper)* | Split *(per-group `layers.split.<group>`)* | feeds `[STYLE_BLOCK]` (split phrase as outer wrapper, appended after figure_scale) | `assets/split/horizontal-mirrored.md`, `assets/split/angled-mirrored.md` |
-| **8c** | Figure type (`figure_type`) | #5 Composition/rhythm *(figure classification)*, #9 Poses/gestures *(partial — type preamble)* | Figure *(per-group `layers.figure.<group>` encoded value: `character`/`building`/`animal`/`custom`)* | feeds `[STYLE_BLOCK]` (figure-type preamble text, before face style / character framing) | `assets/figure-type/<type>.md` (character.md, building.md, animal.md, custom.md) |
-| **8d** | Face style gate *(character only)* | #11 Typage / facial expression, #7 Degree of stylization *(partial)* | Figure *(pattern face style, gated on `layers.figure.<group> = "character"`)* | feeds `[STYLE_BLOCK]` (pattern's Face Style line and Figure detail — same gate as existing, now narrowed to character type) | `assets/pattern/<style>.md` "Face Style" section |
-| **8e** | Character framing *(character only)* | #5 Composition/rhythm *(character framing/cropping)* | Figure *(deck-wide `character_framing`, gated on `layers.figure.<group> = "character"`)* | feeds `[STYLE_BLOCK]` (character_framing phrase, appended after Face Style/`layers.figure.<group>`'s addition) | `assets/character-framing/<name>.md` |
+| **8c** | Figure type (`figure_type`) — gate for pattern Face Style folds into this step's own paragraph, no separate step | #5 Composition/rhythm *(figure classification)*, #11 Typage / facial expression *(character-only Face Style gate)*, #9 Poses/gestures *(partial — type preamble)* | Figure *(per-group `layers.figure.<group>` encoded value: `character`/`building`/`animal`/`custom`)* | feeds `[STYLE_BLOCK]` (figure-type preamble text; pattern's Face Style line and Figure detail when type is `character`, before character framing) | `assets/figure-type/<type>.md` (character.md, building.md, animal.md, custom.md), `assets/pattern/<style>.md` "Face Style" section |
+| **8e** | Character framing *(character only)* | #5 Composition/rhythm *(character framing/cropping)* | Figure *(deck-wide `character_framing`, gated on `layers.figure.<group> = "character"`)* | feeds `[STYLE_BLOCK]` (character_framing phrase, appended after the pattern's Face Style line) | `assets/character-framing/<name>.md` |
 | **9** | Character / figure description | #9 Poses/gestures (figure cards), #10 Costume/accessories (figure cards) | Center motif (portrait) | `[CHARACTER_NAME]`, `[CHARACTER_FEATURES]` | — |
 | **10** | Additional/replaced attributes | #9, #10 *(figure cards only)* | Center motif (figure cards) | contributes to `[RESOLVED_ATTRIBUTES]` | `assets/courts/<rank>.md` (shows traditional attrs, court only) |
 | **11** | Transfer from reference image | #9, #10, #11 *(figure cards only)* | Center motif (figure cards), Figure | overrides `[RESOLVED_ATTRIBUTES]` | — |
@@ -50,9 +49,10 @@ it's a persistent, deck-wide setting like Steps 1–2 and 5–6.
 `building`, `animal`, `custom`, or a custom free-text entry) — `court` and `joker`
 default to `"character"`, or `pip`/`ace` can be enabled via `--config`. Otherwise
 the wizard goes straight from Step 7 to Step 13. Steps 8a–8c are persistent
-(asked once per group, skipped if already set in config). Step 8d (Face Style gate)
-and Step 8e (character framing) additionally require `layers.figure.<group> =
-"character"` — building/animal/custom types skip both. Steps 9–12 are per-card.
+(asked once per group, skipped if already set in config). Step 8c's Face Style gate
+(folded into 8c's own paragraph, no separate step) and Step 8e (character framing)
+additionally require `layers.figure.<group> = "character"` — building/animal/custom
+types skip both. Steps 9–12 are per-card.
 
 **`structure` setting** (`full`/`illustration`, config mode item 9, persistent) — when
 `illustration`, alters the opening line used in step 1's template, drops
