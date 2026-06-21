@@ -111,13 +111,13 @@ LEGACY_EXTRA_KEYS = {
 # the Defaults table in references/REFERENCE.md, which is the authoritative spec.
 LAYER_DEFAULTS = {
     "background": {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true",      "back": "true",  "special": "true"},
-    "decor":      {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
-    "ornaments":  {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
+    "decor":      {"court": "true",      "pip": "false", "ace": "true",  "joker": "true",      "back": "true",  "special": "true"},
+    "ornaments":  {"court": "true",      "pip": "false", "ace": "true",  "joker": "true",      "back": "true",  "special": "true"},
     "highlights": {"court": "false",     "pip": "false", "ace": "false", "joker": "false",     "back": "false", "special": "false"},
-    "frame":      {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true",      "back": "true",  "special": "false"},
+    "frame":      {"court": "true",      "pip": "false", "ace": "true",  "joker": "true",      "back": "true",  "special": "false"},
     "figure":     {"court": "character", "pip": "false", "ace": "false", "joker": "character", "back": "false", "special": "false"},
-    "mood":       {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
-    "technique":  {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
+    "mood":       {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true",      "back": "true",  "special": "true"},
+    "technique":  {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true",      "back": "true",  "special": "true"},
     "split":      {"court": "false",     "pip": "false", "ace": "false", "joker": "false",     "back": "false", "special": "false"},
 }
 

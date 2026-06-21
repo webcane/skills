@@ -277,14 +277,14 @@ figure; `"character"` / `"building"` / `"animal"` / `"custom"` = figure on + tha
 | Layer        | court       | pip    | ace    | joker       | back  | special |
 |--------------|-------------|--------|--------|-------------|-------|---------|
 | background   | true        | true   | true   | true        | true  | true    |
-| decor        | true        | false  | false  | true        | true  | true    |
-| ornaments    | true        | false  | false  | true        | true  | true    |
+| decor        | true        | false  | true   | true        | true  | true    |
+| ornaments    | true        | false  | true   | true        | true  | true    |
 | highlights   | false       | false  | false  | false       | false | false   |
-| frame        | true        | true   | true   | true        | true  | false   |
+| frame        | true        | false  | true   | true        | true  | false   |
 | figure       | "character" | false  | false  | "character" | false | false   |
 | split        | false       | false  | false  | false       | false | false   |
-| mood         | true        | false  | false  | true        | true  | true    |
-| technique    | true        | false  | false  | true        | true  | true    |
+| mood         | true        | true   | true   | true        | true  | true    |
+| technique    | true        | true   | true   | true        | true  | true    |
 
 The `figure` row uses type enum values: `"character"` = portrait on + character type
 (default for court/joker); `false` = no figure (default for pip/ace/back/special). The `split` row
@@ -294,18 +294,18 @@ no split; `"horizontal-mirrored"` / `"angled-mirrored"` means that split mode.
 
 These reproduce the traditional look out of the box: Court cards carry the full
 pattern including its Figure detail and Face Style sections (character type); plain Pip
-cards show only background + frame (no technique, no finish, no extra accents, no
-figure); Aces carry background + frame but no figure, decor, ornaments, mood, or
-technique; Joker cards carry the full pattern with a figure (like Court cards, character
-type) — a fully decorated single-figure card. Back cards are fully decorated
-(background, decor, ornaments, mood, technique all on) with frame on but no figure —
-designed to carry the pattern's repeat motif and finish.
+cards show only background + center motif (frame off, no decor/ornaments/mood text,
+finish via technique) — pip's frame is off, matching "plain pip has no border"; Aces
+carry background, decor, ornaments, frame, mood, and technique (the ornamental
+flourish a number card lacks) but no figure; Joker cards carry the full pattern with a
+figure (like Court cards, character type) — a fully decorated single-figure card. Back
+cards are fully decorated (background, decor, ornaments, mood, technique all on) with
+frame on but no figure — designed to carry the pattern's repeat motif and finish.
 Highlights is off everywhere by default. `layers.mood.<group>` cells are `"true"`
 (on, no line) where listed above and `theme` is empty by default, so `[MOOD_LINE]`
 and the theme-derived ornaments/highlights produce nothing unless a mood cell holds
 custom text or `theme` is set.
-Technique is on for Court, Joker, Back, and Special cards by default; Pip and Ace
-cards default to technique off (no linework/medium descriptor, no finish lines). Court
+Technique (and the Finish lines it gates) is on for every group by default. Court
 and Joker layers are configurable via `--config` (see `references/CONFIG.md`) but
 default to fully on (except highlights), matching prior behavior.
 

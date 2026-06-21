@@ -28,7 +28,7 @@
         "decor": {
           "court": "true",
           "pip": "false",
-          "ace": "false",
+          "ace": "true",
           "joker": "true",
           "back": "true",
           "special": "true"
@@ -36,7 +36,7 @@
         "ornaments": {
           "court": "true",
           "pip": "false",
-          "ace": "false",
+          "ace": "true",
           "joker": "true",
           "back": "true",
           "special": "true"
@@ -51,7 +51,7 @@
         },
         "frame": {
           "court": "true",
-          "pip": "true",
+          "pip": "false",
           "ace": "true",
           "joker": "true",
           "back": "true",
@@ -67,16 +67,16 @@
         },
         "mood": {
           "court": "true",
-          "pip": "false",
-          "ace": "false",
+          "pip": "true",
+          "ace": "true",
           "joker": "true",
           "back": "true",
           "special": "true"
         },
         "technique": {
           "court": "true",
-          "pip": "false",
-          "ace": "false",
+          "pip": "true",
+          "ace": "true",
           "joker": "true",
           "back": "true",
           "special": "true"
