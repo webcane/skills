@@ -6,6 +6,9 @@ All notable changes to this skill. Released per skill as tag
 
 ## [Unreleased]
 
+### Fixed
+- Removed non-standard `color` frontmatter field — fails `skills-ref validate` (only `allowed-tools`, `compatibility`, `description`, `license`, `metadata`, `name` are permitted)
+
 ## [1.0.0] - 2026-06-21
 
 ### Added

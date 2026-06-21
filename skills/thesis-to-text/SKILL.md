@@ -1,10 +1,9 @@
 ---
 name: thesis-to-text
 description: Interactive wizard that turns raw theses, notes, or scattered thoughts into a finished, audience-ready text (LinkedIn post, Telegram post, internal memo, speech, etc). Walks the user through a structured interview (role/style, context, audience, raw theses, goal, format, hard constraints, extra requests) using multiple-choice questions with a custom-answer option, then runs an internal analysis and inconsistency check, gets explicit approval on a plan summary, and only then produces the text through an Outline → Write → Review loop. Use whenever the user wants help writing a post, article, speech, or any piece of copy starting from raw notes/bullet points/scattered ideas, or asks for a "wizard" to build a writing prompt.
-color: violet
 metadata:
   author: webcane
-  version: 1.0.0
+  version: 1.0.1
 ---
 
 # Thesis-to-Text Wizard
