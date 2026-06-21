@@ -3,10 +3,7 @@
 The skill ships with `config.json` at the skill root, pre-populated with a `default`
 profile holding every setting's factory value — this file *is* the source of truth
 for defaults (the field reference below documents allowed values and the factory
-values, but the canonical copy lives in `config.json`). Settings can also be
-inherited from a global `settings.json` (path given by the `AGENT_SKILLS_SETTINGS`
-environment variable), which sits below profile overrides and above built-in
-defaults.
+values, but the canonical copy lives in `config.json`).
 
 ## Profiles
 
@@ -67,8 +64,7 @@ two-level `layers.<layer>.<group>` (e.g. `layers.frame.pip`, `layers.highlights.
 ## Lookup order
 
 1. The active profile's overrides in `config.json` (highest priority)
-2. `$AGENT_SKILLS_SETTINGS` → path to global `settings.json`
-3. Built-in defaults (lowest priority) — mirrored in `config.json`'s `default` profile
+2. Built-in defaults (lowest priority) — mirrored in `config.json`'s `default` profile
 
 ## Schema
 
@@ -325,18 +321,3 @@ A minimal `config.json` with one custom profile that only overrides a few fields
 }
 ```
 
-## Example global `settings.json`
-
-Located at the path in `$AGENT_SKILLS_SETTINGS`. Can hold defaults for multiple
-skills; this skill reads only the keys listed above from the top level (or from a
-`"playing-card-prompt"` namespace if present).
-
-```json
-{
-  "playing-card-prompt": {
-    "deck": "french",
-    "style": "austrian",
-    "image_generator": "nanobanana"
-  }
-}
-```
