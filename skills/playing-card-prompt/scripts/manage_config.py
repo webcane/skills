@@ -658,8 +658,14 @@ def cmd_path(_args):
 
 
 def cmd_options(args):
+    args, profile = _pop_profile_flag(args)
     keys = [args[0]] if args else sorted(PERSISTENT_KEYS)
-    eff = effective() if CONFIG_PATH.exists() else DEFAULTS
+    if CONFIG_PATH.exists():
+        cfg = load_raw()
+        name = profile or active_profile_name(cfg)
+        eff = effective(cfg, name)
+    else:
+        eff = DEFAULTS
     for k in keys:
         opt = options_for(k, eff)
         if opt is None:
