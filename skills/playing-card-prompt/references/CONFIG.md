@@ -59,9 +59,10 @@ new profile is a self-contained copy a user can then tweak independently.
 Dotted keys address nested groups: `index.size`, `index.count`, `index.layout`, and the
 two-level `layers.<layer>.<group>` (e.g. `layers.frame.pip`, `layers.highlights.ace`,
 `layers.figure.pip`, `layers.mood.court`, `layers.technique.pip`,
-`layers.figure.joker`), where `<layer>` is one of `background`, `decor`, `ornaments`,
-`highlights`, `frame`, `figure`, `mood`, `technique`. `mood`, `theme`, `frame`, and
-`mood`, `theme`, and `frame` are flat fields (no `<group>`).
+`layers.figure.joker`, `layers.split.back`), where `<layer>` is one of `background`,
+`decor`, `ornaments`, `highlights`, `frame`, `figure`, `mood`, `technique`, `split`.
+`theme` and `frame` are flat fields (no `<group>`) — note there is no standalone
+`mood` flat field; mood is set entirely per-group via `layers.mood.<group>`.
 
 ## Lookup order
 
@@ -95,16 +96,15 @@ profile holds the fields below:
       },
       "layers": {
         "background": {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true",      "back": "true",  "special": "true"},
-        "decor":      {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
-        "ornaments":  {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
+        "decor":      {"court": "true",      "pip": "false", "ace": "true",  "joker": "true",      "back": "true",  "special": "true"},
+        "ornaments":  {"court": "true",      "pip": "false", "ace": "true",  "joker": "true",      "back": "true",  "special": "true"},
         "highlights": {"court": "false",     "pip": "false", "ace": "false", "joker": "false",     "back": "false", "special": "false"},
-        "frame":      {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true",      "back": "true",  "special": "false"},
+        "frame":      {"court": "true",      "pip": "false", "ace": "true",  "joker": "true",      "back": "true",  "special": "false"},
         "figure":     {"court": "character", "pip": "false", "ace": "false", "joker": "character", "back": "false", "special": "false"},
-        "mood":       {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
-        "technique":  {"court": "true",      "pip": "false", "ace": "false", "joker": "true",      "back": "true",  "special": "true"},
+        "mood":       {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true",      "back": "true",  "special": "true"},
+        "technique":  {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true",      "back": "true",  "special": "true"},
         "split":      {"court": "false",     "pip": "false", "ace": "false", "joker": "false",     "back": "false", "special": "false"}
       },
-      "mood": "",
       "theme": "",
       "figure_scale": "inscribed-in-frame",
       "character_framing": "",
@@ -150,16 +150,25 @@ Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
 | `layers.ornaments.<group>`  | `true`, `false`, or custom text (addition)                    | court/ace `true`, pip `false` |
 | `layers.highlights.<group>` | `true`, `false`, or custom text (addition)                    | all `false`        |
 | `layers.frame.<group>`      | `true`, `false`, or custom text (addition)                    | court/ace `true`, pip `false` |
-| `layers.figure.<group>`     | `false`, `character`, `building`, `animal`, `custom` — the value IS the figure type, keeping the layer on while recording the type (D-02) | court/joker `character`, pip/ace/back/special `false` |
-| `layers.mood.<group>`       | `true`, `false`, or custom text (per-group mood addition, on top of deck-wide `mood`) | all `true` |
+| `layers.figure.<group>`     | `false` \| `alias` \| `alias addition_text` — `alias` is one of `character`/`building`/`animal`/`custom`; bare `"true"` is still accepted on read for backward compatibility but is migrated to the group's default alias (`"character"`) on load via `_migrate_figure_true_to_character` — do not write `"true"` directly | court/joker `character`, pip/ace `false` |
+| `layers.mood.<group>`       | `true` \| `false` \| `mood_line` — the unified mood schema; when the cell holds free text, that text IS the mood line for this group (no separate deck-wide mood field) | all `true` |
 | `layers.technique.<group>`  | `true`, `false`, or custom text (addition)                    | all `true`         |
 | `layers.split.<group>`      | `false`, `none`, `horizontal-mirrored`, `angled-mirrored`, or custom text | all `false`        |
-| `mood`                      | free text (deck-wide atmosphere, e.g. `gothic and brooding atmosphere,`); see `assets/mood/` for presets | `""` |
 | `theme`                     | free text (deck-wide concept/symbolism, e.g. `celestial mythology`) | `""` |
 | `figure_scale`              | `full-bleed`, `inscribed-in-frame`, `small-centered` (or custom crop text); applies to ALL figure types when `layers.figure.<group>` is on | `inscribed-in-frame` |
-| `character_framing`         | `waist-up` (or any custom framing/crop description); see `assets/character-framing/` for presets — applies ONLY when figure type is `character` | `""` |
+| `character_framing`         | `bust`, `waist-up`, `three-quarter`, `seven-eighths`, `full-body` (or any custom framing/crop description); see `assets/character-framing/` for presets — applies ONLY when figure type is `character` | `""` |
 | `index.symbol`              | `star-in-circle`, `star`, `Jkr`, `J`, `crown`, `jester-face`, `none` (or custom); the glyph shown in Joker corner indices (see `assets/index/options.md` Symbol table for the phrase each value produces) | `star-in-circle` |
 | `index.type`                | `standard` (rank+suit index), `joker` (symbol-only index via Menu D2); auto-derived from card group during assembly — set explicitly only to force joker-style indices on all cards | `standard` |
+
+> **Migration note:** `figure_proportion` is not a current field — a pre-4.0
+> `config.json` that still has it is migrated automatically on load
+> (`_migrate_figure_proportion` in `manage_config.py`): the old value becomes
+> `character_framing` (if not already set), `figure_scale` defaults to
+> `inscribed-in-frame`, and any `layers.figure.<group>` cell that was `"true"`
+> becomes `"character"`. The legacy `figure-proportion` asset presets
+> (`assets/figure-proportion/*.md`) still back this migration path but are no
+> longer offered as a live wizard choice — see `figure_scale` /
+> `character_framing` above.
 
 `<group>` is one of `court`, `pip`, `ace`, `joker`, `back`, `special`.
 
@@ -225,12 +234,13 @@ addition appended after the layer's own pattern/preset text — `layers.backgrou
 <group>`, `layers.frame.<group>`, and `layers.technique.<group>` work this way
 (ornaments, highlights, and frame may also have their addition auto-derived from
 `theme` if the cell is exactly `"true"` — see "Theme-derived ornaments/highlights/
-frame"); `layers.mood.<group>`'s
-addition is appended after `[MOOD_LINE]` as a per-group addition on top of the
-deck-wide `mood`. `frame` picks the preset from `assets/frame/` whose "Frame line"
-supplies `[FRAME_LINE]` (any custom string is also accepted). `mood` is a deck-wide
-free-text atmosphere description, either picked from a preset in `assets/mood/` or
-typed as custom text in Step 7, which also sets `layers.mood.<group>` per card group.
+frame"); `frame` picks the preset from `assets/frame/` whose "Frame line"
+supplies `[FRAME_LINE]` (any custom string is also accepted).
+`layers.mood.<group>` is the single, unified mood schema — `"false"` (no mood line
+for this group), `"true"` (on, but no specific line), or any other text (that text
+IS the `[MOOD_LINE]` for this group). There is no separate deck-wide `mood` field;
+a preset can still be picked from `assets/mood/` or typed as custom text in Step 7,
+which sets the chosen mood line into every group's `layers.mood.<group>` cell.
 `layers.figure.<group>` now carries the figure type — `"false"` (off), or one of
 `"character"`/`"building"`/`"animal"`/`"custom"` (on + figure type, D-02). For
 `character` type, the chosen pattern's own "Figure detail" and "Face Style" sections
@@ -283,7 +293,8 @@ like Pip/Ace, can be tuned per layer via `--config`.
 
 **Persistent** (saved per profile — rarely change between cards):
 `deck`, `lettering`, `style`, `frame`, `aspect_ratio`, `image_generator`, `structure`,
-`index.*` (including `index.symbol` and `index.type`), `layers.*`, `mood`, `theme`,
+`index.*` (including `index.symbol` and `index.type`), `layers.*` (including
+`layers.mood.<group>`, the only mood setting), `theme`,
 `figure_scale`, `character_framing`,
 `back_purpose`, `back_design`, `back_pattern`, `back_palette`, `back_symmetry`
 
@@ -305,7 +316,9 @@ A minimal `config.json` with one custom profile that only overrides a few fields
       "deck": "french",
       "style": "austrian",
       "aspect_ratio": "9:14",
-      "mood": "gothic and brooding atmosphere,",
+      "layers": {
+        "mood": {"court": "gothic and brooding atmosphere,", "pip": "gothic and brooding atmosphere,", "ace": "gothic and brooding atmosphere,", "joker": "gothic and brooding atmosphere,", "back": "gothic and brooding atmosphere,", "special": "gothic and brooding atmosphere,"}
+      },
       "theme": "celestial mythology"
     }
   }

@@ -1,11 +1,18 @@
 # Adding a new figure proportion preset
 
-Create `assets/figure-proportion/<name>.md` with a short title, an optional one-line
-description, and a "Figure proportion line" fenced block — a single comma-separated
-phrase (trailing comma kept) describing how much of the figure is shown and how it's
-cropped/framed within the card. The wizard (Step 8) lists every `*.md` here (except
-files starting with `_`) as a figure proportion option, and uses the "Figure
-proportion line" text verbatim as the `figure_proportion` config value when chosen.
+> **Deprecated (v4):** `figure_proportion` is no longer a live, settable field.
+> It has been replaced by two persistent fields: `figure_scale` (applies to ALL
+> figure types) and `character_framing` (character-only) — see those fields in
+> `references/CONFIG.md`. A pre-4.0 `config.json` that still has `figure_proportion`
+> is migrated automatically on load (`_migrate_figure_proportion` in
+> `manage_config.py`). This directory's presets are kept only to back that
+> migration path and are no longer offered as a live wizard choice; new presets
+> should be added under `assets/character-framing/` instead (see
+> `assets/character-framing/_adding-a-character-framing.md` if present, or follow
+> the `character_framing` docs in `references/CONFIG.md`).
+
+This format is preserved below for historical/migration reference only — it is no
+longer wired into the live wizard. A legacy preset file looked like this:
 
 ```markdown
 # Figure Proportion: <Display Name>
@@ -18,12 +25,9 @@ proportion line" text verbatim as the `figure_proportion` config value when chos
 ```
 ```
 
-`figure_proportion` is folded into `[STYLE_BLOCK]`, immediately after the pattern's
-"Face Style" line, only when `layers.figure.<group>` is `true` for the card's group —
-see "Layers and `[STYLE_BLOCK]` assembly" in `references/REFERENCE.md`. If
-`figure_proportion` is empty (the default), nothing is added and the figure's framing
-is left to the model's own interpretation, as before.
-
-Custom proportion descriptions typed directly via `--config` (`figure_proportion` set
-to free text not matching any preset) follow the same one-line, comma-terminated
-convention but aren't saved as a file.
+Pre-4.0, `figure_proportion` was folded into `[STYLE_BLOCK]`, immediately after the
+pattern's "Face Style" line, only when `layers.figure.<group>` was `true` for the
+card's group. That role is now split across `character_framing` (character-only
+framing/crop) and `figure_scale` (deck-wide scale, all figure types) — see both in
+`references/CONFIG.md` and "Figure type, face style, framing & scale" in
+`references/REFERENCE.md` for the current assembly order.
