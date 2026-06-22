@@ -4,7 +4,7 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
-## [Unreleased]
+## [4.0.1] - 2026-06-22
 
 ### Fixed
 - **`title.enabled` default was a Python `bool`, breaking `validate` and `profile create --from` (CR-01)** — `DEFAULTS["title"]["enabled"]` is now the string `"false"`, matching the string convention used by every other boolean-like field in the schema (`BOOL_VALUES = ["true", "false"]`). Previously, `manage_config.py validate` failed on any profile (including a fresh `profile create --from default`) with `title.enabled must be one of: true, false`, even though the on-disk JSON value was valid — the `str(False)` coercion in `cmd_validate` produced the capitalized `"False"`, which doesn't match the lowercase enum.
