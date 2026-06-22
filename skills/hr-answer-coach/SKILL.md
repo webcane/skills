@@ -3,7 +3,7 @@ name: hr-answer-coach
 description: Interactive wizard that analyzes a draft answer to an HR/interview question, flags red-flags an HR person would actually notice (victim framing, disloyalty signals, arrogance, clichés, oversharing), and helps rewrite the answer using a Past-Present-Future structure. Use whenever the user pastes an HR question plus their draft answer, asks "как лучше ответить HR на вопрос", wants feedback on an interview answer, or asks to check a response for red flags before a job interview.
 metadata:
   author: webcane
-  version: 1.6.0
+  version: 1.6.2
 ---
 
 # HR Answer Coach
@@ -24,6 +24,18 @@ Do not skip straight to a rewrite. The value of this skill is the
 **diagnosis** — showing the user *why* each phrase reads badly — before
 proposing a fix. A rewrite with no diagnosis is just a better answer the
 user can't reproduce next time.
+
+## Core Principles
+
+Four principles guide both diagnosis and rewrite:
+
+**1. Emphasize business value** — Concrete results beat vague claims. When a candidate talks about their work, they should connect it to measurable outcomes: money saved, time shortened, problems solved, growth numbers. An HR person reads "я улучшал процессы" ("I improved processes") as unfocused; they read "сократил время обработки на 40%" ("cut processing time by 40%") as credible impact. Watch for claims without metrics; rewrite should require numbers or specific results. **This applies equally to developers** ("optimized latency by 40%", "shipped feature used by 500K users/month") and managers alike.
+
+**2. Be authentic** — Templated confidence and fake-humble phrases tank credibility faster than honest self-reflection. A candidate who says "я делегирую с трудом, но сейчас учусь давать коллегам больше контроля" (I struggled with delegation, but I'm learning to trust my team) lands better than "я слишком требователен к себе" (I'm too hard on myself). Watch for generic corporate-speak; rewrite should preserve the user's real voice and real experience, not a polished fiction.
+
+**3. Own your outcomes** — Blame-shifting is a kill signal. An HR person sees "начальник не понимал мою идею" (my boss didn't understand my idea) and hears conflict-prone. The stronger move: "я неправильно объяснил идею → изменил подход → нашел общий язык". Watch for environment-blaming, excuse-making, or victim framing in conflict/challenge stories; rewrite should show what the candidate controlled and changed, not what was done to them.
+
+**4. Connect to the role** — A great achievement that's irrelevant to the job description wastes credibility. "I organized company events" is real, but it's off-topic for a backend architect role. Watch for achievements that don't map to the job's actual needs; rewrite should tie each example to specific skills or problems the role will face. If the user doesn't know what the company actually needs, suggest they research the job description before finalizing the answer.
 
 ## Workflow
 
@@ -99,10 +111,17 @@ flagged phrase produce:
 1. The quoted phrase
 2. **Почему плохо** — what the HR person concludes about the candidate (not
    just "звучит плохо" — name the inference: victim framing, disloyalty,
-   arrogance, passive cliché, oversharing, mercenary motivation, etc.)
+   arrogance, passive cliché, oversharing, mercenary motivation, lack of
+   concrete results, generic corporate-speak, etc.)
 3. Severity — call out critical (signals disloyalty, conflict-proneness,
    or victim framing) vs. minor (clichés that just dilute impact) so the
    user knows what to fix first
+
+**Also watch for the four core principles** (see above):
+- **Missing business value**: Claims without metrics or measurable outcomes ("улучшал" without saying what changed or by how much)
+- **Template language over authenticity**: Generic phrases ("я слишком требователен к себе", "амбициозный", "хорошо работаю в команде") that don't reflect the user's real experience
+- **Blame-shifting or victim framing**: "Начальник не слушал", "команда была слабой", "обстоятельства не позволили" — these signal the candidate won't take ownership in conflicts
+- **Irrelevant achievements**: Great stories that don't connect to what the role actually needs
 
 Don't invent red flags that aren't there — if a draft is clean, say so
 plainly rather than padding the response with weak nitpicks.
@@ -119,6 +138,12 @@ questions; use the STAR variant instead for behavioral/conflict questions
 - **Прошлое (Past):** Factual, neutral reason for change — no victim framing, no complaints
 - **Настоящее (Present):** What you're skilled at and what motivates you — new challenges, growth areas, types of work
 - **Будущее (Future):** Concrete value you'll bring to *them* — how your interests align with what they need
+
+**Apply the four core principles to your rewrite:**
+1. **Add business value language** — If the user claims a skill or achievement, push for measurable results. Instead of "улучшал процессы", ask: "What changed? By how much? Was it faster, cheaper, more reliable?" Include numbers or specific outcomes in the rewrite where possible. This applies to all roles: developers should quantify technical impact ("latency down 40%"), managers should quantify team/org impact ("retention 95%", "grew 3 engineers to senior level").
+2. **Keep their authentic voice** — Avoid generic corporate templates. If they struggled with something, show the real struggle and what they learned from it, not a canned humble-brag. Preserve their actual vocabulary and tone.
+3. **Shift from blame to ownership** — Reframe any environment-blaming as "here's what I controlled and changed." Instead of "начальник не понимал", write "я неправильно объяснил идею → я изменил подход → мы нашли общий язык". In conflict stories, focus on the candidate's actions and what they took responsibility for.
+4. **Anchor to the role** — Make sure each achievement or skill maps to something the job description actually mentions or implies. If the user isn't sure what the company needs, suggest they read the job description and research the company before finalizing the answer.
 
 Produce one rewritten answer, calibrated to the company type from Step 2.
 Keep it in the user's own voice/vocabulary where possible — don't make it

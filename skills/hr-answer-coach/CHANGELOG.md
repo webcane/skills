@@ -4,6 +4,17 @@ All notable changes to this skill. Released per skill as tag
 `hr-answer-coach/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
+## [Unreleased]
+
+### Added
+- **Core Principles section expanded to four principles** — now explicitly frame both red-flag diagnosis and rewrite:
+  1. **Emphasize business value** — watch for claims without metrics/results; applies equally to developers and managers
+  2. **Be authentic** — avoid generic templates; preserve user's real voice
+  3. **Own your outcomes** — watch for blame-shifting, victim framing; rewrite should show what candidate controlled and changed
+  4. **Connect to the role** — achievements must map to job description; irrelevant examples waste credibility
+- Step 3 updated to watch for all four principle violations: missing metrics, generic language, blame-shifting, and off-topic achievements
+- Step 4 updated to apply all four principles during rewrite: add measurable results, keep authentic voice, shift from blame to ownership, anchor achievements to the role
+
 ## [1.6.0] - 2026-06-22
 
 ### Added
