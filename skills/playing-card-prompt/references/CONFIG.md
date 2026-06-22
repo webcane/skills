@@ -105,7 +105,7 @@ profile holds the fields below:
       "theme": "",
       "figure_scale": "inscribed-in-frame",
       "character_framing": "",
-      "title": {"enabled": false},
+      "title": {"enabled": "false"},
       "back_purpose": "classic",
       "back_design": "geometric",
       "back_pattern": "diamond",

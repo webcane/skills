@@ -88,6 +88,14 @@
           "joker": "false",
           "back": "false",
           "special": "false"
+        },
+        "seamless": {
+          "court": "false",
+          "pip": "false",
+          "ace": "false",
+          "joker": "false",
+          "back": "false",
+          "special": "false"
         }
       },
       "theme": "",
@@ -97,7 +105,10 @@
       "back_design": "geometric",
       "back_pattern": "diamond",
       "back_palette": "classic-blue",
-      "back_symmetry": "rotational-180"
+      "back_symmetry": "rotational-180",
+      "title": {
+        "enabled": "false"
+      }
     }
   }
 }

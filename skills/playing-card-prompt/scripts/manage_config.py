@@ -433,6 +433,27 @@ def _migrate_figure_true_to_character(profile: dict) -> bool:
     return changed
 
 
+def _migrate_seamless_true_to_alias(profile: dict) -> bool:
+    """Upgrade a stale literal layers.seamless.<group>='true' to a concrete alias.
+
+    Mirrors _migrate_figure_true_to_character: 'true' is accepted as cmd_set input
+    for convenience but should never be the value actually stored. Runs unconditionally
+    so it also catches values written by any path other than this CLI's cmd_set (e.g.
+    a hand-edited config.json).
+
+    Returns True if any cell was changed.
+    """
+    changed = False
+    seamless = profile.get("layers", {}).get("seamless", {})
+    presets = [v for v in allowed_seamless() if v != "false"]
+    default_alias = presets[0] if presets else "false"
+    for group in GROUPS:
+        if seamless.get(group) == "true":
+            seamless[group] = default_alias
+            changed = True
+    return changed
+
+
 def _migrate_root_mood(profile: dict) -> bool:
     """Migrate a pre-MOOD-01 profile that has a root `mood` field into the unified
     `layers.mood.<group>` schema.
@@ -494,6 +515,9 @@ def load_raw() -> dict:
     if any(_migrate_figure_true_to_character(prof) for prof in cfg["profiles"].values()):
         migrated = True
         print("note: migrated layers.figure.<group>='true' to 'character'", file=sys.stderr)
+    if any(_migrate_seamless_true_to_alias(prof) for prof in cfg["profiles"].values()):
+        migrated = True
+        print("note: migrated layers.seamless.<group>='true' to a discovered alias", file=sys.stderr)
     if any(_migrate_root_mood(prof) for prof in cfg["profiles"].values()):
         migrated = True
         print("note: migrated root mood into layers.mood.<group>", file=sys.stderr)

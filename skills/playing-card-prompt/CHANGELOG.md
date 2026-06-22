@@ -4,6 +4,13 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
+## [Unreleased]
+
+### Fixed
+- **`references/CONFIG.md`'s schema example still showed `title.enabled` as a bare JSON boolean (CR-01)** — `"title": {"enabled": false}` corrected to `"title": {"enabled": "false"}`, matching the quoted-string convention used by every other boolean-like cell in the same example block and the code's actual `DEFAULTS["title"]["enabled"]` value (fixed in `7ff975d`, but this doc example was missed).
+- **No load-path migration for a stale literal `layers.seamless.<group>="true"`, asymmetric with `figure` (WR-01)** — added `_migrate_seamless_true_to_alias()`, mirroring `_migrate_figure_true_to_character()`: resolves a stale `"true"` cell to the first discovered non-`"false"` preset from `allowed_seamless()`, same resolution logic as the existing `cmd_set` write-path fix (CR-02). Wired into `load_raw()` so it runs unconditionally on every load, catching values written by a hand-edited `config.json` or any non-CLI path — previously such a value passed `validate`, round-tripped through `get`/`profile create --from` unresolved, and would have produced a broken `true,` literal in assembled prompts.
+- **Shipped `config.json` was missing `layers.seamless` and `title` entirely (WR-02)** — regenerated the default profile from `BUILTIN_CONFIG` (same `reset` + `save_raw` method used in SYNC-01's `d1e72f2`) so it again mirrors `manage_config.py`'s `DEFAULTS`/`LAYER_DEFAULTS` exactly, restoring `CONFIG.md`'s "source of truth for defaults" guarantee for this file.
+
 ## [4.0.1] - 2026-06-22
 
 ### Fixed
