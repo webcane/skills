@@ -4,6 +4,14 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
+## [Unreleased]
+
+### Fixed
+- **`title.enabled` default was a Python `bool`, breaking `validate` and `profile create --from` (CR-01)** — `DEFAULTS["title"]["enabled"]` is now the string `"false"`, matching the string convention used by every other boolean-like field in the schema (`BOOL_VALUES = ["true", "false"]`). Previously, `manage_config.py validate` failed on any profile (including a fresh `profile create --from default`) with `title.enabled must be one of: true, false`, even though the on-disk JSON value was valid — the `str(False)` coercion in `cmd_validate` produced the capitalized `"False"`, which doesn't match the lowercase enum.
+- **`layers.seamless.<group> = "true"` was never resolved on write, contradicting documented behavior (CR-02)** — `cmd_set`'s write-path `"true"`-resolution block gained a `seamless` branch (alongside the existing `figure`/`split` branches): it now resolves to the first discovered non-`"false"` preset from `allowed_seamless()`, matching the already-shipped documentation (CHANGELOG, `SKILL.md` Step 8f, `_adding-a-seamless.md`, `CONFIG.md`, `REFERENCE.md`) which stated `"true"` "is never persisted literally." Previously the literal string `"true"` was written to disk, and prompt assembly would have appended a broken `true,` phrase into the generated `[STYLE_BLOCK]` (no `assets/seamless/true.md` exists).
+- **`cmd_validate`'s `str(v)` coercion hardened against non-string `DEFAULTS` values (WR-02)** — explicit Python-bool-to-lowercase-string normalization added before validation, so a future boolean field stored as a Python `bool` (the root cause of CR-01) fails clearly instead of producing a confusing validation error.
+- **`WIZARD-STEP-MAP.md` row order corrected to match actual wizard execution order (WR-01)** — the "Seamless step" row moved from between `8b`/`8c` to directly after `8e` (its real position as Step 8f, after the figure-type/character-framing steps); the "Title step" row moved to after row `12` (its real position as Step T, which runs for all six card groups, including `back`/`special`, and is not part of the figure block at all).
+
 ## [4.0.0] - 2026-06-22
 
 ### Changed

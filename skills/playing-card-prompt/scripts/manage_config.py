@@ -140,7 +140,7 @@ DEFAULTS = {
     "back_pattern": "diamond",
     "back_palette": "classic-blue",
     "back_symmetry": "rotational-180",
-    "title": {"enabled": False},
+    "title": {"enabled": "false"},
 }
 
 # Top-level field names of a profile — used to detect a pre-3.0 flat config.json
@@ -608,6 +608,9 @@ def cmd_set(args):
             value = LAYER_DEFAULTS["figure"].get(group, "false")
         elif layer == "split":
             value = "none"
+        elif layer == "seamless":
+            presets = [v for v in allowed_seamless() if v != "false"]
+            value = presets[0] if presets else "false"
     node = cfg["profiles"][name]
     for part in parts[:-1]:
         if not isinstance(node.get(part), dict):
@@ -676,7 +679,8 @@ def cmd_validate(_args):
             if k not in PERSISTENT_KEYS:
                 errors.append(f"profile '{name}': unknown key '{k}'")
                 continue
-            ok, msg = validate_value(k, str(v), eff)
+            v_str = "true" if v is True else "false" if v is False else str(v)
+            ok, msg = validate_value(k, v_str, eff)
             if not ok:
                 errors.append(f"profile '{name}': {msg}")
             elif msg:
