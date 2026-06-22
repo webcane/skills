@@ -83,7 +83,7 @@ BOOL_VALUES = ["true", "false"]
 STRUCTURE = ["full", "illustration"]
 
 GROUPS = ("court", "pip", "ace", "joker", "back", "special")
-LAYERS = ("background", "decor", "ornaments", "highlights", "frame", "figure", "mood", "technique", "split")
+LAYERS = ("background", "decor", "ornaments", "highlights", "frame", "figure", "mood", "technique", "split", "seamless")
 
 FIGURE_TYPE = ["character", "building", "animal", "custom"]
 SPLIT_VALUES = ["false", "none", "horizontal-mirrored", "angled-mirrored"]
@@ -119,6 +119,7 @@ LAYER_DEFAULTS = {
     "mood":       {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true",      "back": "true",  "special": "true"},
     "technique":  {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true",      "back": "true",  "special": "true"},
     "split":      {"court": "false",     "pip": "false", "ace": "false", "joker": "false",     "back": "false", "special": "false"},
+    "seamless":   {"court": "false",     "pip": "false", "ace": "false", "joker": "false",     "back": "false", "special": "false"},
 }
 
 DEFAULTS = {
@@ -139,6 +140,7 @@ DEFAULTS = {
     "back_pattern": "diamond",
     "back_palette": "classic-blue",
     "back_symmetry": "rotational-180",
+    "title": {"enabled": False},
 }
 
 # Top-level field names of a profile — used to detect a pre-3.0 flat config.json
@@ -153,7 +155,8 @@ BUILTIN_CONFIG = {
 PERSISTENT_KEYS = {"deck", "lettering", "style", "frame", "aspect_ratio", "image_generator",
                    "structure", "index.size", "index.count", "index.layout", "index.symbol",
                    "index.type", "theme", "figure_scale", "character_framing",
-                   "back_purpose", "back_design", "back_pattern", "back_palette", "back_symmetry"}
+                   "back_purpose", "back_design", "back_pattern", "back_palette", "back_symmetry",
+                   "title.enabled"}
 PERSISTENT_KEYS |= {f"layers.{layer}.{g}" for layer in LAYERS for g in GROUPS}
 
 
@@ -219,6 +222,14 @@ def allowed_splits() -> list[str]:
     return merged
 
 
+def allowed_seamless() -> list[str]:
+    # Seamless values are the on-disk assets/seamless/ stems plus "false" (off).
+    # Unlike split, there is no "none" sibling (D-04) — only false | true | <alias> |
+    # <custom_text>; "true" resolves to a default alias at the cmd_set write path.
+    merged = list(dict.fromkeys(["false"] + _discover("seamless")))
+    return merged
+
+
 def allowed_engines() -> list[str]:
     # Engines may be custom; this is the on-disk set used for suggestions.
     return _discover("engines") or ["nanobanana", "stable-diffusion", "midjourney", "dalle", "kaze"]
@@ -250,6 +261,7 @@ def options_for(key: str, profile: dict | None = None):
         "back_design": (BACK_DESIGN, False),         # custom text allowed (D-21 fallback to geometric)
         "back_palette": (BACK_PALETTE, False),       # custom text allowed
         "back_symmetry": (BACK_SYMMETRY, False),     # custom text allowed
+        "title.enabled": (BOOL_VALUES, True),
     }.get(key)
     if fixed is not None:
         return fixed
@@ -261,14 +273,23 @@ def options_for(key: str, profile: dict | None = None):
             # Split values include the four defined modes plus custom free-text
             # descriptions (e.g. "diagonal-split"). The wizard's Step 8b offers
             # an "Other (free text)" option that saves via cmd_set, so strict=False.
-            return (allowed_splits(), False)
+            # "true" is accepted as input (SPLT-05) — cmd_set resolves it to "none"
+            # before persisting; it is never written verbatim.
+            return (["true"] + allowed_splits(), False)
         if layer == "figure":
-            # figure layer is strict: only "false" or a discovered figure-type stem.
-            # "true" was the pre-4.0 boolean and is no longer valid — it breaks
-            # STYLE_BLOCK assembly (no assets/figure-type/true.md). Reject it here
-            # so cmd_set never persists it; _migrate_figure_true_to_character()
-            # upgrades any existing "true" values on load.
-            return (["false"] + allowed_figure_types(), True)
+            # figure layer is strict: only "false", a discovered figure-type stem,
+            # or "true" (FIG-09 — re-accepted as input). cmd_set resolves "true" to
+            # the group's default alias (LAYER_DEFAULTS["figure"]) before persisting,
+            # so a literal "true" is never written to a figure cell.
+            return (["false", "true"] + allowed_figure_types(), True)
+        if layer == "seamless":
+            # D-05: seamless is only meaningful for court/pip/ace/joker; back/special
+            # are restricted to "false" only (no figure-bearing seamless use case).
+            if group in ("back", "special"):
+                return (["false"], True)
+            # D-04: false | true (resolves to default alias) | <alias> | <custom_text>.
+            # allowed_seamless() already includes "false"; dedupe via dict.fromkeys.
+            return (list(dict.fromkeys(["false", "true"] + allowed_seamless())), False)
         # All other layers: "true"/"false" toggle; any other text enables + adds.
         return (BOOL_VALUES, False)
     return None
@@ -576,8 +597,18 @@ def cmd_set(args):
     ok, msg = validate_value(key, value, effective(cfg, name))
     if not ok:
         sys.exit(f"error: {msg}")
-    node = cfg["profiles"][name]
     parts = key.split(".")
+    # FIG-09/SPLT-05/D-09: "true" is accepted as input for layers.figure.<group> and
+    # layers.split.<group>, but is never persisted verbatim — resolve it immediately
+    # to the group's concrete default before writing. _migrate_figure_true_to_character()
+    # only runs on load, so this write-path resolution is required here too.
+    if len(parts) == 3 and parts[0] == "layers" and value == "true":
+        layer, group = parts[1], parts[2]
+        if layer == "figure":
+            value = LAYER_DEFAULTS["figure"].get(group, "false")
+        elif layer == "split":
+            value = "none"
+    node = cfg["profiles"][name]
     for part in parts[:-1]:
         if not isinstance(node.get(part), dict):
             node[part] = {}
