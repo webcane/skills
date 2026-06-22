@@ -189,6 +189,11 @@ def allowed_figure_types() -> list[str]:
     return _discover("figure-type") or FIGURE_TYPE
 
 
+def allowed_figure_scales() -> list[str]:
+    # Figure scales are discovered from assets/figure-scale/; fall back to enum.
+    return _discover("figure-scale") or FIGURE_SCALE
+
+
 def allowed_character_framings() -> list[str]:
     # Character framings may be custom; this is the on-disk set used for suggestions.
     return _discover("character-framing") or ["waist-up"]
@@ -239,7 +244,7 @@ def options_for(key: str, profile: dict | None = None):
         "index.symbol": (INDEX_SYMBOL, False),   # custom glyph/text allowed
         "index.type": (INDEX_TYPE, True),
         "theme": (None, False),   # free text deck-wide theme/symbolism
-        "figure_scale": (FIGURE_SCALE, False),       # custom crop text allowed
+        "figure_scale": (allowed_figure_scales(), False),  # custom crop text allowed
         "character_framing": (allowed_character_framings(), False),  # custom allowed; "" = not set
         "back_purpose": (BACK_PURPOSE, False),       # custom text allowed
         "back_design": (BACK_DESIGN, False),         # custom text allowed (D-21 fallback to geometric)
