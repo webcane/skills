@@ -4,7 +4,7 @@ All notable changes to this skill. Released per skill as tag
 `hr-answer-coach/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
-## [Unreleased]
+## [1.0.0] - 2026-06-22
 
 ## [1.0.0] - 2026-06-22
 
