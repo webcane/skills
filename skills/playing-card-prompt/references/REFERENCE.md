@@ -120,8 +120,11 @@ Then:
       (FIG-08, D-16). These types receive only items a, c, and d.
 
    c. **Figure scale** — the deck-wide `figure_scale` setting (values: `full-bleed`,
-      `inscribed-in-frame`, `small-centered`, or custom free text; set in Step 8a).
-      Append the `figure_scale` value as its own comma phrase. Applied to ALL figure
+      `inscribed-in-frame`, `small-centered`, `cross-a-frame`, or custom free text; set
+      in Step 8a). If `figure_scale` matches a stem under `assets/figure-scale/` (one
+      of the four presets above), append the "Scale phrase" text from that file
+      (`assets/figure-scale/<figure_scale>.md`); otherwise (custom free text) append
+      the `figure_scale` value verbatim as its own comma phrase. Applied to ALL figure
       types. If `figure_scale` is empty or not set, omit this phrase.
 
    d. **Split** — if `layers.split.g` is `"horizontal-mirrored"` or
@@ -203,8 +206,10 @@ fold Figure detail or Face Style into Technique or vice versa.
   figure type is `character`. Applied ONLY when figure type is `character`; appended
   right after the pattern's Face Style line.
 - **Deck-wide (scale, all types)** — `figure_scale` (set in Step 8a, stored as
-  `full-bleed` / `inscribed-in-frame` / `small-centered`): how the figure sits in the
-  frame, applied to ALL figure types. Appended after `character_framing` (or right
+  `full-bleed` / `inscribed-in-frame` / `small-centered` / `cross-a-frame`, or custom
+  free text): how the figure sits in the frame, applied to ALL figure types. Named
+  presets resolve to the "Scale phrase" text in `assets/figure-scale/<value>.md`;
+  custom text is appended verbatim. Appended after `character_framing` (or right
   after figure-type text for non-character types).
 - **Deck-wide (split, outer wrapper, all types)** — `layers.split.<group>` (`none`,
   `horizontal-mirrored`, `angled-mirrored`): the compositional split layout from

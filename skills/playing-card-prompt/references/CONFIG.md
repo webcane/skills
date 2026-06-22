@@ -151,7 +151,7 @@ Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
 | `layers.technique.<group>`  | `true`, `false`, or custom text (addition)                    | all `true`         |
 | `layers.split.<group>`      | `false`, `none`, `horizontal-mirrored`, `angled-mirrored`, or custom text | all `false`        |
 | `theme`                     | free text (deck-wide concept/symbolism, e.g. `celestial mythology`) | `""` |
-| `figure_scale`              | `full-bleed`, `inscribed-in-frame`, `small-centered` (or custom crop text); applies to ALL figure types when `layers.figure.<group>` is on | `inscribed-in-frame` |
+| `figure_scale`              | `full-bleed`, `inscribed-in-frame`, `small-centered`, `cross-a-frame` (or custom crop text); named presets resolve to the phrase in `assets/figure-scale/<name>.md`, custom text is used verbatim; applies to ALL figure types when `layers.figure.<group>` is on | `inscribed-in-frame` |
 | `character_framing`         | `bust`, `waist-up`, `three-quarter`, `seven-eighths`, `full-body` (or any custom framing/crop description); see `assets/character-framing/` for presets — applies ONLY when figure type is `character` | `""` |
 | `index.symbol`              | `star-in-circle`, `star`, `Jkr`, `J`, `crown`, `jester-face`, `none` (or custom); the glyph shown in Joker corner indices (see `assets/index/options.md` Symbol table for the phrase each value produces) | `star-in-circle` |
 | `index.type`                | `standard` (rank+suit index), `joker` (symbol-only index via Menu D2); auto-derived from card group during assembly — set explicitly only to force joker-style indices on all cards | `standard` |
