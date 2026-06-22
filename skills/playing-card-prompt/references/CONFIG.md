@@ -99,11 +99,13 @@ profile holds the fields below:
         "figure":     {"court": "character", "pip": "false", "ace": "false", "joker": "character", "back": "false", "special": "false"},
         "mood":       {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true",      "back": "true",  "special": "true"},
         "technique":  {"court": "true",      "pip": "true",  "ace": "true",  "joker": "true",      "back": "true",  "special": "true"},
-        "split":      {"court": "false",     "pip": "false", "ace": "false", "joker": "false",     "back": "false", "special": "false"}
+        "split":      {"court": "false",     "pip": "false", "ace": "false", "joker": "false",     "back": "false", "special": "false"},
+        "seamless":   {"court": "false",     "pip": "false", "ace": "false", "joker": "false",     "back": "false", "special": "false"}
       },
       "theme": "",
       "figure_scale": "inscribed-in-frame",
       "character_framing": "",
+      "title": {"enabled": false},
       "back_purpose": "classic",
       "back_design": "geometric",
       "back_pattern": "diamond",
@@ -146,10 +148,12 @@ Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
 | `layers.ornaments.<group>`  | `true`, `false`, or custom text (addition)                    | court/ace `true`, pip `false` |
 | `layers.highlights.<group>` | `true`, `false`, or custom text (addition)                    | all `false`        |
 | `layers.frame.<group>`      | `true`, `false`, or custom text (addition)                    | court/ace `true`, pip `false` |
-| `layers.figure.<group>`     | `false`, `character`, `building`, `animal`, `custom` — strict, no free-text addition (unlike other `layers.<layer>.<group>` cells); bare `"true"` is still accepted on read for backward compatibility but is migrated to the group's default alias (`"character"`) on load via `_migrate_figure_true_to_character` — do not write `"true"` directly | court/joker `character`, pip/ace `false` |
+| `layers.figure.<group>`     | `false`, `character`, `building`, `animal`, `custom` — strict, no free-text addition (unlike other `layers.<layer>.<group>` cells); `"true"` is ACCEPTED as input and resolves immediately to the group's default figure-type alias (`character` for court/joker, `false` for pip/ace, per `LAYER_DEFAULTS["figure"]`) — a literal `"true"` is never persisted | court/joker `character`, pip/ace `false` |
 | `layers.mood.<group>`       | `true` \| `false` \| `mood_line` — the unified mood schema; when the cell holds free text, that text IS the mood line for this group (no separate deck-wide mood field) | all `true` |
 | `layers.technique.<group>`  | `true`, `false`, or custom text (addition)                    | all `true`         |
-| `layers.split.<group>`      | `false`, `none`, `horizontal-mirrored`, `angled-mirrored`, or custom text | all `false`        |
+| `layers.split.<group>`      | `false`, `true` (→ resolves immediately to `none`, never persisted literally), `none`, `horizontal-mirrored`, `angled-mirrored`, or custom free text (used verbatim) | all `false`        |
+| `layers.seamless.<group>`   | `false` \| `true` (→ resolves to the group's default seamless alias) \| `<alias>` (from `assets/seamless/*.md`, e.g. `continuous-border`, `interlocking-motif`) \| `<custom_text>` (used verbatim); valid only for `court`/`pip`/`ace`/`joker` — `back`/`special` accept `"false"` only (no figure-bearing seamless use case, D-05) | all `false` |
+| `title.enabled`             | `true`, `false` — deck-wide persistent gate; when `true` AND `structure == "full"`, the wizard asks for per-card title text (ephemeral, never saved to `config.json`); dropped entirely under `structure: illustration` regardless of this value (TITL-05) | `false` |
 | `theme`                     | free text (deck-wide concept/symbolism, e.g. `celestial mythology`) | `""` |
 | `figure_scale`              | `full-bleed`, `inscribed-in-frame`, `small-centered`, `cross-a-frame` (or custom crop text); named presets resolve to the phrase in `assets/figure-scale/<name>.md`, custom text is used verbatim; applies to ALL figure types when `layers.figure.<group>` is on | `inscribed-in-frame` |
 | `character_framing`         | `bust`, `waist-up`, `three-quarter`, `seven-eighths`, `full-body` (or any custom framing/crop description); see `assets/character-framing/` for presets — applies ONLY when figure type is `character` | `""` |
