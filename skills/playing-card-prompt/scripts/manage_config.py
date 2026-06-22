@@ -283,10 +283,6 @@ def options_for(key: str, profile: dict | None = None):
             # so a literal "true" is never written to a figure cell.
             return (["false", "true"] + allowed_figure_types(), True)
         if layer == "seamless":
-            # D-05: seamless is only meaningful for court/pip/ace/joker; back/special
-            # are restricted to "false" only (no figure-bearing seamless use case).
-            if group in ("back", "special"):
-                return (["false"], True)
             # D-04: false | true (resolves to default alias) | <alias> | <custom_text>.
             # allowed_seamless() already includes "false"; dedupe via dict.fromkeys.
             return (list(dict.fromkeys(["false", "true"] + allowed_seamless())), False)

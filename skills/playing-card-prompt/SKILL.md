@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 4.0.1
+  version: 4.1.0
   description_claudeai: Interactive wizard to build image-gen prompts for stylized playing cards. 4 deck patterns, 6 lettering systems, 3+ styles, court/pip/ace. Trigger on card design requests.
 ---
 
@@ -293,8 +293,8 @@ has no figure — **skip the entire figure block (Steps 8a–8f) and go straight
 and joker cards by default, plus any pip/ace/back/special card whose `layers.figure.<group>` was
 set to a type value. Steps 8a–8c are persistent — skipped if already set or loaded from
 config; Step 8e is character-only persistent (skipped if `layers.figure.<group>` is
-not `"character"`); Step 8f (seamless) is per-group persistent, scoped to
-court/pip/ace/joker only; Steps 9–12 are per-card.
+not `"character"`); Step 8f (seamless) is per-group persistent; Steps 9–12 are
+per-card.
 
 ---
 
