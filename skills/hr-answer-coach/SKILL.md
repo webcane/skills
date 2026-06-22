@@ -3,7 +3,7 @@ name: hr-answer-coach
 description: Interactive wizard that analyzes a draft answer to an HR/interview question, flags red-flags an HR person would actually notice (victim framing, disloyalty signals, arrogance, clichés, oversharing), and helps rewrite the answer using a Past-Present-Future structure. Use whenever the user pastes an HR question plus their draft answer, asks "как лучше ответить HR на вопрос", wants feedback on an interview answer, or asks to check a response for red flags before a job interview.
 metadata:
   author: webcane
-  version: 1.5.1
+  version: 1.6.0
 ---
 
 # HR Answer Coach
@@ -15,10 +15,10 @@ exists because candidates usually can't hear their own red flags — phrases
 that feel honest to them ("меня сократили", "хочу стабильности") land as
 warning signs to the person evaluating them.
 
-Default language for the whole interaction is Russian, since the primary
-use case is the Russian job market (RF companies, emigration/sanctions
-subtext, loyalty signaling). If the user writes in another language, match
-theirs instead.
+**Language support:** At the start, you'll be asked to choose Russian (RU) or 
+English (EN) for the entire interaction. If you provide text on the first 
+trigger (both question + draft answer together), the skill will auto-detect 
+the language and use it throughout — no explicit choice needed.
 
 Do not skip straight to a rewrite. The value of this skill is the
 **diagnosis** — showing the user *why* each phrase reads badly — before
@@ -27,21 +27,34 @@ user can't reproduce next time.
 
 ## Workflow
 
-### Step 1 — Collect the question + draft answer
+### Step 1 — Language selection + collect the question + draft answer
 
-Ask the user to paste, in one message:
+**Language auto-detection:** If the user triggers the skill with both the HR question and draft answer already in their first message, detect the language from their text and use it for the entire interaction (Russian or English). Skip the language question below.
+
+**If no input text yet** (or only partial input), use AskUserQuestion to ask:
+
+**Язык / Language:**
+- Русский (RU) — все вопросы и ответы на русском
+- English (EN) — all questions and answers in English
+
+Then ask the user to paste, in one message:
 - the HR question being asked (any question — this skill is not limited to
   a fixed list: "почему ищете работу", "расскажите о себе", "слабые
   стороны", "почему именно к нам", "ожидания по зарплате", "как разрешали
-  конфликт" — all fair game)
+  конфликт" / "why are you looking", "tell me about yourself", "weaknesses", 
+  "why us", "salary expectations", "conflict resolution" — all fair game)
 - their current draft answer (even a rough/unfinished one)
 
 If the user already pasted both in their first message (as in this skill's
-own trigger example), skip straight to Step 2 instead of asking again.
+own trigger example), use language auto-detection and skip the language
+selection question.
 
 ### Step 2 — Context (one AskUserQuestion round, max 4 options each)
 
-Ask two short questions before analyzing:
+Ask two short questions before analyzing. **Use the language selected in Step 1 
+(RU or EN).**
+
+**In Russian (if RU selected):**
 
 **A. Тип компании** — affects what reads as a red flag and what tone to
 recommend:
@@ -56,6 +69,22 @@ the draft itself:
 - Сокращение или увольнение с предыдущего места
 - Конфликт с руководством/командой на предыдущем месте
 - Ничего из этого
+
+**In English (if EN selected):**
+
+**A. Company type** — affects what reads as a red flag and what tone to
+recommend:
+- Large corporation / government company
+- Startup
+- International company / international team
+- Not sure / not specified
+
+**B. Sensitive context** (multiSelect) — only ask if not obvious from
+the draft itself:
+- Moving to/from international company, relocation, work restrictions from Russia
+- Layoff or termination from previous position
+- Conflict with management/team at previous place
+- None of the above
 
 Use the answers to calibrate Step 3 — e.g. "ограничения на работу из РФ" is
 a sharper red flag when the target is a Russian-only company than when the
