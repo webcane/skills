@@ -4,7 +4,7 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
-## [Unreleased]
+## [4.1.0] - 2026-06-22
 
 ### Fixed
 - **`references/CONFIG.md`'s schema example still showed `title.enabled` as a bare JSON boolean (CR-01)** — `"title": {"enabled": false}` corrected to `"title": {"enabled": "false"}`, matching the quoted-string convention used by every other boolean-like cell in the same example block and the code's actual `DEFAULTS["title"]["enabled"]` value (fixed in `7ff975d`, but this doc example was missed).
