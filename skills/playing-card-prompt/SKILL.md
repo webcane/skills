@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 3.29.0
+  version: 3.30.0
   description_claudeai: Interactive wizard to build image-gen prompts for stylized playing cards. 4 deck patterns, 6 lettering systems, 3+ styles, court/pip/ace. Trigger on card design requests.
 ---
 
@@ -284,13 +284,17 @@ deselected ones.
 **Check `layers.figure.<group>` for this card's group** (`court`/`pip`/`ace`/`joker`/`back`/`special`).
 The value is `"false"` (no figure) or a figure type (`"character"`, `"building"`,
 `"animal"`, `"custom"`), defaulting to `"character"` for court and joker, `"false"` for
-pip/ace/back/special unless previously configured via `--config`). If it's `"false"`, this card
-has no figure — **skip the entire figure block (Steps 8a–8e) and go straight to Step 13**
-(Aspect ratio). Otherwise, the figure block (Steps 8a–8e) and Steps 9–12 apply: court
+pip/ace/back/special unless previously configured via `--config`. `layers.figure.<group>`
+also accepts `"true"` as a `--config`/`set` input — it resolves immediately to the
+group's default figure-type alias (`character` for court/joker, `false` for pip/ace,
+FIG-09) and is never persisted literally. If it's `"false"`, this card
+has no figure — **skip the entire figure block (Steps 8a–8f) and go straight to Step 13**
+(Aspect ratio). Otherwise, the figure block (Steps 8a–8f) and Steps 9–12 apply: court
 and joker cards by default, plus any pip/ace/back/special card whose `layers.figure.<group>` was
 set to a type value. Steps 8a–8c are persistent — skipped if already set or loaded from
 config; Step 8e is character-only persistent (skipped if `layers.figure.<group>` is
-not `"character"`); Steps 9–12 are per-card.
+not `"character"`); Step 8f (seamless) is per-group persistent, scoped to
+court/pip/ace/joker only; Steps 9–12 are per-card.
 
 ---
 
@@ -319,7 +323,9 @@ save it phrased as its own comma-separated phrase (ending in a comma).
 _Skipped if already set for this group in config, or if `layers.figure.<group>` is
 `"false"` (the whole figure block is skipped when the layer is off — SPLT-04)._ Ask
 how the figures on the cards in this group should be split (per-group; asked once for
-each group, then reused). Applies to all figure types.
+each group, then reused). Applies to all figure types. `layers.split.<group>` also
+accepts `"true"` as a value (resolves to `"none"` on write — SPLT-05) and any custom
+free-text split description beyond the three presets below.
 
 Offer (default first):
 - **Full body, no split (default)** — single upright figure, no mirroring. Sets
@@ -397,6 +403,37 @@ description (e.g. "tightly cropped headshot, shoulders only,").
 
 Save via `python3 scripts/manage_config.py set character_framing <value>`.
 
+### Step 8f — Seamless design · _per-group persistent_
+
+_Skipped if already set for this group in config, if `layers.figure.<group>` is
+`"false"`, or if `structure` is `"illustration"` (SEAM-05) — under illustration mode
+neither the question nor its assembled phrase apply, since seamless connects a card's
+border/motif to its neighbors, a purely SVG-template concern in that mode (see
+"`structure` setting" in `references/REFERENCE.md`)._ Only runs for `court`/`pip`/
+`ace`/`joker` (SEAM-03) — `back` and `special` never get this question; their
+`layers.seamless.<group>` stays `"false"`. Ask whether this group's cards should carry
+a seamless / connecting design that reads as one unbroken pattern across the deck
+(per-group; asked once for each group, then reused).
+
+List the `*.md` files in `assets/seamless/` (ignore names starting with `_`) as
+options. Offer (default first, per 4-option AskUserQuestion limit):
+- **No seamless design (default)** — sets `layers.seamless.<group> = "false"`.
+- **Continuous border** — edges align to form one unbroken pattern across the layout.
+- **Interlocking motif** — a repeating motif that tiles edge-to-edge with neighbouring
+  cards.
+- **Other** — any custom seamless/connecting design description (free text).
+
+- If a preset is named, save its file stem (e.g. `continuous-border`,
+  `interlocking-motif`) as `layers.seamless.<group>`.
+- If the user gives custom text instead, save it verbatim as `layers.seamless.<group>`.
+- If "No seamless design" or skipped, leave `layers.seamless.<group> = "false"` — no
+  seamless phrase is added for this group.
+
+Save via `python3 scripts/manage_config.py set layers.seamless.<group> <value>`
+(replace `<group>` with the actual group: `court`, `pip`, `ace`, or `joker`). Note
+`"true"` is also accepted and resolves to the group's default seamless alias on write
+(SEAM-04) — a literal `"true"` is never persisted.
+
 ### Step 9 — Character / figure description (REQUIRED for cards with a figure) · _per-card_
 
 Every card with a figure must have a figure description — **at minimum a name or label**. Two paths:
@@ -462,6 +499,26 @@ over Step 10** when merged during assembly. If the user has no reference image, 
 Ask what must NOT carry over (background, decorative elements, props, landscape). Phrase
 each as "no <thing>" — these get merged into the single `[NEGATIVE_LIST]` at the end of
 the prompt during assembly. If nothing, no extra exclusions are added.
+
+---
+
+### Step T — Title text · _per-card, ephemeral_
+
+_Skip this step entirely if `structure` is `"illustration"` (TITL-05) — title
+placement is purely the user's own SVG/HTML template's concern in that mode, so the
+question would be asked-then-discarded. Skip this step entirely if `title.enabled` is
+not `"true"` (TITL-04) — `title.enabled` itself is a persistent, deck-wide setting
+changed via `--config`/`python3 scripts/manage_config.py set title.enabled true`, not
+asked here per-card._ Otherwise (i.e. `title.enabled == "true"` AND `structure ==
+"full"`), this step runs for every card in all six groups — court, pip, ace, joker,
+back, and special (title is not group-restricted).
+
+Ask the user for this card's title text, free text. The text feeds the assembled
+prompt's title named element — naming only that a title exists and what it says, with
+no position, font, or styling specified (see "Title text" in `references/REFERENCE.md`).
+This text is **never saved to `config.json`** — it's collected fresh for every card,
+the same way `extra_attributes`/`reference_transfers`/`exclusions` are ephemeral
+per-card fields.
 
 ---
 
