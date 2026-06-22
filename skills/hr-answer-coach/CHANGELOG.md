@@ -4,7 +4,7 @@ All notable changes to this skill. Released per skill as tag
 `hr-answer-coach/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
-## [Unreleased]
+## [1.6.0] - 2026-06-22
 
 ### Changed
 - **Restructured Common Question Formulas** — each of 8 typical HR questions now includes: _Зачем спрашивают?_ (HR's intent), _Что хотят услышать_ (answer formula), _Чего не стоит говорить_ (specific red-flag phrases). Makes the "why" transparent so candidates understand HR's evaluation logic, not just follow a template.
