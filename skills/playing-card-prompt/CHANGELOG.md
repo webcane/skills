@@ -4,7 +4,7 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
-## [Unreleased]
+## [4.1.0] - 2026-06-22
 
 ### Changed
 - **`layers.seamless.<group>` no longer restricted to court/pip/ace/joker** — removed the D-05 validation restriction in `manage_config.py` (`options_for`) that forced `back`/`special` to `"false"` only; all six groups now accept the same `false` | `true` | `<alias>` | `<custom_text>` values. Updated `references/CONFIG.md`, `references/STYLE-COMPONENTS.md`, `references/WIZARD-STEP-MAP.md`, and `SKILL.md` Step 8f to drop the now-inaccurate "court/pip/ace/joker only" framing. Defaults remain `"false"` for every group, so behavior is unchanged unless a user explicitly opts a `back`/`special` group in.

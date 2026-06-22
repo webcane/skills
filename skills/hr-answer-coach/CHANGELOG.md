@@ -4,7 +4,7 @@ All notable changes to this skill. Released per skill as tag
 `hr-answer-coach/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
-## [Unreleased]
+## [1.6.0] - 2026-06-22
 
 ### Added
 - **Explicit language selection (RU/EN)** — Step 1 now asks which language to use for the entire interaction (Russian or English). If both HR question and draft answer are provided on first trigger, language is auto-detected from the text — no choice needed.
