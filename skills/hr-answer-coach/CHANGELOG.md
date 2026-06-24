@@ -6,6 +6,12 @@ All notable changes to this skill. Released per skill as tag
 
 ## [Unreleased]
 
+### Changed
+- **Moved "Common Question Formulas" out of SKILL.md into `references/QUESTION-FORMULAS.md`** — this block was ~150 of SKILL.md's 339 lines, always loaded into context even though Step 3 only ever needs the single entry matching the question actually being diagnosed. SKILL.md now points Step 3 at the reference file by name instead of inlining all 8 entries; progressive disclosure loads it only when needed.
+- **BREAKING: SKILL.md instructional text translated to English** — all workflow/step instructions are now written in English (the user-facing wizard remains bilingual RU/EN, unchanged). Russian text is kept only where it's literally the example phrase or HR-question wording being matched/quoted.
+- **Step 3 (diagnosis) now requires explicit question framing before the phrase-by-phrase red-flag scan** — every diagnosis must state, up front: (1) "Зачем спрашивают?" — what HR is evaluating with this question, (2) "Что хотят услышать?" — which answer model is being used (Past→Present→Future, STAR, PAR, etc.) and its structure, (3) "Чего не стоит говорить?" — the specific red-flag phrases for that question. Previously this framing only existed inside the "Common Question Formulas" reference section and wasn't surfaced as a required part of every diagnosis response.
+- Description shortened to 195 characters (was unbounded prose) for the Claude.ai upload limit.
+
 ### Added
 - **Core Principles section expanded to four principles** — now explicitly frame both red-flag diagnosis and rewrite:
   1. **Emphasize business value** — watch for claims without metrics/results; applies equally to developers and managers
