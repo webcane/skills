@@ -4,7 +4,7 @@ All notable changes to this skill. Released per skill as tag
 `thesis-to-text/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
-## [Unreleased]
+## [1.0.2] - 2026-06-24
 
 ### Fixed
 - Removed non-standard `color` frontmatter field — fails `skills-ref validate` (only `allowed-tools`, `compatibility`, `description`, `license`, `metadata`, `name` are permitted)
