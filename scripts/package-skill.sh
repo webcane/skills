@@ -28,7 +28,7 @@ mkdir -p "$DIST_DIR"
 
 cd "$SKILL_DIR"
 SKILL_FILE="$DIST_DIR/${SKILL_NAME}.skill"
-tar -czf "$SKILL_FILE" --exclude='.DS_Store' --exclude='*.swp' --exclude='config.json.bak*' .
+tar -czf "$SKILL_FILE" --exclude='.DS_Store' --exclude='*.swp' --exclude='config.json' --exclude='config.json.bak*' .
 
 cp "$SKILL_FILE" "$DIST_DIR/${SKILL_NAME}-${VERSION}.skill"
 
