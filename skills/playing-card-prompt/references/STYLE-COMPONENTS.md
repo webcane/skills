@@ -9,6 +9,16 @@ Card-back design is covered by the `back` card group (rank = Back), added in v3.
 Back cards share all style layers (background, decor, ornaments, mood, technique, frame)
 with front-facing cards and are assembled using the same STYLE_BLOCK mechanism.
 
+Special/prospect cards are covered by the `special` card group (rank = Special), which
+runs Steps S1-S5 instead of Steps 4.1-4.2 (Step 4 Suit is skipped). Special card types
+come from `assets/special/*.md` (e.g. `marketing.md`, `prospect.md`; `_*` files excluded)
+via Step S2, addressing #5 Composition/rhythm. The figure block (Steps 8a-12) is skipped
+for `special` unless `layers.figure.special` is explicitly set to a non-`"false"` type
+value (default `"false"`); when opted in, Steps S3/S4 feed #9 Poses/gestures and #10
+Costume/accessories, with Step S4 (named figure) running only for prospect-type special
+cards. Like all groups, `special` still enters the mood check (Step 7) and the aspect-ratio
+/ generator steps (Steps 13-14), and is assembled using the same STYLE_BLOCK mechanism.
+
 | #  | Component | Status | Mechanism |
 |----|-----------|--------|-----------|
 | 1  | Medium / technique | Covered | `style` pattern choice → "Technique" + Finish sections of `assets/pattern/<style>.md`, gated by `layers.technique.<group>` |
