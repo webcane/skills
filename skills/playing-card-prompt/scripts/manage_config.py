@@ -31,16 +31,20 @@ Keys (within a profile): deck, lettering, style, frame, aspect_ratio, image_gene
       layers.<background|decor|ornaments|highlights|frame|figure|mood|technique|split>.<court|pip|ace|joker|back|special>,
       theme, figure_scale, character_framing
 
-Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
-"false" (layer off), "true" (layer on, no addition), or any other text (layer on,
-used as that group's addition on top of the layer's own pattern/preset text).
-`layers.mood.<group>` follows this same three-way schema and is the ONLY mood
-setting — there is no separate deck-wide `mood` field; the mood line, when on, is
-the cell's own value.
+Every `layers.<layer>.<group>` cell (figure included) shares one unified contract:
+"false" (layer off), "true" (layer on; the alias/custom text is asked fresh per-card
+at generation time — not resolved here), or any other text (an alias or custom
+addition, used verbatim as that group's contribution). `layers.mood.<group>` follows
+this same schema and is the ONLY mood setting — there is no separate deck-wide
+`mood` field; the mood line, when on, is the cell's own value. `layers.figure.<group>`
+no longer has a strict type enum — "character"/"building"/"animal"/"custom" remain
+valid aliases, but any other custom figure description is also accepted.
+`layers.split.<group>` accepts "false", "true", "none", "horizontal-mirrored",
+"angled-mirrored", or any custom free-text split description.
 
-`layers.figure.<group>` extends this with type-encoding: "false" (off), "character",
-"building", "animal", "custom" (on + figure type). `layers.split.<group>` accepts "false" (not configured), "none" (no split),
-"horizontal-mirrored", "angled-mirrored", or any custom free-text split description.
+`title` and the `back_purpose`/`back_design`/`back_pattern`/`back_palette`/
+`back_symmetry` fields are NOT persistent settings — title and card-back design are
+asked fresh per-card in the wizard and never written to config.json.
 
 A pre-4.0 config.json may still have `figure_proportion` — it is migrated automatically
 to `character_framing` on load (figure_proportion value → character_framing; figure_scale
@@ -56,6 +60,9 @@ A pre-3.6 config.json may still have the old per-layer `ornaments_extra.<group>`
 config.json may still have a separate `extras.<layer>.<group>` namespace — both are
 migrated automatically into the merged `layers.<layer>.<group>` cells the first time
 the file is loaded.
+
+A pre-Phase-5 config.json may still have a `title` key or any `back_*` field — both
+are dropped automatically on load (they are no longer persistent; see above).
 """
 from __future__ import annotations
 
@@ -135,12 +142,6 @@ DEFAULTS = {
     "theme": "",
     "figure_scale": "inscribed-in-frame",
     "character_framing": "",
-    "back_purpose": "classic",
-    "back_design": "geometric",
-    "back_pattern": "diamond",
-    "back_palette": "classic-blue",
-    "back_symmetry": "rotational-180",
-    "title": {"enabled": "false"},
 }
 
 # Top-level field names of a profile — used to detect a pre-3.0 flat config.json
@@ -154,9 +155,7 @@ BUILTIN_CONFIG = {
 
 PERSISTENT_KEYS = {"deck", "lettering", "style", "frame", "aspect_ratio", "image_generator",
                    "structure", "index.size", "index.count", "index.layout", "index.symbol",
-                   "index.type", "theme", "figure_scale", "character_framing",
-                   "back_purpose", "back_design", "back_pattern", "back_palette", "back_symmetry",
-                   "title.enabled"}
+                   "index.type", "theme", "figure_scale", "character_framing"}
 PERSISTENT_KEYS |= {f"layers.{layer}.{g}" for layer in LAYERS for g in GROUPS}
 
 
@@ -236,11 +235,12 @@ def allowed_engines() -> list[str]:
 
 
 def options_for(key: str, profile: dict | None = None):
-    if key == "back_pattern":
-        # Valid aliases depend on the current profile's back_design category
-        # (D-21 fallback to "geometric" when back_design is custom/unset).
-        category = (profile or {}).get("back_design", "geometric")
-        return (allowed_back_patterns(category), False)  # custom allowed
+    # NOTE (BACK-EPH-01): back_pattern (and the other back_* fields) are no
+    # longer persistent keys, so they intentionally do NOT resolve here —
+    # options_for/PERSISTENT_KEYS only cover persisted config schema. A
+    # per-card wizard step can still call allowed_back_patterns(category)
+    # directly (kept below) to list category-gated pattern aliases; it is
+    # just no longer wired through this persistent-config choke point.
     fixed = {
         "deck": (allowed_decks(), True),
         "lettering": (LETTERING, True),
@@ -257,11 +257,6 @@ def options_for(key: str, profile: dict | None = None):
         "theme": (None, False),   # free text deck-wide theme/symbolism
         "figure_scale": (allowed_figure_scales(), False),  # custom crop text allowed
         "character_framing": (allowed_character_framings(), False),  # custom allowed; "" = not set
-        "back_purpose": (BACK_PURPOSE, False),       # custom text allowed
-        "back_design": (BACK_DESIGN, False),         # custom text allowed (D-21 fallback to geometric)
-        "back_palette": (BACK_PALETTE, False),       # custom text allowed
-        "back_symmetry": (BACK_SYMMETRY, False),     # custom text allowed
-        "title.enabled": (BOOL_VALUES, True),
     }.get(key)
     if fixed is not None:
         return fixed
@@ -269,22 +264,16 @@ def options_for(key: str, profile: dict | None = None):
         _, layer, group = key.split(".")
         if layer not in LAYERS or group not in GROUPS:
             return None
+        # Unified false|true|alias|custom contract (D-06/D-07): every layer is
+        # non-strict. "true" means "layer active for this group" — the actual
+        # alias/custom text is asked fresh per-card at generation time, not
+        # resolved here or at cmd_set write time. A literal custom string is
+        # always a valid cell value.
         if layer == "split":
-            # Split values include the four defined modes plus custom free-text
-            # descriptions (e.g. "diagonal-split"). The wizard's Step 8b offers
-            # an "Other (free text)" option that saves via cmd_set, so strict=False.
-            # "true" is accepted as input (SPLT-05) — cmd_set resolves it to "none"
-            # before persisting; it is never written verbatim.
-            return (["true"] + allowed_splits(), False)
+            return (["false", "true"] + allowed_splits(), False)
         if layer == "figure":
-            # figure layer is strict: only "false", a discovered figure-type stem,
-            # or "true" (FIG-09 — re-accepted as input). cmd_set resolves "true" to
-            # the group's default alias (LAYER_DEFAULTS["figure"]) before persisting,
-            # so a literal "true" is never written to a figure cell.
-            return (["false", "true"] + allowed_figure_types(), True)
+            return (["false", "true"] + allowed_figure_types(), False)
         if layer == "seamless":
-            # D-04: false | true (resolves to default alias) | <alias> | <custom_text>.
-            # allowed_seamless() already includes "false"; dedupe via dict.fromkeys.
             return (list(dict.fromkeys(["false", "true"] + allowed_seamless())), False)
         # All other layers: "true"/"false" toggle; any other text enables + adds.
         return (BOOL_VALUES, False)
@@ -482,9 +471,36 @@ def _migrate_root_mood(profile: dict) -> bool:
     return True
 
 
+def _migrate_drop_phase5_persistent(profile: dict) -> bool:
+    """Drop the now-removed `title` and `back_*` persistent fields (TITLE-01/BACK-EPH-01).
+
+    Title and the five back_* fields (back_purpose/back_design/back_pattern/
+    back_palette/back_symmetry) moved from deck-wide persistent config fields
+    to per-card ephemeral wizard steps (D-01/D-04) — they are no longer valid
+    PERSISTENT_KEYS. A stale profile (hand-edited, or written by pre-Phase-5
+    code) may still carry these keys; this migration silently drops them so
+    `cmd_validate` never rejects an upgraded profile.
+
+    Unlike `_migrate_figure_true_to_character`/`_migrate_seamless_true_to_alias`,
+    this migration does NOT touch `layers.*` cells — a literal stored "true" is
+    now a valid value under the unified contract (D-07) and is intentionally
+    left untouched.
+
+    Returns True if anything was removed.
+    """
+    changed = False
+    if profile.pop("title", None) is not None:
+        changed = True
+    for key in ("back_purpose", "back_design", "back_pattern", "back_palette", "back_symmetry"):
+        if profile.pop(key, None) is not None:
+            changed = True
+    return changed
+
+
 def load_raw() -> dict:
     """Load config.json, migrating a pre-3.0 flat file, pre-3.6 *_extra fields, a
-    pre-3.13 extras.<layer>.<group> namespace, and a pre-4.0 figure_proportion field."""
+    pre-3.13 extras.<layer>.<group> namespace, a pre-4.0 figure_proportion field, a
+    pre-MOOD-01 root mood field, and pre-Phase-5 title/back_* persistent fields."""
     if not CONFIG_PATH.exists():
         return json.loads(json.dumps(BUILTIN_CONFIG))
     try:
@@ -508,15 +524,19 @@ def load_raw() -> dict:
     if any(_migrate_figure_proportion(prof) for prof in cfg["profiles"].values()):
         migrated = True
         print("note: migrated figure_proportion to figure_scale + character_framing", file=sys.stderr)
-    if any(_migrate_figure_true_to_character(prof) for prof in cfg["profiles"].values()):
-        migrated = True
-        print("note: migrated layers.figure.<group>='true' to 'character'", file=sys.stderr)
-    if any(_migrate_seamless_true_to_alias(prof) for prof in cfg["profiles"].values()):
-        migrated = True
-        print("note: migrated layers.seamless.<group>='true' to a discovered alias", file=sys.stderr)
+    # _migrate_figure_true_to_character / _migrate_seamless_true_to_alias are PRESERVED
+    # below (unchanged) but are no longer called unconditionally from this chain: under
+    # the unified D-06/D-07 contract a literal "true" is now a valid, intentionally
+    # preserved cell value (T-05-03) — eagerly rewriting it on every load would silently
+    # discard data and fight the new contract. They remain available for one-off/manual
+    # use against truly pre-4.0 configs if ever needed, but are not part of the automatic
+    # migration chain.
     if any(_migrate_root_mood(prof) for prof in cfg["profiles"].values()):
         migrated = True
         print("note: migrated root mood into layers.mood.<group>", file=sys.stderr)
+    if any(_migrate_drop_phase5_persistent(prof) for prof in cfg["profiles"].values()):
+        migrated = True
+        print("note: dropped removed persistent fields title/back_* (now per-card ephemeral)", file=sys.stderr)
     if migrated:
         save_raw(cfg)
     return cfg
@@ -611,26 +631,15 @@ def cmd_set(args):
     name = profile or active_profile_name(cfg)
     if name not in cfg["profiles"]:
         sys.exit(f"error: unknown profile '{name}' (see: profile list)")
-    # Use the effective (defaults + overrides) profile so category-aware
-    # validation (e.g. back_pattern against back_design) sees the active
-    # back_design even when it has never been explicitly set (WR-01).
+    # Use the effective (defaults + overrides) profile so any category-aware
+    # validation sees active values even when they were never explicitly set (WR-01).
     ok, msg = validate_value(key, value, effective(cfg, name))
     if not ok:
         sys.exit(f"error: {msg}")
     parts = key.split(".")
-    # FIG-09/SPLT-05/D-09: "true" is accepted as input for layers.figure.<group> and
-    # layers.split.<group>, but is never persisted verbatim — resolve it immediately
-    # to the group's concrete default before writing. _migrate_figure_true_to_character()
-    # only runs on load, so this write-path resolution is required here too.
-    if len(parts) == 3 and parts[0] == "layers" and value == "true":
-        layer, group = parts[1], parts[2]
-        if layer == "figure":
-            value = LAYER_DEFAULTS["figure"].get(group, "false")
-        elif layer == "split":
-            value = "none"
-        elif layer == "seamless":
-            presets = [v for v in allowed_seamless() if v != "false"]
-            value = presets[0] if presets else "false"
+    # D-07: a literal "true" is persisted verbatim for every layer — no eager
+    # write-path resolution. "true" means "layer active for this group"; the
+    # concrete alias/custom text is asked fresh per-card at generation time.
     node = cfg["profiles"][name]
     for part in parts[:-1]:
         if not isinstance(node.get(part), dict):
