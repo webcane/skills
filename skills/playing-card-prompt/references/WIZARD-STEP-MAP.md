@@ -15,11 +15,11 @@ loads.
 | **4** | Suit *(skipped for Joker)* | #12 Pip/suit symbol design | Center motif *(structural)* | `SUIT_NAME_TITLE`, `SUIT_NAME`, `SUIT_SYMBOL`, `SUIT_COLOR` | `assets/decks/<deck>.md` |
 | **4.1** | Joker role *(Joker only, per-card)* | #2 Color palette | Center motif *(structural)* | `JOKER_ROLE` | — |
 | **4.2** | Joker index glyph *(Joker only, persistent)* | #13 Typography / indices | Index *(structural)* | `JOKER_INDEX` → feeds `[INDEX_LINE]` | — |
-| **B1** | Back purpose *(Back only, persistent)* | #5 Composition/rhythm | — | contributes to `BACK_DESIGN` | `assets/back/purpose/<choice>.md` |
-| **B2** | Back design category *(Back only, persistent)* | #5 Composition/rhythm | — | sets `back_design` (filter for B3) | — |
-| **B3** | Back pattern *(Back only, persistent)* | #5 Composition/rhythm, #14 Decoration | — | contributes to `BACK_DESIGN` | `assets/back/design/<back_design>/<choice>.md` |
-| **B4** | Back palette *(Back only, persistent)* | #2 Color palette | — | contributes to `BACK_DESIGN` | `assets/back/palette/<choice>.md` |
-| **B5** | Back symmetry *(Back only, persistent)* | #5 Composition/rhythm | — | feeds STYLE_BLOCK step 10 via `back_symmetry` | `assets/back/symmetry/<choice>.md` |
+| **B1** | Back purpose *(Back only, per-card)* | #5 Composition/rhythm | — | contributes to `BACK_DESIGN` | `assets/back/purpose/<choice>.md` |
+| **B2** | Back design category *(Back only, per-card)* | #5 Composition/rhythm | — | this card's category answer (filter for B3) | — |
+| **B3** | Back pattern *(Back only, per-card)* | #5 Composition/rhythm, #14 Decoration | — | contributes to `BACK_DESIGN` | `assets/back/design/<back_design>/<choice>.md` |
+| **B4** | Back palette *(Back only, per-card)* | #2 Color palette | — | contributes to `BACK_DESIGN` | `assets/back/palette/<choice>.md` |
+| **B5** | Back symmetry *(Back only, per-card)* | #5 Composition/rhythm | — | feeds STYLE_BLOCK step 10 via this card's symmetry answer | `assets/back/symmetry/<choice>.md` |
 | **B6** | Back frame *(Back only, persistent)* | — | Frame (`layers.frame.back`) | — (sets `layers.frame.back`) | — |
 | **B7** | Back exclusions *(Back only, per-card, optional)* | — *(negative constraints)* | — | `NEGATIVE_LIST` | — |
 | **S1** | Card title *(Special only, per-card)* | — *(structural)* | — | `CARD_NAME` | — |
@@ -39,7 +39,7 @@ loads.
 | **10** | Additional/replaced attributes | #9, #10 *(figure cards only)* | Center motif (figure cards) | contributes to `[RESOLVED_ATTRIBUTES]` | `assets/courts/<rank>.md` (shows traditional attrs, court only) |
 | **11** | Transfer from reference image | #9, #10, #11 *(figure cards only)* | Center motif (figure cards), Figure | overrides `[RESOLVED_ATTRIBUTES]` | — |
 | **12** | Exclude from reference image | — *(negative constraints, not a style component)* | — | `[NEGATIVE_LIST]` | — |
-| **T** | Title overlay *(per-card, all six groups — not part of the figure block)* | #5 Composition/rhythm *(deck-wide presence gate)* | — *(no `layers.*` cell — `title.enabled` is a standalone deck-wide field)* | feeds the title named element (no position/font/styling); per-card title text is ephemeral, never saved | — *(no asset file lookup)* |
+| **T** | Title overlay *(per-card, all six groups — not part of the figure block)* | #5 Composition/rhythm *(per-card title placement)* | — *(no layers.\* cell — title is per-card ephemeral, never persisted)* | feeds the title named element (no position/font/styling); per-card title text and placement alias are ephemeral, never saved | `assets/title/<alias>.md` (e.g. `below-figure`, `side-running`) — Joker suggests `below-figure`, Court suggests `side-running`, pip/ace/back/special suggest none |
 | **13** | Aspect ratio | — *(format)* | — | `[ASPECT_RATIO]` | `references/REFERENCE.md` (aspect ratio table) |
 | **14** | Image generator | — *(output post-processing)* | — *(touches all layers indirectly — reformatting)* | adapts `[NEGATIVE_LIST]`, `[ASPECT_RATIO]`, extra suffix params | `assets/engines/<engine>.md`, `assets/engines/_config.md` |
 
@@ -61,10 +61,11 @@ types skip both. Steps 9–12 are per-card.
 `[INDEX_LINE]` (step 2's placeholder, normally fed by the "not covered" item below),
 drops `[FRAME_LINE]` (fed by step 6) regardless of `layers.frame.<group>`, appends
 a fixed block to `[NEGATIVE_LIST]` (step 12), and drops the Title step and Seamless
-step entirely — neither the title named element nor the seamless phrase is added to
-any STYLE_BLOCK under `illustration`, regardless of `title.enabled` /
-`layers.seamless.<group>` (TITL-05/SEAM-05, one shared gate). See "`structure` setting"
-in `REFERENCE.md`. All other steps/components are unaffected.
+step entirely — under `illustration`, the per-card Title step (T) is skipped
+outright (never asked, not asked-then-discarded), and the seamless phrase is not
+added to any STYLE_BLOCK regardless of `layers.seamless.<group>` (TITL-05/SEAM-05,
+one shared gate). See "`structure` setting" in `REFERENCE.md`. All other
+steps/components are unaffected.
 
 **Not covered by a dedicated step (silent / assembly-only):**
 - **`[INDEX_LINE]`** — assembled from `assets/index/options.md` via silent defaults in Assembling step 2; not asked in the wizard.
@@ -76,6 +77,6 @@ in `REFERENCE.md`. All other steps/components are unaffected.
 
 **Joker rank group** (`rank = Joker`): Steps 4.1–4.2 (role, index placement + symbol) are documented in references/JOKER-WIZARD.md.
 
-**Back rank group** (`rank = Back`): Steps B1–B7 run instead of Steps 4.1–4.2. B1–B6 are persistent (skipped if already set in config); B7 exclusions are per-card. Steps 4 (Suit) and 8a–12 (figure block) are skipped unless `layers.figure.back` is explicitly set to a non-false type value in config. The `back` group enters the mood check (Step 7) and the aspect ratio / generator steps (Steps 13–14) like all other groups.
+**Back rank group** (`rank = Back`): Steps B1–B7 run instead of Steps 4.1–4.2. B1–B5 are per-card ephemeral (asked fresh every Back card, never persisted); B6 (frame) sets the persistent `layers.frame.back` cell; B7 exclusions are per-card. Steps 4 (Suit) and 8a–12 (figure block) are skipped unless `layers.figure.back` is explicitly set to a non-false type value in config. The `back` group enters the mood check (Step 7) and the aspect ratio / generator steps (Steps 13–14) like all other groups.
 
 **Special rank group** (`rank = Special`): Steps S1–S5 run instead of Steps 4.1–4.2 (and Step 4 suit is skipped). Steps 8a–12 (figure block) are skipped unless `layers.figure.special` is explicitly set to a non-false type value. The `special` group enters the mood check (Step 7) and the aspect ratio / generator steps (Steps 13–14) like all other groups. Step S4 (named figure) only runs for prospect-type special cards.
