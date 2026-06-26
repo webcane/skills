@@ -270,7 +270,8 @@ def options_for(key: str, profile: dict | None = None):
         # resolved here or at cmd_set write time. A literal custom string is
         # always a valid cell value.
         if layer == "split":
-            return (["false", "true"] + allowed_splits(), False)
+            # allowed_splits() already contributes "false" (and "none") — don't double up.
+            return (["true"] + allowed_splits(), False)
         if layer == "figure":
             return (["false", "true"] + allowed_figure_types(), False)
         if layer == "seamless":
