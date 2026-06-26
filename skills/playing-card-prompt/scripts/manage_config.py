@@ -515,13 +515,18 @@ def load_raw() -> dict:
     cfg.setdefault("profiles", {})
     cfg["profiles"].setdefault(DEFAULT_PROFILE_NAME, {})
     migrated = False
-    if any(_migrate_extras(prof) for prof in cfg["profiles"].values()):
+    # NOTE: each `_migrate_*` call below must visit every profile even after an earlier
+    # profile already triggered a change — `any(gen for prof in ...)` short-circuits on
+    # the first truthy result and silently skips the migration's side effect (it mutates
+    # `prof` in place) for the remaining profiles. Using a list comprehension forces full
+    # evaluation before `any()` runs, so every profile is always visited.
+    if any([_migrate_extras(prof) for prof in cfg["profiles"].values()]):
         migrated = True
         print("note: migrated ornaments_extra/highlights_extra/frame_extra into extras.*", file=sys.stderr)
-    if any(_migrate_layers_extras(prof) for prof in cfg["profiles"].values()):
+    if any([_migrate_layers_extras(prof) for prof in cfg["profiles"].values()]):
         migrated = True
         print("note: merged extras.<layer>.<group> into layers.<layer>.<group>", file=sys.stderr)
-    if any(_migrate_figure_proportion(prof) for prof in cfg["profiles"].values()):
+    if any([_migrate_figure_proportion(prof) for prof in cfg["profiles"].values()]):
         migrated = True
         print("note: migrated figure_proportion to figure_scale + character_framing", file=sys.stderr)
     # _migrate_figure_true_to_character / _migrate_seamless_true_to_alias are PRESERVED
@@ -531,10 +536,10 @@ def load_raw() -> dict:
     # discard data and fight the new contract. They remain available for one-off/manual
     # use against truly pre-4.0 configs if ever needed, but are not part of the automatic
     # migration chain.
-    if any(_migrate_root_mood(prof) for prof in cfg["profiles"].values()):
+    if any([_migrate_root_mood(prof) for prof in cfg["profiles"].values()]):
         migrated = True
         print("note: migrated root mood into layers.mood.<group>", file=sys.stderr)
-    if any(_migrate_drop_phase5_persistent(prof) for prof in cfg["profiles"].values()):
+    if any([_migrate_drop_phase5_persistent(prof) for prof in cfg["profiles"].values()]):
         migrated = True
         print("note: dropped removed persistent fields title/back_* (now per-card ephemeral)", file=sys.stderr)
     if migrated:
