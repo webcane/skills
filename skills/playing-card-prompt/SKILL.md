@@ -44,15 +44,15 @@ Before asking any wizard questions, load the active profile's persistent setting
 (`deck`, `lettering`, `style`, `frame`, `aspect_ratio`, `image_generator`, `structure`,
 `index.symbol`, `index.*`, `layers.*` (including `layers.mood.<group>`, the deck's
 only mood setting), `theme`, `figure_scale`,
-`character_framing`, `back_purpose`, `back_design`, `back_pattern`, `back_palette`,
-`back_symmetry`) via `python3 scripts/manage_config.py show`. This also lists
+`character_framing`) via `python3 scripts/manage_config.py show`. This also lists
 every saved profile and which one is active. `layers.*` includes all card groups:
 `court`, `pip`, `ace`, `joker`, `back`, and `special`.
 Everything else — schema, profile concept, lookup order, field reference, and the
 full CLI — is in `references/CONFIG.md`; read it whenever you need to inspect,
 change, or validate `config.json`. Per-card fields (`rank`, `suit`,
 `character_name`, `character_features`, `extra_attributes`, `reference_transfers`,
-`exclusions`) are always asked fresh and never saved.
+`exclusions`, title text/placement, and the back design criteria — back purpose,
+design category, pattern, palette, symmetry) are always asked fresh and never saved.
 
 ---
 
@@ -151,7 +151,10 @@ Always ask. Offer only the ranks listed in the chosen `assets/decks/<deck>.md`
   `joker` (`layers.figure.joker` defaults to `"character"`). Skip Step 4 (no suit); run
   Steps 4.1–4.2 from references/JOKER-WIZARD.md instead.
 - **Back → BACK** → this card's group is `back` (`layers.figure.back` defaults to
-  `"false"`). Skip Step 4 (no suit); run Steps B1–B7 from references/WIZARD-BACK.md instead of Steps 4.1–4.2.
+  `"false"`). Skip Step 4 (no suit); run Steps B1–B7 from references/WIZARD-BACK.md
+  instead of Steps 4.1–4.2 — B1–B5 are per-card ephemeral back-design steps (asked
+  fresh every Back card, never saved), B6 sets the persistent `layers.frame.back`
+  cell, and B7 (exclusions) is per-card.
 - **Special → SPECIAL** → this card's group is `special` (`layers.figure.special` defaults to
   `"false"`). Skip Step 4 (no suit); run Steps S1–S5 from references/WIZARD-SPECIAL.md instead of Steps 4.1–4.2.
 
@@ -283,19 +286,19 @@ deselected ones.
 ---
 
 **Check `layers.figure.<group>` for this card's group** (`court`/`pip`/`ace`/`joker`/`back`/`special`).
-The value is `"false"` (no figure) or a figure type (`"character"`, `"building"`,
-`"animal"`, `"custom"`), defaulting to `"character"` for court and joker, `"false"` for
-pip/ace/back/special unless previously configured via `--config`. `layers.figure.<group>`
-also accepts `"true"` as a `--config`/`set` input — it resolves immediately to the
-group's default figure-type alias (`character` for court/joker, `false` for pip/ace,
-FIG-09) and is never persisted literally. If it's `"false"`, this card
-has no figure — **skip the entire figure block (Steps 8a–8f) and go straight to Step 13**
-(Aspect ratio). Otherwise, the figure block (Steps 8a–8f) and Steps 9–12 apply: court
-and joker cards by default, plus any pip/ace/back/special card whose `layers.figure.<group>` was
-set to a type value. Steps 8a–8c are persistent — skipped if already set or loaded from
-config; Step 8e is character-only persistent (skipped if `layers.figure.<group>` is
-not `"character"`); Step 8f (seamless) is per-group persistent; Steps 9–12 are
-per-card.
+Every `layers.<layer>.<group>` cell — figure included — follows one unified contract:
+`"false"` (no figure), `"true"` (figure active for this group; the actual type or
+description is resolved fresh per-card in Steps 8c/9–12, NOT eagerly defaulted), a
+known figure-type alias (`"character"`, `"building"`, `"animal"`), or custom free-text
+figure description (used verbatim), defaulting to `"character"` for court and joker,
+`"false"` for pip/ace/back/special unless previously configured via `--config`. If
+it's `"false"`, this card has no figure — **skip the entire figure block (Steps 8a–8f)
+and go straight to Step 13** (Aspect ratio). Otherwise, the figure block (Steps 8a–8f)
+and Steps 9–12 apply: court and joker cards by default, plus any pip/ace/back/special
+card whose `layers.figure.<group>` was set to a type value. Steps 8a–8c are
+persistent — skipped if already set or loaded from config; Step 8e is character-only
+persistent (skipped if `layers.figure.<group>` is not `"character"`); Step 8f
+(seamless) is per-group persistent; Steps 9–12 are per-card.
 
 ---
 
@@ -324,9 +327,10 @@ save it phrased as its own comma-separated phrase (ending in a comma).
 _Skipped if already set for this group in config, or if `layers.figure.<group>` is
 `"false"` (the whole figure block is skipped when the layer is off — SPLT-04)._ Ask
 how the figures on the cards in this group should be split (per-group; asked once for
-each group, then reused). Applies to all figure types. `layers.split.<group>` also
-accepts `"true"` as a value (resolves to `"none"` on write — SPLT-05) and any custom
-free-text split description beyond the three presets below.
+each group, then reused). Applies to all figure types. A `"true"` cell means split is
+active for this group — the actual split composition is resolved per-card here
+(UNIFY-02/03) — and `layers.split.<group>` also accepts any custom free-text split
+description beyond the three presets below.
 
 Offer (default first):
 - **Full body, no split (default)** — single upright figure, no mirroring. Sets
@@ -345,7 +349,9 @@ Save via `python3 scripts/manage_config.py set layers.split.<group> <value>` (re
 _Skipped if already set for this group in config, or if `layers.figure.<group>` is
 `"false"`._ Ask what kind of figure this group carries. This sets the group's figure
 layer value — the value IS the figure type, keeping the layer on while recording the
-type (D-02). Per-group; asked once, then reused.
+type (D-02). A `"true"` cell reaching this step is resolved to the chosen type or
+custom description here, per-card-group (UNIFY-01). Per-group; asked once, then
+reused.
 
 Offer (default first, per 4-option AskUserQuestion limit):
 - **Character (default)** — a person or humanoid figure. Sets
@@ -353,16 +359,16 @@ Offer (default first, per 4-option AskUserQuestion limit):
 - **Building** — an architectural structure. Sets
   `layers.figure.<group> = "building"`.
 - **Animal** — a creature or beast. Sets `layers.figure.<group> = "animal"`.
-- **Custom** — user-described figure type (free text). Sets
-  `layers.figure.<group> = "custom"` — the CLI only accepts the literal keyword
-  `"custom"` here (see `manage_config.py`'s `strict=True` validation for this key); the
-  user's actual free-text description is captured separately as part of the per-card
-  figure description in Steps 9–12, not stored in this config cell.
+- **Custom** — user-described figure type (free text). The figure cell now accepts a
+  custom free-text figure description directly (used verbatim) in addition to the
+  character/building/animal aliases — no strict-keyword-only restriction. The
+  free-text description doubles as the per-card figure description fed into
+  Steps 9–12.
 
 Save via `python3 scripts/manage_config.py set layers.figure.<group> <type>` (replace
-`<group>` with the actual group — `<type>` must be one of `false`/`character`/
-`building`/`animal`/`custom`). Note that this both keeps the figure layer on for this
-group and records the figure type category; it does not store free-text descriptions.
+`<group>` with the actual group — `<type>` is `false`/`character`/`building`/`animal`,
+or any custom free-text figure description). Note that this both keeps the figure
+layer on for this group and records the figure type/description.
 
 **Step 8e applies ONLY when the group's figure type is `"character"`.** For
 `building`, `animal`, and `custom` figure types, skip Step 8e and proceed directly
@@ -431,9 +437,9 @@ options. Offer (default first, per 4-option AskUserQuestion limit):
   seamless phrase is added for this group.
 
 Save via `python3 scripts/manage_config.py set layers.seamless.<group> <value>`
-(replace `<group>` with the actual group: `court`, `pip`, `ace`, or `joker`). Note
-`"true"` is also accepted and resolves to the group's default seamless alias on write
-(SEAM-04) — a literal `"true"` is never persisted.
+(replace `<group>` with the actual group: `court`, `pip`, `ace`, or `joker`). A
+`"true"` cell means seamless is active for this group — the alias or custom text is
+resolved per-card here (UNIFY-02).
 
 ### Step 9 — Character / figure description (REQUIRED for cards with a figure) · _per-card_
 
