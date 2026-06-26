@@ -96,14 +96,10 @@ FIGURE_TYPE = ["character", "building", "animal", "custom"]
 SPLIT_VALUES = ["false", "none", "horizontal-mirrored", "angled-mirrored"]
 FIGURE_SCALE = ["full-bleed", "inscribed-in-frame", "small-centered"]
 
-BACK_PURPOSE = ["classic", "designer", "casino"]
-BACK_DESIGN = ["geometric", "botanical", "abstract", "illustrated"]
 BACK_PATTERN_GEOMETRIC = ["diamond", "cross-hatch", "hexgrid", "wave"]
 BACK_PATTERN_BOTANICAL = ["vine", "floral", "leaf", "branch"]
 BACK_PATTERN_ABSTRACT = ["interlacing", "color-field", "paint-stroke", "fractal"]
 BACK_PATTERN_ILLUSTRATED = ["thematic", "portrait", "landscape", "heraldic"]
-BACK_PALETTE = ["classic-red", "classic-blue", "dark", "gold"]
-BACK_SYMMETRY = ["rotational-180", "bilateral", "asymmetric"]
 
 # Pre-3.6 field names that are migrated into extras.<layer>.<group> (and from there,
 # on a later load, into layers.<layer>.<group> — see _migrate_layers_extras) on load.
