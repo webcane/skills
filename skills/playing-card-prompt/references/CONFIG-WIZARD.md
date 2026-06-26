@@ -31,9 +31,10 @@ Step 1b's resequenced position right after Deck type — WIZ-03/D-12):
 5. Card decoration layers and theme (Step 6)
 6. Mood / atmosphere (Step 7)
 7. Figure block — figure_scale (deck-wide scale), split (per-group split layout),
-   figure_type (per-group character/building/animal/custom), and
-   character_framing (deck-wide framing, character-only) — from the figure-block
-   steps (Steps 8a–8e)
+   figure_type (per-group character/building/animal/custom),
+   character_framing (deck-wide framing, character-only), and seamless
+   (per-group connecting/seamless design) — from the figure-block steps
+   (Steps 8a–8f)
 8. Aspect ratio (Step 13)
 9. Image generator (optional — see Step 14)
 10. Joker index (D2) — `index.count` (placement: `4-index` / `2-index` / `top-only` /
