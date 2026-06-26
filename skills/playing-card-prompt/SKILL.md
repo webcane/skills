@@ -507,19 +507,32 @@ the prompt during assembly. If nothing, no extra exclusions are added.
 
 _Skip this step entirely if `structure` is `"illustration"` (TITL-05) — title
 placement is purely the user's own SVG/HTML template's concern in that mode, so the
-question would be asked-then-discarded. Skip this step entirely if `title.enabled` is
-not `"true"` (TITL-04) — `title.enabled` itself is a persistent, deck-wide setting
-changed via `--config`/`python3 scripts/manage_config.py set title.enabled true`, not
-asked here per-card._ Otherwise (i.e. `title.enabled == "true"` AND `structure ==
-"full"`), this step runs for every card in all six groups — court, pip, ace, joker,
-back, and special (title is not group-restricted).
+question would be asked-then-discarded._ Otherwise (i.e. `structure == "full"`), this
+step runs for every card in all six groups — court, pip, ace, joker, back, and special
+(title is not group-restricted). Title has no `layers.*` cell and no deck-wide
+persistent gate; whether to ask is determined purely by `structure`.
 
-Ask the user for this card's title text, free text. The text feeds the assembled
-prompt's title named element — naming only that a title exists and what it says, with
-no position, font, or styling specified (see "Title text" in `references/REFERENCE.md`).
-This text is **never saved to `config.json`** — it's collected fresh for every card,
-the same way `extra_attributes`/`reference_transfers`/`exclusions` are ephemeral
-per-card fields.
+The SUGGESTED default differs by this card's group — two groups suggest a placement
+alias, four suggest no title:
+- **Joker** → suggested default alias `below-figure`.
+- **Court** → suggested default alias `side-running`.
+- **Pip / Ace / Back / Special** → suggested default is **no title for this card**.
+
+Ask whether this card should have a title. Offer the group's suggested default as the
+first option (either "No title for this card" for pip/ace/back/special, or the
+suggested alias's display name for Joker/Court), plus the remaining `assets/title/*.md`
+presets (`below-figure`, `side-running`, `top-banner`, `corner-plate`) and an "Other"
+custom-placement-text option. If a preset is chosen, load `assets/title/<alias>.md` for
+its placement phrase. If the user declines, no title element is added for this card.
+Otherwise, ask for the title text itself (free text).
+
+The text feeds the assembled prompt's title named element — naming only that a title
+exists and what it says, with no position, font, or styling specified (see "Title
+text" in `references/REFERENCE.md`); the `assets/title` phrase contributes only a
+placement concept, never font/size/color. BOTH the chosen placement alias (or custom
+placement text) AND the title text are per-card and **never saved to `config.json`**
+— collected fresh for every card, the same way `extra_attributes`/
+`reference_transfers`/`exclusions` are ephemeral per-card fields.
 
 ---
 
