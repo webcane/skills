@@ -23,10 +23,12 @@ toggled off, because they're what makes the card that card:
   per-rank content built directly into the COURT/PIP/ACE templates below.
 
 The rest are **configurable layers**, each controlled per card group (`court` / `pip`
-/ `ace`) via `layers.<layer>.<group>` in `references/CONFIG.md`. Each cell is
-`"false"` (layer off), `"true"` (layer on, no addition), or any other text (layer on,
-that text is this group's addition, appended after the layer's own pattern/preset
-text):
+/ `ace`) via `layers.<layer>.<group>` in `references/CONFIG.md`. Every layer — Figure
+included — shares the same one contract: `"false"` (layer off), `"true"` (layer on;
+the specific alias/custom text is resolved fresh per-card at generation time, not
+looked up from a stored default), an alias (a known preset stem for that layer), or
+any other text (layer on, that text is this group's addition, appended after the
+layer's own pattern/preset text):
 
 - **Background** — base cardstock color/texture, plus this group's addition if the
   cell is custom text. On for every group by default.
@@ -39,19 +41,26 @@ text):
 - **Frame** — the border/architectural framing (`[FRAME_LINE]`), its text drawn from
   the chosen `frame` preset in `assets/frame/`, plus this group's addition if the cell
   is custom text.
-- **Figure** — the figure type for this group's center motif. The cell value is
-  the figure TYPE: `"false"` = no figure; `"character"` / `"building"` / `"animal"` /
-  `"custom"` = figure on + that type. The type selects which
-  `assets/figure-type/<type>.md` text is pulled into `[STYLE_BLOCK]`, and determines
-  whether character-only sources (Face Style, character_framing) apply. Default:
-  `"character"` for `court` and `joker` (the portrait); `"false"` for `pip`/`ace`
-  (no figure) — set to a type value for `pip`/`ace` only for transformation-style
-  decks where number/ace cards carry small figures.
-- **Mood** — the cell `layers.mood.<group>` is the deck's only mood setting:
-  `"false"` (no mood line), `"true"` (on, no specific line — nothing to add), or
-  any other text (`[MOOD_LINE]`, the atmosphere phrase itself, e.g. "gothic and
-  brooding atmosphere"). On for every group by default; produces no line unless
-  the cell holds custom text.
+- **Figure** — the figure type for this group's center motif. The cell follows the
+  same `false|true|alias|custom` contract as every other layer: `"false"` = no
+  figure; `"true"` = figure on, with the actual type resolved per-card (the wizard
+  asks at generation time, not looked up from a stored default); a known type alias
+  (`character` / `building` / `animal` from `assets/figure-type/`) = figure on + that
+  type; or any other custom free text = figure on + that text used verbatim as the
+  type description. The resolved type selects which `assets/figure-type/<type>.md`
+  text is pulled into `[STYLE_BLOCK]`, and determines whether character-only sources
+  (Face Style, character_framing) apply. Default: `"character"` for `court` and
+  `joker` (the portrait); `"false"` for `pip`/`ace` (no figure) — set to a type value
+  for `pip`/`ace` only for transformation-style decks where number/ace cards carry
+  small figures.
+- **Mood** — the cell `layers.mood.<group>` is the deck's only mood setting. In the
+  normal wizard flow this cell is **bool-only**: `"false"` (no mood line) or `"true"`
+  (on, no specific line — nothing to add); the wizard never asks for raw mood text
+  per group. Setting the cell to any other text — so that text becomes
+  `[MOOD_LINE]`, the atmosphere phrase itself, e.g. "gothic and brooding atmosphere"
+  — is a `manage_config.py set` escape hatch outside the wizard, not a per-card
+  ephemeral question. On for every group by default; produces no line unless the
+  cell holds raw text set this way.
 - **Technique** — the rendering technique/medium applied to whatever sits in the
   center (portrait, pip layout, or suit symbol alike) — linework, tonal/area-fill
   rendering, painterly treatment, collage, and so on — plus this group's addition if
@@ -101,21 +110,25 @@ by concatenating, in this order, only the layers that are on:
 
 Then:
 
-6. **Figure block** — only if `layers.figure.g` is a type value (not `"false"`).
-   Read the type from `layers.figure.g` and append, in this exact order (D-15):
+6. **Figure block** — only if `layers.figure.g` is not `"false"` (i.e. `"true"`, a
+   known type alias, or custom text). Resolve the type from `layers.figure.g` and
+   append, in this exact order (D-15):
 
    a. **Figure-type text** — the text from `assets/figure-type/<type>.md`, where
       `<type>` is the `layers.figure.g` value (`character`, `building`, `animal`, or
-      `custom`). Applied to ALL figure types.
+      custom text). When the cell is exactly `"true"`, the actual type/alias is not
+      looked up from a stored default — it is resolved fresh per-card at generation
+      time (the wizard asks which type this card's figure is). Applied to ALL figure
+      types.
 
-   b. **Character-only sources** — ONLY when `layers.figure.g` is `"character"`:
+   b. **Character-only sources** — ONLY when the resolved type is `"character"`:
       append the pattern's "Figure detail" lines (skip entirely if that section is
       `(none)`), then the pattern's "Face Style" line (how a figure's face reads in
       this pattern — typage, expression, degree of stylization). Then, if
       `character_framing` is non-empty, append it as its own comma phrase (the
       deck-wide character framing from `assets/character-framing/`, e.g.
       `waist-up portrait, torso and arms visible, hands free to hold attributes,`).
-      **For `building`, `animal`, and `custom` figure types: skip the pattern's
+      **For `building`, `animal`, and custom figure types: skip the pattern's
       "Figure detail" lines, Face Style line, and `character_framing` entirely**
       (FIG-08, D-16). These types receive only items a, c, and d.
 
@@ -130,18 +143,21 @@ Then:
    d. **Split** — if `layers.split.g` is `"horizontal-mirrored"` or
       `"angled-mirrored"`, append the text from
       `assets/split/<layers.split.g value>.md` as its own comma phrase — the outer
-      compositional wrapper (SPLT-03). If `layers.split.g` is `"none"` or `"false"`,
-      no split text is added.
+      compositional wrapper (SPLT-03). If `layers.split.g` is `"true"`, split is
+      active for this group and the specific mode is resolved per-card (the wizard
+      asks fresh each generation, not looked up from a stored default). If
+      `layers.split.g` is `"false"`, no split text is added.
 
    e. **Seamless** — only for `g` in court/pip/ace/joker (back/special have no
       seamless setting). If `layers.seamless.g` is non-`"false"`, append the seamless
       phrase as its own comma phrase: if the value matches a stem under
       `assets/seamless/` (e.g. `continuous-border`, `interlocking-motif`), append that
       file's "Seamless phrase" text; otherwise (custom free text) append the value
-      verbatim. `"true"` resolves to the group's default seamless alias before
-      assembly ever sees it (same write-path resolution as `layers.figure.g="true"`),
-      so assembly never needs to special-case a literal `"true"`. If
-      `layers.seamless.g` is `"false"`, no seamless text is added (SEAM-02).
+      verbatim. If `layers.seamless.g` is exactly `"true"`, the specific alias/custom
+      text is resolved fresh per-card at generation time, not looked up from a stored
+      default — assembly never needs to special-case a literal `"true"` because the
+      per-card resolution happens before assembly runs. If `layers.seamless.g` is
+      `"false"`, no seamless text is added (SEAM-02).
 
    The entire figure block (a–e) is skipped when `layers.figure.g` is `"false"`.
    This is independent of `layers.technique.g` — a card can have Technique on with
@@ -157,8 +173,10 @@ Then:
 
 8. **Mood** — `layers.mood.g` is the deck's only mood setting: if the cell is
    `"false"`, no mood line. If `"true"`, also no mood line (on, but nothing to
-   show). If the cell holds any other text, append it verbatim as `[MOOD_LINE]`
-   — its own comma phrase (e.g. `gothic and brooding atmosphere,`).
+   show) — this is the only state the normal wizard flow produces. If the cell
+   holds any other text (set via the `manage_config.py set` escape hatch, not asked
+   in the wizard), append it verbatim as `[MOOD_LINE]` — its own comma phrase (e.g.
+   `gothic and brooding atmosphere,`).
 
 9. **Plain fallback** — if `g` is `pip` and `layers.decor.pip`, `layers.ornaments.pip`,
    and `layers.highlights.pip` are all `"false"`, append the line `plain card face, no
@@ -196,9 +214,12 @@ face). The pattern file never says when "Figure detail" or "Face Style" apply �
 value. Keep these three as separate sections when adding or editing a pattern — don't
 fold Figure detail or Face Style into Technique or vice versa.
 
-**Figure type assembly** — `layers.figure.<group>` now carries the figure type (`"false"` / `"character"` / `"building"` / `"animal"` / `"custom"`); this cell is strict and has no free-text addition (unlike other `layers.<layer>.<group>` cells):
+**Figure type assembly** — `layers.figure.<group>` carries the figure type and follows
+the same `false|true|alias|custom` contract as every other layer: `"false"` (off),
+`"true"` (on, resolved fresh per-card), a known type alias (`character` / `building` /
+`animal`), or any other custom text (used verbatim as the type description):
 - For `character` type: figure block = `assets/figure-type/character.md` text + pattern's Figure detail + Face Style + `character_framing` text (from `assets/character-framing/`) + `figure_scale` text + split text + seamless text (D-17, FIG-07, SEAM-02).
-- For `building` / `animal` / `custom`: figure block = `assets/figure-type/<type>.md` text + `figure_scale` text + split text + seamless text. Pattern's Figure detail, Face Style, and `character_framing` are all skipped (FIG-08, D-16).
+- For `building` / `animal` / custom-text types: figure block = `assets/figure-type/<type>.md` text (or the custom text itself) + `figure_scale` text + split text + seamless text. Pattern's Figure detail, Face Style, and `character_framing` are all skipped (FIG-08, D-16).
 
 **Four scopes of figure content**, broadest to narrowest:
 - **Deck-wide (figure type)** — the `assets/figure-type/<type>.md` text for the group's
@@ -221,12 +242,13 @@ fold Figure detail or Face Style into Technique or vice versa.
   presets resolve to the "Scale phrase" text in `assets/figure-scale/<value>.md`;
   custom text is appended verbatim. Appended after `character_framing` (or right
   after figure-type text for non-character types).
-- **Deck-wide (split, outer wrapper, all types)** — `layers.split.<group>` (`none`,
-  `horizontal-mirrored`, `angled-mirrored`): the compositional split layout from
-  `assets/split/<mode>.md`. Applied to all figure types; appended as the outermost
-  wrapper after `figure_scale`. No split text for `none`/`false`.
+- **Deck-wide (split, outer wrapper, all types)** — `layers.split.<group>` (`false`,
+  `true` resolved per-card, `horizontal-mirrored`, `angled-mirrored`): the
+  compositional split layout from `assets/split/<mode>.md`. Applied to all figure
+  types; appended as the outermost wrapper after `figure_scale`. No split text for
+  `"false"`.
 - **Deck-wide (seamless, all figure-bearing groups)** — `layers.seamless.<group>`
-  (`false`, `true`→default alias, `<alias>`, or `<custom_text>`): the connecting/
+  (`false`, `true` resolved per-card, `<alias>`, or `<custom_text>`): the connecting/
   seamless design phrase from `assets/seamless/<alias>.md`, or custom text verbatim.
   Court/pip/ace/joker only (back/special excluded, D-05). Appended last in the figure
   block, after split. No seamless text when the cell is `"false"`.
@@ -282,6 +304,10 @@ don't force).
 
 ### Defaults
 
+This table is the **single canonical source** for every `(layer, group)` default —
+`SKILL.md` and `references/CONFIG.md` point here rather than restating these values
+(WIZ-01); if a default ever needs to change, change it only here.
+
 `layers.figure.<group>` now stores the figure type, not a boolean. `"false"` = no
 figure; `"character"` / `"building"` / `"animal"` / `"custom"` = figure on + that type.
 
@@ -298,10 +324,11 @@ figure; `"character"` / `"building"` / `"animal"` / `"custom"` = figure on + tha
 | technique    | true        | true   | true   | true        | true  | true    |
 
 The `figure` row uses type enum values: `"character"` = portrait on + character type
-(default for court/joker); `false` = no figure (default for pip/ace/back/special). The `split` row
-defaults to `false` (not configured) for all groups — `"false"` means the wizard asks
-the first time a figure card in that group is generated; `"none"` means configured as
-no split; `"horizontal-mirrored"` / `"angled-mirrored"` means that split mode.
+(default for court/joker); `false` = no figure (default for pip/ace/back/special). The
+`split` row defaults to `false` (split off) for all groups — `"false"` means no split;
+`"true"` means split active for this group, with the specific mode (`horizontal-
+mirrored` / `angled-mirrored`) resolved fresh per-card; `"horizontal-mirrored"` /
+`"angled-mirrored"` set directly means that mode is configured persistently.
 
 These reproduce the traditional look out of the box: Court cards carry the full
 pattern including its Figure detail and Face Style sections (character type); plain Pip
@@ -365,10 +392,12 @@ prompt that describes ONLY what goes in the center clip area.
      title-text instruction is added to any STYLE_BLOCK (TITL-05) and no
      `layers.seamless.<group>` instruction is added to any STYLE_BLOCK (SEAM-05),
      regardless of their configured values — both are purely SVG-template concerns
-     under this mode. `title.enabled` and `layers.seamless.<group>` are **not modified
-     or cleared** in `config.json`, mirroring how `layers.frame.<group>` is preserved
-     in item 2 above — switching back to `structure: full` restores title/seamless
-     exactly as configured.
+     under this mode. `layers.seamless.<group>` is **not modified or cleared** in
+     `config.json`, mirroring how `layers.frame.<group>` is preserved in item 2 above
+     — switching back to `structure: full` restores seamless exactly as configured.
+     The per-card title step itself is simply skipped entirely under
+     `structure: illustration` (there is no persistent title field to preserve or
+     restore — see "Title text" below).
 
 **Scope — everything else is unaffected.** `structure: illustration` touches only the
 five items above. The following remain fully AI-generated regardless of `structure`,
@@ -380,7 +409,8 @@ five items above. The following remain fully AI-generated regardless of `structu
 - The **Center motif** — the portrait + `[RESOLVED_ATTRIBUTES]` on Court cards, the
   `[RANK_COUNT]` pip layout on Pip cards, and the large suit symbol on Aces.
 - The title named element (see "Title text" below) is the other exception: present
-  under `structure: full` (when `title.enabled`), absent entirely under `illustration`.
+  under `structure: full` when the user supplies a per-card title, absent entirely
+  under `illustration` (the title wizard step is skipped, not just its output).
 
 Rounded or cut corners need no separate handling: that treatment lives in
 `[FRAME_LINE]` (e.g. `assets/frame/cut-corner.md`, `assets/frame/rounded-cut-corner.md`),
@@ -394,21 +424,24 @@ engines), so the whole set of illustrations reads as one consistent style. This 
 workflow tip for the user — this skill does not inject reference-image parameters into
 the generated prompt text itself.
 
-### Title text (`title.enabled`)
+### Title text
 
-When `title.enabled` is `"true"` AND `structure == "full"`, the assembled prompt names
-the title text as its own element — a short reference to the per-card title text the
-wizard collected (e.g. naming the card's title so the image generator is aware text
-will accompany the artwork). The prompt states ONLY that a title exists and what it
-says; it specifies NO position, NO font, and NO styling for that text (TITL-03) — those
-are deliberately left to the SVG/HTML template the user composites the artwork into,
-for reproducibility across generations (same rationale as `[FRAME_LINE]`/`[INDEX_LINE]`
-under `structure: illustration`). The title element is absent when `title.enabled` is
-`"false"`, and is dropped entirely under `structure: illustration` regardless of
-`title.enabled` (item 5 above, TITL-05) — title placement in that mode is purely the
-user's own SVG template's concern. The per-card title text itself is supplied per card
-and is ephemeral (asked fresh each time, never saved to `config.json`) — only the
-`title.enabled` gate is persistent.
+The title element is a **per-card ephemeral** feature, not a persistent layer — there
+is no deck-wide gate stored in `config.json`. Under `structure == "full"`, the per-card
+title wizard step asks whether this card has a title and, if so, what it says; when
+the user supplies a title, the assembled prompt names the title text as its own
+element — a short reference to the per-card title text the wizard just collected
+(e.g. naming the card's title so the image generator is aware text will accompany the
+artwork). The prompt states ONLY that a title exists and what it says; it specifies NO
+position, NO font, and NO styling for that text (TITL-03) — those are deliberately
+left to the SVG/HTML template the user composites the artwork into, for
+reproducibility across generations (same rationale as `[FRAME_LINE]`/`[INDEX_LINE]`
+under `structure: illustration`). The title element is absent whenever the user
+declines a title for that card. Under `structure == "illustration"`, the title step is
+skipped entirely (TITL-05) — title placement in that mode is purely the user's own SVG
+template's concern, so the question is never asked rather than asked-then-discarded.
+The title text and its placement alias are collected fresh per card and are never
+saved to `config.json` — nothing about title persists between cards or sessions.
 
 ---
 
