@@ -1,6 +1,6 @@
 #!/bin/bash
 # Phase 5 (structural-cleanup) verification gate for playing-card-prompt.
-# Usage: bash scripts/verify_phase5_gate.sh
+# Usage: bash skills/playing-card-prompt/scripts/verify_phase5_gate.sh
 #
 # Runs the four required verification commands plus the archive-exclusion
 # check, exiting non-zero on any failure (VERIFY-5).
@@ -15,9 +15,10 @@
 
 set -e
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_ROOT="$(cd "$SKILL_DIR/../.." && pwd)"
 SKILL_NAME="playing-card-prompt"
-TEST_SCRIPT="$REPO_ROOT/skills/$SKILL_NAME/scripts/test_phase5_schema.py"
+TEST_SCRIPT="$SKILL_DIR/scripts/test_phase5_schema.py"
 
 echo "== Phase 5 verification gate: $SKILL_NAME =="
 
@@ -29,7 +30,7 @@ else
 fi
 
 echo "-- [2/5] python3 scripts/manage_config.py validate --"
-python3 "$REPO_ROOT/skills/$SKILL_NAME/scripts/manage_config.py" validate
+python3 "$SKILL_DIR/scripts/manage_config.py" validate
 
 echo "-- [3/5] bash scripts/package-skill.sh $SKILL_NAME --"
 bash "$REPO_ROOT/scripts/package-skill.sh" "$SKILL_NAME"
