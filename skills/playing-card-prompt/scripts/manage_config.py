@@ -375,8 +375,14 @@ def _migrate_figure_proportion(profile: dict) -> bool:
     Mapping (D-06/D-07):
     - figure_proportion → character_framing (if character_framing not already set)
     - figure_scale defaults to "inscribed-in-frame" if not already set
-    - layers.figure.<group> = "true" → "character" (existing enabled figures default to character)
     - figure_proportion key is removed from the profile
+
+    Does NOT touch `layers.figure.<group>` cells — like
+    `_migrate_figure_true_to_character`/`_migrate_seamless_true_to_alias`, eagerly
+    rewriting a stored literal "true" to "character" would silently discard data
+    and fight the unified D-06/D-07 contract (a literal "true" is now a valid,
+    intentionally preserved cell value, T-05-03). Resolution of "true" to a
+    concrete figure type is deferred to per-card wizard steps.
 
     Returns True if anything was changed.
     """
@@ -387,12 +393,6 @@ def _migrate_figure_proportion(profile: dict) -> bool:
     if old_val and not profile.get("character_framing"):
         profile["character_framing"] = old_val
     profile.setdefault("figure_scale", "inscribed-in-frame")
-    # Migrate layers.figure.<group> = "true" → "character"
-    layers = profile.get("layers", {})
-    fig = layers.get("figure", {})
-    for group in GROUPS:
-        if fig.get(group) == "true":
-            fig[group] = "character"
     return changed
 
 
