@@ -51,8 +51,12 @@ it's a persistent, deck-wide setting like Steps 1–2 and 5–6.
 `layers.figure.<group>` set to a non-`"false"` value** (any of `character`,
 `building`, `animal`, `custom`, or a custom free-text entry) — `court` and `joker`
 default to `"character"`, or `pip`/`ace` can be enabled via `--config`. Otherwise
-the wizard goes straight from Step 7 to Step 13. Steps 8a–8c are persistent
-(asked once per group, skipped if already set in config). Step 8c's Face Style gate
+the wizard goes straight from Step 7 to Step 13. Step 8a (figure scale) is a
+deck-wide persistent setting, skipped if `figure_scale` is already set in config.
+Steps 8b (split layout) and 8c (figure type) are per-group persistent but always
+run when this group's figure layer is active, since a stored `"true"` still defers
+its concrete value to per-card resolution at these steps (UNIFY-01/02/03) — they
+are not skipped just because the cell already holds a value. Step 8c's Face Style gate
 (folded into 8c's own paragraph, no separate step) and Step 8e (character framing)
 additionally require `layers.figure.<group> = "character"` — building/animal/custom
 types skip both. Steps 9–12 are per-card.
