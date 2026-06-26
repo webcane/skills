@@ -10,6 +10,7 @@ loads.
 | # | Step | Components (STYLE-COMPONENTS.md) | Layers (`layers.*`) | Placeholders | Assets |
 |---|---|---|---|---|---|
 | **1** | Deck type | #12 Pip/suit symbol design (deck's suits) | — | — (loads the suit/rank table) | `assets/decks/<deck>.md` |
+| **1b** | Structure *(full vs. illustration-only, persistent)* | — *(structural — gates index/frame/title/seamless deck-wide)* | — | — (no placeholder of its own; gates `[INDEX_LINE]`/`[FRAME_LINE]`/title/seamless downstream) | — |
 | **2** | Court lettering | #13 Typography / indices | Index *(structural — rank letters)* | `RANK_LETTER` (for court/ace) | `assets/lettering/systems.md` |
 | **3** | Rank | — *(template choice, not a style component)* | Center motif *(structural — selects COURT/PIP/ACE/JOKER)*; sets this card's group (`court`/`pip`/`ace`/`joker`), which determines the `layers.figure.<group>` default checked after Step 7 | `RANK_NAME`, `RANK_LETTER` | `references/REFERENCE.md` (rank table), `assets/courts/<rank>.md` if court or joker |
 | **4** | Suit *(skipped for Joker)* | #12 Pip/suit symbol design | Center motif *(structural)* | `SUIT_NAME_TITLE`, `SUIT_NAME`, `SUIT_SYMBOL`, `SUIT_COLOR` | `assets/decks/<deck>.md` |
@@ -56,16 +57,19 @@ the wizard goes straight from Step 7 to Step 13. Steps 8a–8c are persistent
 additionally require `layers.figure.<group> = "character"` — building/animal/custom
 types skip both. Steps 9–12 are per-card.
 
-**`structure` setting** (`full`/`illustration`, config mode item 9, persistent) — when
-`illustration`, alters the opening line used in step 1's template, drops
-`[INDEX_LINE]` (step 2's placeholder, normally fed by the "not covered" item below),
-drops `[FRAME_LINE]` (fed by step 6) regardless of `layers.frame.<group>`, appends
-a fixed block to `[NEGATIVE_LIST]` (step 12), and drops the Title step and Seamless
-step entirely — under `illustration`, the per-card Title step (T) is skipped
-outright (never asked, not asked-then-discarded), and the seamless phrase is not
-added to any STYLE_BLOCK regardless of `layers.seamless.<group>` (TITL-05/SEAM-05,
-one shared gate). See "`structure` setting" in `REFERENCE.md`. All other
-steps/components are unaffected.
+**`structure` setting** (`full`/`illustration`, asked early as Step 1b — right after
+Deck type — and config mode item 2, persistent, WIZ-03/D-12) — when `illustration`,
+alters the opening line used in step 1's template, drops `[INDEX_LINE]` (step 2's
+placeholder, normally fed by the "not covered" item below), drops `[FRAME_LINE]` (fed
+by step 6) regardless of `layers.frame.<group>`, appends a fixed block to
+`[NEGATIVE_LIST]` (step 12), and drops the Title step and Seamless step entirely —
+under `illustration`, the per-card Title step (T) is skipped outright (never asked,
+not asked-then-discarded), and the seamless phrase is not added to any STYLE_BLOCK
+regardless of `layers.seamless.<group>` (TITL-05/SEAM-05, one shared gate). Asking
+this early means its downstream consequences are explained once at Step 1b; later
+steps (the figure-check, Step 8f, Step T, and assembly) simply refer back to "the
+structure setting chosen earlier." See "`structure` setting" in `REFERENCE.md`. All
+other steps/components are unaffected.
 
 **Not covered by a dedicated step (silent / assembly-only):**
 - **`[INDEX_LINE]`** — assembled from `assets/index/options.md` via silent defaults in Assembling step 2; not asked in the wizard.

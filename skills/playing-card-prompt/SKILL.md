@@ -124,6 +124,25 @@ _Skipped if loaded from config._ Ask which deck. Options:
 Load the matching `assets/decks/<deck>.md`. It defines the suit table, the available ranks,
 and the deck's default lettering system.
 
+### Step 1b — Structure (full card vs. illustration-only) · _persistent_
+
+_Skipped if loaded from config._ Ask whether the assembled prompt should describe a
+complete card or only the center illustration. Options:
+- **Full card (default)** — the prompt describes the whole card: frame/border, corner
+  indices, and the center motif together. Sets `structure = "full"`.
+- **Illustration only** — for users compositing the AI-generated artwork into their own
+  SVG/HTML card template that already supplies the frame, corner indices, fonts, and
+  margins. Sets `structure = "illustration"`.
+
+Explain the downstream effect once, here: choosing **Illustration only** drops the
+index line and the frame line from every card's prompt, replaces the opening line with
+an illustration-only framing, appends a fixed `no card border, no frame, ...` block to
+the negative list, and skips the per-card Title step (Step T) and the Seamless question
+(Step 8f) entirely for every card in this deck — see "`structure` setting" in
+`references/REFERENCE.md` for the exact mechanics. Later steps (the figure-check, Step
+8f, Step T, and prompt assembly) simply refer back to "the structure setting chosen
+earlier" rather than re-explaining these consequences.
+
 ### Step 2 — Court lettering system · _persistent_
 
 _Skipped if loaded from config._ Ask which lettering system sets the printed court
@@ -142,21 +161,22 @@ letter); for number cards it's unused, but ask it here to keep the flow consiste
 
 Always ask. Offer only the ranks listed in the chosen `assets/decks/<deck>.md`
 (standard set: A, 2–10, J, Q, K, Joker). Resolve via the rank table in
-`references/REFERENCE.md`:
+`references/REFERENCE.md`. Per-group `layers.figure.<group>` defaults — see the
+Defaults table in `references/REFERENCE.md` (the single canonical source for every
+`(layer, group)` default):
 - **K / Q / J → COURT** → auto-load `assets/courts/<rank>.md`; this card's group is
-  `court` (`layers.figure.court` defaults to `"character"`).
-- **A → ACE** → this card's group is `ace` (`layers.figure.ace` defaults to `"false"`).
-- **2–10 → PIP** → this card's group is `pip` (`layers.figure.pip` defaults to `"false"`).
+  `court`.
+- **A → ACE** → this card's group is `ace`.
+- **2–10 → PIP** → this card's group is `pip`.
 - **Joker → JOKER** → auto-load `assets/courts/joker.md`; this card's group is
-  `joker` (`layers.figure.joker` defaults to `"character"`). Skip Step 4 (no suit); run
-  Steps 4.1–4.2 from references/JOKER-WIZARD.md instead.
-- **Back → BACK** → this card's group is `back` (`layers.figure.back` defaults to
-  `"false"`). Skip Step 4 (no suit); run Steps B1–B7 from references/WIZARD-BACK.md
-  instead of Steps 4.1–4.2 — B1–B5 are per-card ephemeral back-design steps (asked
-  fresh every Back card, never saved), B6 sets the persistent `layers.frame.back`
-  cell, and B7 (exclusions) is per-card.
-- **Special → SPECIAL** → this card's group is `special` (`layers.figure.special` defaults to
-  `"false"`). Skip Step 4 (no suit); run Steps S1–S5 from references/WIZARD-SPECIAL.md instead of Steps 4.1–4.2.
+  `joker`. Skip Step 4 (no suit); run Steps 4.1–4.2 from references/JOKER-WIZARD.md
+  instead.
+- **Back → BACK** → this card's group is `back`. Skip Step 4 (no suit); run Steps
+  B1–B7 from references/WIZARD-BACK.md instead of Steps 4.1–4.2 — B1–B5 are per-card
+  ephemeral back-design steps (asked fresh every Back card, never saved), B6 sets the
+  persistent `layers.frame.back` cell, and B7 (exclusions) is per-card.
+- **Special → SPECIAL** → this card's group is `special`. Skip Step 4 (no suit); run
+  Steps S1–S5 from references/WIZARD-SPECIAL.md instead of Steps 4.1–4.2.
 
 > If the deck has more than 4 standard rank groups, surface the 4 most common ranks as
 > explicit options; Back, Special, and Joker appear under "Other" unless the user is
@@ -290,25 +310,32 @@ Every `layers.<layer>.<group>` cell — figure included — follows one unified 
 `"false"` (no figure), `"true"` (figure active for this group; the actual type or
 description is resolved fresh per-card in Steps 8c/9–12, NOT eagerly defaulted), a
 known figure-type alias (`"character"`, `"building"`, `"animal"`), or custom free-text
-figure description (used verbatim), defaulting to `"character"` for court and joker,
-`"false"` for pip/ace/back/special unless previously configured via `--config`. If
-it's `"false"`, this card has no figure — **skip the entire figure block (Steps 8a–8f)
-and go straight to Step 13** (Aspect ratio). Otherwise, the figure block (Steps 8a–8f)
-and Steps 9–12 apply: court and joker cards by default, plus any pip/ace/back/special
-card whose `layers.figure.<group>` was set to a type value. Steps 8a–8c are
-persistent — skipped if already set or loaded from config; Step 8e is character-only
-persistent (skipped if `layers.figure.<group>` is not `"character"`); Step 8f
-(seamless) is per-group persistent; Steps 9–12 are per-card.
+figure description (used verbatim) — see the Defaults table in
+`references/REFERENCE.md` for which groups default to a figure type vs. `"false"`
+unless previously configured via `--config`. If it's `"false"`, this card has no
+figure — **skip the entire figure block (Steps 8a–8f) and go straight to Step 13**
+(Aspect ratio). Otherwise, the figure block (Steps 8a–8f) and Steps 9–12 apply: court
+and joker cards by default, plus any pip/ace/back/special card whose
+`layers.figure.<group>` was set to a type value. Step 8a is persistent and skipped if
+`figure_scale` is already set; Steps 8b/8c are per-group persistent but always run
+when this group's figure layer is active, since a stored `"true"` still defers its
+concrete value to per-card resolution here; Step 8e is character-only persistent
+(skipped if `character_framing` is already set, or if `layers.figure.<group>` is not
+`"character"`); Step 8f (seamless) is per-group persistent with the same
+always-resolves-here behavior as 8b/8c; Steps 9–12 are per-card.
 
 ---
 
 ### Step 8a — Figure scale · _persistent_
 
-_Skipped if already set in config, or if `layers.figure.<group>` is `"false"` for
-this card's group (see the check above)._ Ask how the figure should sit in the frame
-across the deck — this becomes `figure_scale`, applied to every card with a figure
-(all figure types: character, building, animal, custom). This is a deck-wide setting;
-the same scale is reused for every figure card so the set reads consistently framed.
+_Skip this step if ANY of:_
+- `figure_scale` is already set in config.
+- `layers.figure.<group>` is `"false"` for this card's group (see the check above).
+
+Ask how the figure should sit in the frame across the deck — this becomes
+`figure_scale`, applied to every card with a figure (all figure types: character,
+building, animal, custom). This is a deck-wide setting; the same scale is reused for
+every figure card so the set reads consistently framed.
 
 Offer (default first, per the AskUserQuestion 4-option limit):
 - **Inscribed in frame (default)** — the figure is fully contained within the card
@@ -324,12 +351,15 @@ save it phrased as its own comma-separated phrase (ending in a comma).
 
 ### Step 8b — Split layout · _per-group persistent_
 
-_Skipped if already set for this group in config, or if `layers.figure.<group>` is
-`"false"` (the whole figure block is skipped when the layer is off — SPLT-04)._ Ask
-how the figures on the cards in this group should be split (per-group; asked once for
-each group, then reused). Applies to all figure types. A `"true"` cell means split is
-active for this group — the actual split composition is resolved per-card here
-(UNIFY-02/03) — and `layers.split.<group>` also accepts any custom free-text split
+_Skip this step if ANY of:_
+- `layers.figure.<group>` is `"false"` (the whole figure block is skipped when the
+  layer is off — SPLT-04).
+
+Ask how the figures on the cards in this group should be split (per-group; asked once
+for each group, then reused). Applies to all figure types. A `"true"` cell means split
+is active for this group — the actual split composition is resolved per-card here
+(UNIFY-02/03), so this step still runs even if `layers.split.<group>` already holds
+`"true"` — and `layers.split.<group>` also accepts any custom free-text split
 description beyond the three presets below.
 
 Offer (default first):
@@ -346,12 +376,15 @@ Save via `python3 scripts/manage_config.py set layers.split.<group> <value>` (re
 
 ### Step 8c — Figure type · _per-group persistent_
 
-_Skipped if already set for this group in config, or if `layers.figure.<group>` is
-`"false"`._ Ask what kind of figure this group carries. This sets the group's figure
-layer value — the value IS the figure type, keeping the layer on while recording the
-type (D-02). A `"true"` cell reaching this step is resolved to the chosen type or
-custom description here, per-card-group (UNIFY-01). Per-group; asked once, then
-reused.
+_Skip this step if ANY of:_
+- `layers.figure.<group>` is `"false"`.
+
+Ask what kind of figure this group carries. This sets the group's figure layer
+value — the value IS the figure type, keeping the layer on while recording the type
+(D-02). A `"true"` cell reaching this step is resolved to the chosen type or custom
+description here, per-card-group (UNIFY-01) — so this step still runs even if
+`layers.figure.<group>` already holds `"true"`. Per-group; asked once, then reused
+once resolved to a concrete type/custom value.
 
 Offer (default first, per 4-option AskUserQuestion limit):
 - **Character (default)** — a person or humanoid figure. Sets
@@ -382,13 +415,16 @@ separate question for it, and building/animal/custom figures don't receive it.
 
 ### Step 8e — Character framing · _character-only persistent_
 
-_Applies ONLY when `layers.figure.<group>` is `"character"`. Skipped if already set
-in config, or if figure type is not character._ Ask how much of the character figure
-is shown across the deck — this becomes `character_framing`, folded into `[STYLE_BLOCK]`
-for every character-type card (see "Figure, face style & proportion" in
-`references/REFERENCE.md`). This is a deck-wide setting; reused across every card
-whose group's figure type is character. Building, animal, and custom figures skip this
-step (FIG-08).
+_Skip this step if ANY of:_
+- `character_framing` is already set in config.
+- This group's figure type is not `"character"` (i.e. `layers.figure.<group>` is
+  `"building"`, `"animal"`, `"custom"`, or other custom text).
+
+Ask how much of the character figure is shown across the deck — this becomes
+`character_framing`, folded into `[STYLE_BLOCK]` for every character-type card (see
+"Figure, face style & proportion" in `references/REFERENCE.md`). This is a deck-wide
+setting; reused across every card whose group's figure type is character. Building,
+animal, and custom figures skip this step (FIG-08).
 
 List the `*.md` files in `assets/character-framing/` (ignore names starting with `_`)
 as options. Offer (default first, per 4-option AskUserQuestion limit):
@@ -412,15 +448,20 @@ Save via `python3 scripts/manage_config.py set character_framing <value>`.
 
 ### Step 8f — Seamless design · _per-group persistent_
 
-_Skipped if already set for this group in config, if `layers.figure.<group>` is
-`"false"`, or if `structure` is `"illustration"` (SEAM-05) — under illustration mode
-neither the question nor its assembled phrase apply, since seamless connects a card's
-border/motif to its neighbors, a purely SVG-template concern in that mode (see
-"`structure` setting" in `references/REFERENCE.md`)._ Only runs for `court`/`pip`/
-`ace`/`joker` (SEAM-03) — `back` and `special` never get this question; their
-`layers.seamless.<group>` stays `"false"`. Ask whether this group's cards should carry
-a seamless / connecting design that reads as one unbroken pattern across the deck
-(per-group; asked once for each group, then reused).
+_Skip this step if ANY of:_
+- `layers.figure.<group>` is `"false"`.
+- `structure` is `"illustration"` (SEAM-05) — under the structure setting chosen
+  earlier (Step 1b), neither the question nor its assembled phrase apply, since
+  seamless connects a card's border/motif to its neighbors, a purely SVG-template
+  concern in that mode (see "`structure` setting" in `references/REFERENCE.md`).
+- This group is `back` or `special` (SEAM-03) — only `court`/`pip`/`ace`/`joker` ever
+  get this question; `back`/`special`'s `layers.seamless.<group>` stays `"false"`.
+
+Ask whether this group's cards should carry a seamless / connecting design that reads
+as one unbroken pattern across the deck (per-group; asked once for each group, then
+reused). A `"true"` cell means seamless is active for this group — the actual
+alias/custom text is resolved per-card here (UNIFY-02), so this step still runs even if
+`layers.seamless.<group>` already holds `"true"`.
 
 List the `*.md` files in `assets/seamless/` (ignore names starting with `_`) as
 options. Offer (default first, per 4-option AskUserQuestion limit):
@@ -437,9 +478,7 @@ options. Offer (default first, per 4-option AskUserQuestion limit):
   seamless phrase is added for this group.
 
 Save via `python3 scripts/manage_config.py set layers.seamless.<group> <value>`
-(replace `<group>` with the actual group: `court`, `pip`, `ace`, or `joker`). A
-`"true"` cell means seamless is active for this group — the alias or custom text is
-resolved per-card here (UNIFY-02).
+(replace `<group>` with the actual group: `court`, `pip`, `ace`, or `joker`).
 
 ### Step 9 — Character / figure description (REQUIRED for cards with a figure) · _per-card_
 
@@ -511,12 +550,15 @@ the prompt during assembly. If nothing, no extra exclusions are added.
 
 ### Step T — Title text · _per-card, ephemeral_
 
-_Skip this step entirely if `structure` is `"illustration"` (TITL-05) — title
-placement is purely the user's own SVG/HTML template's concern in that mode, so the
-question would be asked-then-discarded._ Otherwise (i.e. `structure == "full"`), this
-step runs for every card in all six groups — court, pip, ace, joker, back, and special
-(title is not group-restricted). Title has no `layers.*` cell and no deck-wide
-persistent gate; whether to ask is determined purely by `structure`.
+_Skip this step if ANY of:_
+- `structure` (the structure setting chosen earlier, Step 1b) is `"illustration"`
+  (TITL-05) — title placement is purely the user's own SVG/HTML template's concern in
+  that mode, so the question would be asked-then-discarded.
+
+Otherwise (i.e. `structure == "full"`), this step runs for every card in all six
+groups — court, pip, ace, joker, back, and special (title is not group-restricted).
+Title has no `layers.*` cell and no deck-wide persistent gate; whether to ask is
+determined purely by the structure setting chosen earlier.
 
 The SUGGESTED default differs by this card's group — two groups suggest a placement
 alias, four suggest no title:
@@ -553,10 +595,10 @@ _Skipped if loaded from config._ Ask the card type (see the aspect-ratio table i
 - **Mini** — 5:7
 - or a custom ratio (free text)
 
-Fill `[ASPECT_RATIO]` with the ratio only. If `structure` is `illustration`, this
-ratio describes the proportions of the center illustration/clip area in the user's
-own card template, not the whole card — see "`structure` setting" in
-`references/REFERENCE.md`.
+Fill `[ASPECT_RATIO]` with the ratio only. Under the structure setting chosen earlier
+(Step 1b), if it's `illustration`, this ratio describes the proportions of the center
+illustration/clip area in the user's own card template, not the whole card — see
+"`structure` setting" in `references/REFERENCE.md`.
 
 ---
 
@@ -584,27 +626,29 @@ Offer to save the choice to `config.json` like the other persistent settings.
 
 1. Pick the template (COURT / PIP / ACE / JOKER / BACK / SPECIAL) from `references/REFERENCE.md`.
    If rank = Back, use the BACK template. If rank = Special, use the SPECIAL template.
-   If `structure` is `illustration`, replace the template's opening line with the
-   illustration-only opening line from "`structure` setting" in `references/REFERENCE.md`
-   (otherwise use the template's default opening line unchanged).
+   Under the structure setting chosen earlier (Step 1b), if it's `illustration`,
+   replace the template's opening line with the illustration-only opening line from
+   "`structure` setting" in `references/REFERENCE.md` (otherwise use the template's
+   default opening line unchanged).
 2. Build `[INDEX_LINE]` from `assets/index/options.md` per the card's `index.type` and
    group (Menus A/B/C for standard cards, Menu D2 + Symbol table for Joker — see
    `assets/index/options.md` for the menu detail). Back and Special cards use their
    template's fixed no-index line instead (skip the `assets/index/options.md` lookup
-   entirely for those two). Skip this step entirely if `structure` is `illustration`.
+   entirely for those two). Skip this step entirely under the `illustration` structure
+   setting.
 3. For cards with a figure, fill `[CHARACTER_NAME]`/`[CHARACTER_FEATURES]` (required), then build
    `[RESOLVED_ATTRIBUTES]` and `[NEGATIVE_LIST]` by following the merge rules in
    `references/REFERENCE.md` (resolve conflicts down to one final, deduplicated,
    contradiction-free state — do not list "traditional" and "override" side by side).
-   If `structure` is `illustration`, append the fixed negative block from "`structure`
-   setting" in `references/REFERENCE.md` (`no card border, no frame, no corner index
-   letters or numbers, no corner suit symbols`) to `[NEGATIVE_LIST]`.
+   Under the `illustration` structure setting, append the fixed negative block from
+   "`structure` setting" in `references/REFERENCE.md` (`no card border, no frame, no
+   corner index letters or numbers, no corner suit symbols`) to `[NEGATIVE_LIST]`.
 4. Resolve `[STYLE_BLOCK]` and `[FRAME_LINE]` for this card's group per "Layers and
    `[STYLE_BLOCK]` assembly" and "Figure, face style & proportion" in
    `references/REFERENCE.md`, using `layers.*`, `frame`, `mood`, and `theme`. Splice in
    **full** — never summarize, reorder, or drop an enabled layer's line. Drop
-   `[FRAME_LINE]` entirely when `structure` is `illustration`. For the `back` group,
-   append the symmetry line per "Resolving `[STYLE_BLOCK]`" step 10 in
+   `[FRAME_LINE]` entirely under the `illustration` structure setting. For the `back`
+   group, append the symmetry line per "Resolving `[STYLE_BLOCK]`" step 10 in
    `references/REFERENCE.md`. Reuse the identical resolved `[STYLE_BLOCK]`/`[FRAME_LINE]`
    across every card of the same group so the set stays visually consistent.
 5. **Drop any line whose placeholder is empty** — never output a literal `[PLACEHOLDER]`.

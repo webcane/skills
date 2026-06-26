@@ -19,22 +19,23 @@ show`) so the user can accept or change each one. At the end, persist each value
 active profile in `config.json`; pass `--profile <name>` if editing a non-active
 profile), then confirm. Do **not** proceed to card generation.
 
-Steps to ask in config mode:
+Steps to ask in config mode (Structure moved to position 2, mirroring `SKILL.md`
+Step 1b's resequenced position right after Deck type — WIZ-03/D-12):
 1. Deck type
-2. Court lettering system
-3. Visual style / pattern
-4. Card decoration layers and theme (Step 6)
-5. Mood / atmosphere (Step 7)
-6. Figure block — figure_scale (deck-wide scale), split (per-group split layout),
-   figure_type (per-group character/building/animal/custom), and
-   character_framing (deck-wide framing, character-only) — from the figure-block
-   steps (Steps 8a–8e)
-7. Aspect ratio (Step 13)
-8. Image generator (optional — see Step 14)
-9. Structure — full card (`full`, default) or center-illustration-only
+2. Structure — full card (`full`, default) or center-illustration-only
    (`illustration`, for users compositing the artwork into their own SVG/HTML card
    template that already supplies the frame and corner indices). See "`structure`
    setting" in `references/REFERENCE.md` for what changes under `illustration`.
+3. Court lettering system
+4. Visual style / pattern
+5. Card decoration layers and theme (Step 6)
+6. Mood / atmosphere (Step 7)
+7. Figure block — figure_scale (deck-wide scale), split (per-group split layout),
+   figure_type (per-group character/building/animal/custom), and
+   character_framing (deck-wide framing, character-only) — from the figure-block
+   steps (Steps 8a–8e)
+8. Aspect ratio (Step 13)
+9. Image generator (optional — see Step 14)
 10. Joker index (D2) — `index.count` (placement: `4-index` / `2-index` / `top-only` /
     `none`) and `index.symbol` (glyph: `star-in-circle` / `star` / `Jkr` / `crown` /
     `jester-face` / `none` / custom). Only surface when the user mentions Joker
