@@ -104,13 +104,7 @@ profile holds the fields below:
       },
       "theme": "",
       "figure_scale": "inscribed-in-frame",
-      "character_framing": "",
-      "title": {"enabled": "false"},
-      "back_purpose": "classic",
-      "back_design": "geometric",
-      "back_pattern": "diamond",
-      "back_palette": "classic-blue",
-      "back_symmetry": "rotational-180"
+      "character_framing": ""
     }
   }
 }
@@ -120,14 +114,21 @@ Within a profile, all fields are optional. Any missing field falls back to the n
 source in the lookup order, ultimately to the built-in default (the field reference
 below).
 
-Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
+Every `layers.<layer>.<group>` cell — **figure, split, and seamless included** — is a
+free-text string sharing one unified contract, `false | true | alias | custom`:
 - `"false"` — the layer is off for this group; nothing from it appears.
 - `"true"` — the layer is on, contributing only its own pattern/preset text (no
-  group-wide addition).
-- any other text — the layer is on, and that text is appended as this group's
-  addition on top of the layer's own pattern/preset text (e.g.
-  `"layers": {"ornaments": {"pip": "small corner flourishes,"}}` turns pip ornaments
-  on and adds that phrase).
+  group-wide addition). The specific alias/custom value (for layers that have one,
+  e.g. figure's type, split's mode, seamless's design) is **resolved fresh per-card**
+  at generation time — it is never looked up from a stored default when the cell is
+  read.
+- a known alias (a preset stem discovered under that layer's `assets/<layer>/`
+  directory, e.g. `character` for figure, `horizontal-mirrored` for split,
+  `continuous-border` for seamless) — the layer is on with that specific preset.
+- any other text — the layer is on, and that text is appended (or, for figure,
+  used as the type description) as this group's addition on top of the layer's own
+  pattern/preset text (e.g. `"layers": {"ornaments": {"pip": "small corner
+  flourishes,"}}` turns pip ornaments on and adds that phrase).
 
 ### Field reference
 
@@ -148,17 +149,22 @@ Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
 | `layers.ornaments.<group>`  | `true`, `false`, or custom text (addition)                    | court/ace `true`, pip `false` |
 | `layers.highlights.<group>` | `true`, `false`, or custom text (addition)                    | all `false`        |
 | `layers.frame.<group>`      | `true`, `false`, or custom text (addition)                    | court/ace `true`, pip `false` |
-| `layers.figure.<group>`     | `false`, `character`, `building`, `animal`, `custom` — strict, no free-text addition (unlike other `layers.<layer>.<group>` cells); `"true"` is ACCEPTED as input and resolves immediately to the group's default figure-type alias (`character` for court/joker, `false` for pip/ace, per `LAYER_DEFAULTS["figure"]`) — a literal `"true"` is never persisted | court/joker `character`, pip/ace `false` |
-| `layers.mood.<group>`       | `true` \| `false` \| `mood_line` — the unified mood schema; when the cell holds free text, that text IS the mood line for this group (no separate deck-wide mood field) | all `true` |
+| `layers.figure.<group>`     | `false` (off) \| `true` (layer active; the type is resolved fresh per-card, not looked up from a stored default) \| `<alias>` (a known `assets/figure-type/` stem: `character`, `building`, `animal`) \| `<custom_text>` (used verbatim as the figure-type description) — the same unified contract as every other layer | court/joker `character`, pip/ace `false` |
+| `layers.mood.<group>`       | `true` \| `false` \| `mood_line` — the unified mood schema; bool-only in the normal wizard flow, raw text is a `manage_config.py set` escape hatch where that text IS the mood line for this group (no separate deck-wide mood field) | all `true` |
 | `layers.technique.<group>`  | `true`, `false`, or custom text (addition)                    | all `true`         |
-| `layers.split.<group>`      | `false`, `true` (→ resolves immediately to `none`, never persisted literally), `none`, `horizontal-mirrored`, `angled-mirrored`, or custom free text (used verbatim) | all `false`        |
-| `layers.seamless.<group>`   | `false` \| `true` (→ resolves to the group's default seamless alias) \| `<alias>` (from `assets/seamless/*.md`, e.g. `continuous-border`, `interlocking-motif`) \| `<custom_text>` (used verbatim) | all `false` |
-| `title.enabled`             | `true`, `false` — deck-wide persistent gate; when `true` AND `structure == "full"`, the wizard asks for per-card title text (ephemeral, never saved to `config.json`); dropped entirely under `structure: illustration` regardless of this value (TITL-05) | `false` |
+| `layers.split.<group>`      | `false` (off) \| `true` (split active; the mode is resolved fresh per-card, not looked up from a stored default) \| `horizontal-mirrored` \| `angled-mirrored` \| custom free text (used verbatim) | all `false`        |
+| `layers.seamless.<group>`   | `false` (off) \| `true` (seamless active; resolved fresh per-card, not looked up from a stored default) \| `<alias>` (from `assets/seamless/*.md`, e.g. `continuous-border`, `interlocking-motif`) \| `<custom_text>` (used verbatim) | all `false` |
 | `theme`                     | free text (deck-wide concept/symbolism, e.g. `celestial mythology`) | `""` |
 | `figure_scale`              | `full-bleed`, `inscribed-in-frame`, `small-centered`, `cross-a-frame` (or custom crop text); named presets resolve to the phrase in `assets/figure-scale/<name>.md`, custom text is used verbatim; applies to ALL figure types when `layers.figure.<group>` is on | `inscribed-in-frame` |
 | `character_framing`         | `bust`, `waist-up`, `three-quarter`, `seven-eighths`, `full-body` (or any custom framing/crop description); see `assets/character-framing/` for presets — applies ONLY when figure type is `character` | `""` |
 | `index.symbol`              | `star-in-circle`, `star`, `Jkr`, `J`, `crown`, `jester-face`, `none` (or custom); the glyph shown in Joker corner indices (see `assets/index/options.md` Symbol table for the phrase each value produces) | `star-in-circle` |
 | `index.type`                | `standard` (rank+suit index), `joker` (symbol-only index via Menu D2); auto-derived from card group during assembly — set explicitly only to force joker-style indices on all cards | `standard` |
+
+The Default column above gives each field's factory value in isolation; for the full
+`(layer, group)` default matrix across every layer and group at once, see the
+"Defaults" table in `references/REFERENCE.md` — that table is the single canonical
+source for every layer default (WIZ-01); this file's Default column is kept
+consistent with it but does not restate it.
 
 > **Migration note:** `figure_proportion` is not a current field — a pre-4.0
 > `config.json` that still has it is migrated automatically on load
@@ -169,6 +175,15 @@ Each `layers.<layer>.<group>` cell is a free-text string with three meanings:
 > (`assets/figure-proportion/*.md`) still back this migration path but are no
 > longer offered as a live wizard choice — see `figure_scale` /
 > `character_framing` above.
+>
+> A pre-Phase-5 `config.json` may still carry a `title` key or any `back_*` field
+> (`back_purpose`, `back_design`, `back_pattern`, `back_palette`, `back_symmetry`) —
+> these are silently dropped on load by `_migrate_drop_phase5_persistent` in
+> `manage_config.py`, since none of them are persistent fields anymore (see "Back
+> design criteria" below). Separately, a literal `layers.*.<group> = "true"` value
+> (for `figure`, `split`, or `seamless`) is now **preserved as-is** on load — it is no
+> longer eagerly resolved to a concrete alias. It means "this layer is active for this
+> group; ask per-card."
 
 `<group>` is one of `court`, `pip`, `ace`, `joker`, `back`, `special`.
 
@@ -177,36 +192,24 @@ all other layers default `"true"` except highlights (`"false"`). Back cards alwa
 the symmetry instruction from `assets/back/symmetry/<back_symmetry>.md` in their
 STYLE_BLOCK regardless of layer settings (step 10 in REFERENCE.md).
 
-### Back design criteria fields
+### Back design criteria
 
-Five persistent fields control the structured B1–B6 back card wizard steps. All allow
-custom free text in addition to the listed preset aliases:
+The back design criteria — purpose, design category, pattern, palette, and symmetry —
+are **not** persistent fields. They are collected fresh per-card in the Back wizard
+(Steps B1–B5, see `references/WIZARD-BACK.md`) every time a back card is generated,
+and are never written to `config.json` (D-04). `back_purpose`/`back_pattern`/
+`back_palette` contribute their asset "Purpose line"/"Pattern line"/"Palette line" to
+`[BACK_DESIGN]` in the BACK template; `back_symmetry` controls STYLE_BLOCK step 10 for
+the `back` group (its "Symmetry line" is always appended regardless of `layers.*`
+values); `back_design` is a category selector that filters which pattern aliases Step
+B3 offers (falls back to the `geometric` category for custom/unknown values) — see
+`references/REFERENCE.md` for the full per-card assembly order.
 
-| Field | Values | Default | Asset path |
-|-------|--------|---------|------------|
-| `back_purpose` | `classic`, `designer`, `casino` (or custom text) | `classic` | `assets/back/purpose/<back_purpose>.md` |
-| `back_design` | `geometric`, `botanical`, `abstract`, `illustrated` (or custom text) | `geometric` | — (filter for B3 options; no asset loaded) |
-| `back_pattern` | alias within chosen design category (or custom text) | `diamond` | `assets/back/design/<back_design>/<back_pattern>.md` |
-| `back_palette` | `classic-red`, `classic-blue`, `dark`, `gold` (or custom text) | `classic-blue` | `assets/back/palette/<back_palette>.md` |
-| `back_symmetry` | `rotational-180`, `bilateral`, `asymmetric` (or custom text) | `rotational-180` | `assets/back/symmetry/<back_symmetry>.md` |
-
-Pattern aliases per design category:
-- `geometric`: `diamond`, `cross-hatch`, `hexgrid`, `wave`
-- `botanical`: `vine`, `floral`, `leaf`, `branch`
-- `abstract`: `interlacing`, `color-field`, `paint-stroke`, `fractal`
-- `illustrated`: `thematic`, `portrait`, `landscape`, `heraldic`
-
-`back_purpose`, `back_pattern`, and `back_palette` contribute their asset "Purpose
-line", "Pattern line", and "Palette line" (respectively) to `[BACK_DESIGN]` in the BACK
-template — concatenated in that order.
-
-`back_symmetry` controls STYLE_BLOCK step 10 for the `back` group — its "Symmetry
-line" is always appended to STYLE_BLOCK regardless of `layers.*` cell values.
-
-`back_design` is a category selector only; its value is not loaded as an asset —
-instead it determines which pattern aliases are shown in Step B3. If `back_design` is
-set to custom text (not a known category alias), B3 falls back to the `geometric`
-category's options.
+The category→pattern option dependency (`back_design` → `back_pattern`) is still
+available as `allowed_back_patterns(category)` in `manage_config.py` — kept as a
+standalone helper the per-card wizard step calls directly to enumerate pattern
+options for the chosen category; it is no longer wired through `options_for`/
+`PERSISTENT_KEYS` since these fields aren't persisted.
 
 **Special group defaults** — `layers.frame.special` = `"false"` (no standard card border),
 `layers.figure.special` = `"false"` (no figure by default), `layers.split.special` = `"false"`.
@@ -241,15 +244,15 @@ for this group), `"true"` (on, but no specific line), or any other text (that te
 IS the `[MOOD_LINE]` for this group). There is no separate deck-wide `mood` field;
 a preset can still be picked from `assets/mood/` or typed as custom text in Step 7,
 which sets the chosen mood line into every group's `layers.mood.<group>` cell.
-`layers.figure.<group>` now carries the figure type — `"false"` (off), or one of
-`"character"`/`"building"`/`"animal"`/`"custom"` (on + figure type, D-02). This cell
-is strict (unlike other `layers.<layer>.<group>` cells) and does not accept a
-free-text addition — `manage_config.py set layers.figure.<group> "<text>"` only
-accepts the five literal tokens above. For `character` type, the chosen pattern's own
-"Figure detail" and "Face Style" sections are folded into `[STYLE_BLOCK]`
-automatically — additional portrait-only rendering detail (e.g. skin tones) and how a
-figure's face reads are part of the `style` pattern, not a separate setting; these are
-skipped entirely for `building`/`animal`/`custom` (FIG-08, D-16).
+`layers.figure.<group>` carries the figure type and follows the same unified
+`false|true|alias|custom` contract as every other layer — `"false"` (off), `"true"`
+(on, type resolved fresh per-card), a known alias (`"character"`/`"building"`/
+`"animal"`), or any other custom text (on, used verbatim as the figure-type
+description, D-06). For `character` type, the chosen pattern's own "Figure detail"
+and "Face Style" sections are folded into `[STYLE_BLOCK]` automatically — additional
+portrait-only rendering detail (e.g. skin tones) and how a figure's face reads are
+part of the `style` pattern, not a separate setting; these are skipped entirely for
+`building`/`animal`/custom-text types (FIG-08, D-16).
 
 `character_framing` is folded into `[STYLE_BLOCK]` right after the pattern's Face
 Style line, ONLY when figure type is `character` — a deck-wide framing/crop
@@ -290,12 +293,13 @@ like Pip/Ace, can be tuned per layer via `--config`.
 `deck`, `lettering`, `style`, `frame`, `aspect_ratio`, `image_generator`, `structure`,
 `index.*` (including `index.symbol` and `index.type`), `layers.*` (including
 `layers.mood.<group>`, the only mood setting), `theme`,
-`figure_scale`, `character_framing`,
-`back_purpose`, `back_design`, `back_pattern`, `back_palette`, `back_symmetry`
+`figure_scale`, `character_framing`
 
 **Per-card** (always asked in the wizard — never saved):
 `rank`, `suit` (or `joker_color` for Joker cards), `character_name`,
-`character_features`, `extra_attributes`, `reference_transfers`, `exclusions`
+`character_features`, `extra_attributes`, `reference_transfers`, `exclusions`,
+`back_purpose`, `back_design`, `back_pattern`, `back_palette`, `back_symmetry`,
+title text and title placement alias
 
 ## Example `config.json`
 
