@@ -32,7 +32,7 @@ Usage:
 
 Keys (within a profile): deck, lettering, style, frame, aspect_ratio, image_generator,
       structure, index.size, index.count, index.layout, index.symbol, index.type,
-      layers.<background|decor|ornaments|highlights|frame|figure|mood|technique|split>.<court|pip|ace|joker|back|special>,
+      layers.<background|decor|ornaments|highlights|frame|figure|mood|technique|split|seamless>.<court|pip|ace|joker|back|special>,
       theme, figure_scale, character_framing
 
 Every `layers.<layer>.<group>` cell (figure included) shares one unified contract:
