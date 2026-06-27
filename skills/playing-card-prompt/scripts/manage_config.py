@@ -293,6 +293,12 @@ def validate_value(key: str, value: str, profile: dict | None = None) -> tuple[b
             return True, ""
         return False, f"aspect_ratio must be a preset ({', '.join(allowed)}) or N:M"
     if value in allowed:
+        if key.startswith("layers.figure.") and value == "custom":
+            return True, (f"note: '{value}' is the discovered figure-type alias "
+                           f"'custom' (resolves to assets/figure-type/custom.md's "
+                           f"generic placeholder line), NOT a marker for free-text "
+                           f"custom description — to use your own description, set "
+                           f"{key} to that description text directly")
         return True, ""
     if strict:
         return False, f"{key} must be one of: {', '.join(allowed)}"
