@@ -66,14 +66,17 @@ Deck type — and config mode item 2, persistent, WIZ-03/D-12) — when `illustr
 alters the opening line used in step 1's template, drops `[INDEX_LINE]` (step 2's
 placeholder, normally fed by the "not covered" item below), drops `[FRAME_LINE]` (fed
 by step 6) regardless of `layers.frame.<group>`, appends a fixed block to
-`[NEGATIVE_LIST]` (step 12), and drops the Title step and Seamless step entirely —
-under `illustration`, the per-card Title step (T) is skipped outright (never asked,
-not asked-then-discarded), and the seamless phrase is not added to any STYLE_BLOCK
-regardless of `layers.seamless.<group>` (TITL-05/SEAM-05, one shared gate). Asking
-this early means its downstream consequences are explained once at Step 1b; later
-steps (the figure-check, Step 8f, Step T, and assembly) simply refer back to "the
-structure setting chosen earlier." See "`structure` setting" in `REFERENCE.md`. All
-other steps/components are unaffected.
+`[NEGATIVE_LIST]` (step 12), and drops the Title step, the Split step, and the
+Seamless step entirely — under `illustration`, the per-card Title step (T) is skipped
+outright (never asked, not asked-then-discarded), the per-group Split step (8b) is
+skipped the same way and the split phrase is not added to any STYLE_BLOCK regardless
+of `layers.split.<group>`, and the seamless phrase is not added to any STYLE_BLOCK
+regardless of `layers.seamless.<group>` (TITL-05/SEAM-05, one shared structure==
+illustration gate that Split now also follows). Asking this early means its
+downstream consequences are explained once at Step 1b;
+later steps (the figure-check, Step 8b, Step 8f, Step T, and assembly) simply refer
+back to "the structure setting chosen earlier." See "`structure` setting" in
+`REFERENCE.md`. All other steps/components are unaffected.
 
 **Not covered by a dedicated step (silent / assembly-only):**
 - **`[INDEX_LINE]`** — assembled from `assets/index/options.md` via silent defaults in Assembling step 2; not asked in the wizard.

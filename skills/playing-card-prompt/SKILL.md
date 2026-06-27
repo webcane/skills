@@ -137,11 +137,12 @@ complete card or only the center illustration. Options:
 Explain the downstream effect once, here: choosing **Illustration only** drops the
 index line and the frame line from every card's prompt, replaces the opening line with
 an illustration-only framing, appends a fixed `no card border, no frame, ...` block to
-the negative list, and skips the per-card Title step (Step T) and the Seamless question
-(Step 8f) entirely for every card in this deck — see "`structure` setting" in
-`references/REFERENCE.md` for the exact mechanics. Later steps (the figure-check, Step
-8f, Step T, and prompt assembly) simply refer back to "the structure setting chosen
-earlier" rather than re-explaining these consequences.
+the negative list, and skips the per-card Title step (Step T), the Split question
+(Step 8b), and the Seamless question (Step 8f) entirely for every card in this deck —
+see "`structure` setting" in `references/REFERENCE.md` for the exact mechanics. Later
+steps (the figure-check, Step 8b, Step 8f, Step T, and prompt assembly) simply refer
+back to "the structure setting chosen earlier" rather than re-explaining these
+consequences.
 
 ### Step 2 — Court lettering system · _persistent_
 
@@ -354,6 +355,12 @@ save it phrased as its own comma-separated phrase (ending in a comma).
 _Skip this step if ANY of:_
 - `layers.figure.<group>` is `"false"` (the whole figure block is skipped when the
   layer is off — SPLT-04).
+- `structure` is `"illustration"` — under the structure setting chosen earlier
+  (Step 1b), neither the question nor its assembled phrase apply, since split layout
+  is purely an SVG-template/compositional concern in that mode (see "`structure`
+  setting" in `references/REFERENCE.md`). `layers.split.<group>` is preserved in
+  config but ignored at assembly time, mirroring frame/seamless — this is the same
+  shared structure==illustration gate as Step 8f's SEAM-05 rule.
 
 Ask how the figures on the cards in this group should be split (per-group; asked once
 for each group, then reused). Applies to all figure types. A `"true"` cell means split

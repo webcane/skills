@@ -140,7 +140,11 @@ Then:
       the `figure_scale` value verbatim as its own comma phrase. Applied to ALL figure
       types. If `figure_scale` is empty or not set, omit this phrase.
 
-   d. **Split** — if `layers.split.g` is `"horizontal-mirrored"` or
+   d. **Split** — under `structure: illustration`, no split text is added to
+      `[STYLE_BLOCK]` regardless of `layers.split.g`'s value — split layout is purely
+      an SVG-template/compositional concern in that mode (see "`structure` setting"
+      above), exactly like seamless's illustration exclusion in sub-step e below.
+      Otherwise (`structure: full`): if `layers.split.g` is `"horizontal-mirrored"` or
       `"angled-mirrored"`, append the text from
       `assets/split/<layers.split.g value>.md` as its own comma phrase — the outer
       compositional wrapper (SPLT-03). If `layers.split.g` is `"true"`, split is
@@ -367,7 +371,7 @@ that already supplies the frame, corner indices, fonts, and margins — and so w
 prompt that describes ONLY what goes in the center clip area.
 
 - **`full`** (default) — current behavior, unchanged.
-- **`illustration`** — exactly five changes to assembly, all others unchanged:
+- **`illustration`** — exactly six changes to assembly, all others unchanged:
   1. **Drop `[INDEX_LINE]`** entirely from every template — no corner rank/suit
      markers (the user's own template supplies these).
   2. **Drop `[FRAME_LINE]`** entirely from every template, regardless of
@@ -398,14 +402,24 @@ prompt that describes ONLY what goes in the center clip area.
      The per-card title step itself is simply skipped entirely under
      `structure: illustration` (there is no persistent title field to preserve or
      restore — see "Title text" below).
+  6. **Drop split-layout instructions.** Under `structure: illustration`, no
+     `layers.split.<group>` instruction is added to any STYLE_BLOCK — split layout is
+     purely an SVG-template/compositional concern under this mode, exactly like
+     seamless in item 5. `layers.split.<group>` is **not modified or cleared** in
+     `config.json`, mirroring how `layers.frame.<group>` and `layers.seamless.<group>`
+     are preserved above — switching back to `structure: full` restores split exactly
+     as configured. The per-card Split wizard step (Step 8b) is skipped entirely under
+     `illustration` (asked-not-then-discarded — never asked), exactly like the Title
+     step.
 
 **Scope — everything else is unaffected.** `structure: illustration` touches only the
-five items above. The following remain fully AI-generated regardless of `structure`,
-**except for the title and seamless exceptions item 5 introduces**:
+six items above. The following remain fully AI-generated regardless of `structure`,
+**except for the title, seamless, and split exceptions items 5 and 6 introduce**:
 - All of `[STYLE_BLOCK]` — background, decor, ornaments, highlights, figure, mood, and
   technique layers (including Finish lines), resolved exactly as for `structure: full`.
-  The figure block's seamless sub-step (6e) is the one part of `[STYLE_BLOCK]` that is
-  NOT resolved the same way under `illustration` — it is dropped entirely per item 5.
+  The figure block's split sub-step (6d) and seamless sub-step (6e) are the parts of
+  `[STYLE_BLOCK]` that are NOT resolved the same way under `illustration` — both are
+  dropped entirely per items 5 and 6.
 - The **Center motif** — the portrait + `[RESOLVED_ATTRIBUTES]` on Court cards, the
   `[RANK_COUNT]` pip layout on Pip cards, and the large suit symbol on Aces.
 - The title named element (see "Title text" below) is the other exception: present
