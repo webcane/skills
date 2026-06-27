@@ -4,7 +4,7 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
-## [Unreleased]
+## [4.6.0] - 2026-06-27
 
 ### Fixed
 - **`references/STYLE-COMPONENTS.md` had no callout for the Special/Prospect card group (`rank = Special`)** — the file gave the `back` group an explicit top-of-file callout but never mentioned Special, even though Special is a fully-wired rank group (Steps S1-S5, `assets/special/*.md`, figure block opt-in via `layers.figure.special`, prospect-only Step S4). Added a matching callout alongside the `back` one so the component-coverage audit is complete; no behavior change (doc-only).
