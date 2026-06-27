@@ -45,9 +45,12 @@ layer's own pattern/preset text):
   same `false|true|alias|custom` contract as every other layer: `"false"` = no
   figure; `"true"` = figure on, with the actual type resolved per-card (the wizard
   asks at generation time, not looked up from a stored default); a known type alias
-  (`character` / `building` / `animal` from `assets/figure-type/`) = figure on + that
-  type; or any other custom free text = figure on + that text used verbatim as the
-  type description. The resolved type selects which `assets/figure-type/<type>.md`
+  (`character` / `building` / `animal` / `custom` — all four are discovered from
+  `assets/figure-type/`) = figure on + that type, where the `custom` alias itself
+  resolves to a generic "central subject as described," placeholder line (distinct
+  from supplying your own free-text description below); or any other custom free
+  text = figure on + that text used verbatim as the type description. The resolved
+  type selects which `assets/figure-type/<type>.md`
   text is pulled into `[STYLE_BLOCK]`, and determines whether character-only sources
   (Face Style, character_framing) apply. Default: `"character"` for `court` and
   `joker` (the portrait); `"false"` for `pip`/`ace` (no figure) — set to a type value
@@ -115,8 +118,9 @@ Then:
    append, in this exact order (D-15):
 
    a. **Figure-type text** — the text from `assets/figure-type/<type>.md`, where
-      `<type>` is the `layers.figure.g` value (`character`, `building`, `animal`, or
-      custom text). When the cell is exactly `"true"`, the actual type/alias is not
+      `<type>` is the `layers.figure.g` value (`character`, `building`, `animal`,
+      `custom` — the discovered alias, which resolves to a generic placeholder line —
+      or custom free text). When the cell is exactly `"true"`, the actual type/alias is not
       looked up from a stored default — it is resolved fresh per-card at generation
       time (the wizard asks which type this card's figure is). Applied to ALL figure
       types.
@@ -221,9 +225,11 @@ fold Figure detail or Face Style into Technique or vice versa.
 **Figure type assembly** — `layers.figure.<group>` carries the figure type and follows
 the same `false|true|alias|custom` contract as every other layer: `"false"` (off),
 `"true"` (on, resolved fresh per-card), a known type alias (`character` / `building` /
-`animal`), or any other custom text (used verbatim as the type description):
+`animal` / `custom` — all four discovered from `assets/figure-type/`; the `custom`
+alias itself resolves to a generic placeholder line, not to your own free text), or
+any other custom text (used verbatim as the type description):
 - For `character` type: figure block = `assets/figure-type/character.md` text + pattern's Figure detail + Face Style + `character_framing` text (from `assets/character-framing/`) + `figure_scale` text + split text + seamless text (D-17, FIG-07, SEAM-02).
-- For `building` / `animal` / custom-text types: figure block = `assets/figure-type/<type>.md` text (or the custom text itself) + `figure_scale` text + split text + seamless text. Pattern's Figure detail, Face Style, and `character_framing` are all skipped (FIG-08, D-16).
+- For `building` / `animal` / `custom`-alias / custom-text types: figure block = `assets/figure-type/<type>.md` text (or the custom text itself) + `figure_scale` text + split text + seamless text. Pattern's Figure detail, Face Style, and `character_framing` are all skipped (FIG-08, D-16).
 
 **Four scopes of figure content**, broadest to narrowest:
 - **Deck-wide (figure type)** — the `assets/figure-type/<type>.md` text for the group's
