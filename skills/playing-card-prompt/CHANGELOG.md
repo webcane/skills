@@ -4,7 +4,7 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
-## [Unreleased]
+## [4.6.0] - 2026-06-27
 
 ### Fixed
 - **`layers.seamless.<group>` silently dropped for `back`/`special` despite being schema-valid (v4.6.0)** — `manage_config.py`'s `options_for()` already accepted and persisted `layers.seamless.<group>` values for the `back`/`special` groups (matching the `[4.1.0]` claim that the restriction was lifted everywhere), but `SKILL.md` Step 8f's skip-condition and `references/REFERENCE.md`'s assembly spec (step 6e) still hard-coded a court/pip/ace/joker-only restriction — so a persisted `back`/`special` seamless value was silently dropped at assembly time and the wizard never asked for it. Dropped the stale exclusion in `SKILL.md` Step 8f, generalized `REFERENCE.md` step 6e to any group, and added the missing `seamless` row to `REFERENCE.md`'s canonical Defaults table. Also added the missing `seamless` entry to `manage_config.py`'s own module docstring "Keys" line, which omitted it from the layers enum despite full schema support. Doc-only fix — no code/schema change.
