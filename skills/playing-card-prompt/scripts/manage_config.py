@@ -17,6 +17,10 @@ Usage:
   manage_config.py validate             # check config.json against the schema
   manage_config.py path                 # print the config.json path
   manage_config.py options [key]        # list allowed values
+  manage_config.py migrate <figure-true-to-character|seamless-true-to-alias> --yes
+                                         # one-off/manual: upgrade a stale "true"
+                                         # layers.<figure|seamless>.<group> cell to a
+                                         # concrete alias (not run automatically)
 
   manage_config.py profile list                       # list profiles, mark active
   manage_config.py profile show [<name>]              # show one profile
@@ -442,6 +446,40 @@ def _migrate_seamless_true_to_alias(profile: dict) -> bool:
     return changed
 
 
+MANUAL_MIGRATIONS = {
+    "figure-true-to-character": _migrate_figure_true_to_character,
+    "seamless-true-to-alias": _migrate_seamless_true_to_alias,
+}
+
+
+def cmd_migrate(args):
+    """One-off/manual migrations not run automatically by load_raw() (IN-01).
+
+    These two migrations were deliberately disconnected from the automatic
+    load_raw() chain once the unified false|true|alias|custom contract made a
+    stored literal "true" a valid, intentionally preserved value (T-05-03).
+    They remain available here for a user/script that explicitly wants to
+    upgrade a truly pre-4.0 config's lingering "true" cells to a concrete
+    alias.
+    """
+    args, profile = _pop_profile_flag(args)
+    if not args or args[0] not in MANUAL_MIGRATIONS:
+        sys.exit(f"usage: migrate <{'|'.join(MANUAL_MIGRATIONS)}> [--profile <name>] [--yes]")
+    name = args[0]
+    if "--yes" not in args and "-y" not in args:
+        sys.exit(f"refusing to run migration '{name}' without --yes (it rewrites config.json)")
+    cfg = load_raw()
+    prof_name = profile or active_profile_name(cfg)
+    if prof_name not in cfg["profiles"]:
+        sys.exit(f"error: unknown profile '{prof_name}' (see: profile list)")
+    changed = MANUAL_MIGRATIONS[name](cfg["profiles"][prof_name])
+    if changed:
+        save_raw(cfg)
+        print(f"✓ migration '{name}' applied to profile '{prof_name}'.")
+    else:
+        print(f"no change — migration '{name}' found nothing to migrate in profile '{prof_name}'.")
+
+
 def _migrate_root_mood(profile: dict) -> bool:
     """Migrate a pre-MOOD-01 profile that has a root `mood` field into the unified
     `layers.mood.<group>` schema.
@@ -536,8 +574,9 @@ def load_raw() -> dict:
     # below (unchanged) but are no longer called unconditionally from this chain: under
     # the unified D-06/D-07 contract a literal "true" is now a valid, intentionally
     # preserved cell value (T-05-03) — eagerly rewriting it on every load would silently
-    # discard data and fight the new contract. They remain available for one-off/manual
-    # use against truly pre-4.0 configs if ever needed, but are not part of the automatic
+    # discard data and fight the new contract. They remain reachable for one-off/manual
+    # use against truly pre-4.0 configs via `manage_config.py migrate <name> --yes`
+    # (see MANUAL_MIGRATIONS/cmd_migrate, IN-01) but are not part of the automatic
     # migration chain.
     if any([_migrate_root_mood(prof) for prof in cfg["profiles"].values()]):
         migrated = True
@@ -883,7 +922,7 @@ COMMANDS = {
     "get": cmd_get, "set": cmd_set, "unset": cmd_unset,
     "reset": cmd_reset, "validate": cmd_validate,
     "path": cmd_path, "options": cmd_options,
-    "profile": cmd_profile,
+    "profile": cmd_profile, "migrate": cmd_migrate,
 }
 
 
