@@ -9,7 +9,7 @@ central subject type. The file stem becomes an allowed value for `layers.figure.
 
 <optional one-line description shown while picking>
 
-## <Display Name> figure line
+## Figure type line
 ```
 <central subject phrase>,
 ```

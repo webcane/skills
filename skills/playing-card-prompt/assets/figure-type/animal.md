@@ -2,7 +2,7 @@
 
 An animal as the central subject of the card.
 
-## Animal figure line
+## Figure type line
 ```
 animal figure as central subject,
 ```

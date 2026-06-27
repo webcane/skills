@@ -2,7 +2,7 @@
 
 A single human or humanoid figure as the central subject of the card.
 
-## Character figure line
+## Figure type line
 ```
 single human figure as central subject,
 ```
