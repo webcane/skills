@@ -156,9 +156,8 @@ Then:
       asks fresh each generation, not looked up from a stored default). If
       `layers.split.g` is `"false"`, no split text is added.
 
-   e. **Seamless** — only for `g` in court/pip/ace/joker (back/special have no
-      seamless setting). If `layers.seamless.g` is non-`"false"`, append the seamless
-      phrase as its own comma phrase: if the value matches a stem under
+   e. **Seamless** — for any group `g`. If `layers.seamless.g` is non-`"false"`,
+      append the seamless phrase as its own comma phrase: if the value matches a stem under
       `assets/seamless/` (e.g. `continuous-border`, `interlocking-motif`), append that
       file's "Seamless phrase" text; otherwise (custom free text) append the value
       verbatim. If `layers.seamless.g` is exactly `"true"`, the specific alias/custom
@@ -260,8 +259,9 @@ any other custom text (used verbatim as the type description):
 - **Deck-wide (seamless, all figure-bearing groups)** — `layers.seamless.<group>`
   (`false`, `true` resolved per-card, `<alias>`, or `<custom_text>`): the connecting/
   seamless design phrase from `assets/seamless/<alias>.md`, or custom text verbatim.
-  Court/pip/ace/joker only (back/special excluded, D-05). Appended last in the figure
-  block, after split. No seamless text when the cell is `"false"`.
+  Applies to any group whose figure block runs (court/pip/ace/joker by default, plus
+  back/special if their figure layer is explicitly enabled). Appended last in the
+  figure block, after split. No seamless text when the cell is `"false"`.
 - **Per-card** — `[CHARACTER_NAME]`/`[CHARACTER_FEATURES]` plus the Steps 10-12
   attributes/reference-transfers/exclusions: who this specific card's figure is,
   always supplied per card (from the user or a reference image).
@@ -330,6 +330,7 @@ figure; `"character"` / `"building"` / `"animal"` / `"custom"` = figure on + tha
 | frame        | true        | false  | true   | true        | true  | false   |
 | figure       | "character" | false  | false  | "character" | false | false   |
 | split        | false       | false  | false  | false       | false | false   |
+| seamless     | false       | false  | false  | false       | false | false   |
 | mood         | true        | true   | true   | true        | true  | true    |
 | technique    | true        | true   | true   | true        | true  | true    |
 

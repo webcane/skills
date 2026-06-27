@@ -466,8 +466,6 @@ _Skip this step if ANY of:_
   earlier (Step 1b), neither the question nor its assembled phrase apply, since
   seamless connects a card's border/motif to its neighbors, a purely SVG-template
   concern in that mode (see "`structure` setting" in `references/REFERENCE.md`).
-- This group is `back` or `special` (SEAM-03) — only `court`/`pip`/`ace`/`joker` ever
-  get this question; `back`/`special`'s `layers.seamless.<group>` stays `"false"`.
 
 Ask whether this group's cards should carry a seamless / connecting design that reads
 as one unbroken pattern across the deck (per-group; asked once for each group, then
@@ -490,7 +488,8 @@ options. Offer (default first, per 4-option AskUserQuestion limit):
   seamless phrase is added for this group.
 
 Save via `python3 scripts/manage_config.py set layers.seamless.<group> <value>`
-(replace `<group>` with the actual group: `court`, `pip`, `ace`, or `joker`).
+(replace `<group>` with the actual group: `court`, `pip`, `ace`, `joker`, `back`, or
+`special`).
 
 ### Step 9 — Character / figure description (REQUIRED for cards with a figure) · _per-card_
 
