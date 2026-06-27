@@ -383,7 +383,8 @@ Offer (default first):
 - **Other** — any custom split/mirror description (free text).
 
 Save via `python3 scripts/manage_config.py set layers.split.<group> <value>` (replace
-`<group>` with the actual group: `court`, `pip`, `ace`, or `joker`).
+`<group>` with this card's group: `court`, `pip`, `ace`, `joker`, `back`, or
+`special`).
 
 ### Step 8c — Figure type · _per-group persistent_
 
