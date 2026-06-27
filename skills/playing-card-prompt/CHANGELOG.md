@@ -6,6 +6,9 @@ All notable changes to this skill. Released per skill as tag
 
 ## [Unreleased]
 
+### Fixed
+- **`structure: illustration` mixed split-layout phrasing with illustration-only phrasing (v4.5.0)** — under `structure: illustration`, split layout (Step 8b / `layers.split.<group>`) is now suppressed alongside title and seamless — the assembled prompt no longer mixes split-layout phrasing (two-way mirrored layout, central dividing line, card-border references) with illustration-only phrasing. `SKILL.md` Step 1b's consequences list and Step 8b's skip-condition, `references/REFERENCE.md`'s structure section (now six changes, not five) and assembly step 6d, and `references/WIZARD-STEP-MAP.md`'s structure footnote all name Split as a suppressed item, mirroring the existing Title/Seamless precedent. `layers.split.<group>` is preserved in `config.json`, not cleared — it is simply ignored at assembly time under `illustration`, exactly like `layers.frame.<group>` and `layers.seamless.<group>`. Doc-only fix — no code/schema/asset change (WIZ-02, WIZ-03, VERIFY-5).
+
 ### Added
 - `scripts/verify_phase5_gate.sh`: reusable phase-verification-gate helper for this skill — runs the schema/migration contract test (if present), `manage_config.py validate`, `package-skill.sh`, `install-local.sh`, and an archive-exclusion check (confirms one-off test scripts are not shipped in the packaged `.skill`), exiting non-zero on any failure. Lives under this skill's own `scripts/` directory since it is specific to `playing-card-prompt`, not shared repo tooling.
 
