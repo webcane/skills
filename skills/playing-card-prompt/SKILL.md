@@ -142,7 +142,9 @@ the negative list, and skips the per-card Title step (Step T), the Split questio
 see "`structure` setting" in `references/REFERENCE.md` for the exact mechanics. Later
 steps (the figure-check, Step 8b, Step 8f, Step T, and prompt assembly) simply refer
 back to "the structure setting chosen earlier" rather than re-explaining these
-consequences.
+consequences. Note that Step T's entry point is independent of the figure-check's
+figure-off branch (Step 7's skip-to-Step-T instruction) — a card with no figure still
+reaches Step T and is only skipped there if `structure == "illustration"`.
 
 ### Step 2 — Court lettering system · _persistent_
 
@@ -314,8 +316,10 @@ known figure-type alias (`"character"`, `"building"`, `"animal"`), or custom fre
 figure description (used verbatim) — see the Defaults table in
 `references/REFERENCE.md` for which groups default to a figure type vs. `"false"`
 unless previously configured via `--config`. If it's `"false"`, this card has no
-figure — **skip the entire figure block (Steps 8a–8f) and go straight to Step 13**
-(Aspect ratio). Otherwise, the figure block (Steps 8a–8f) and Steps 9–12 apply: court
+figure — **skip the figure block (Steps 8a–8f) and Steps 9–12, then continue from
+Step T** (Title text) — Step T still runs for this card regardless of figure status;
+only Step T's own skip-condition (`structure`) applies. Otherwise, the figure block
+(Steps 8a–8f) and Steps 9–12 apply: court
 and joker cards by default, plus any pip/ace/back/special card whose
 `layers.figure.<group>` was set to a type value. Step 8a is persistent and skipped if
 `figure_scale` is already set; Steps 8b/8c are per-group persistent but always run
