@@ -94,7 +94,7 @@ LAYERS = ("background", "decor", "ornaments", "highlights", "frame", "figure", "
 
 FIGURE_TYPE = ["character", "building", "animal", "custom"]
 SPLIT_VALUES = ["false", "none", "horizontal-mirrored", "angled-mirrored"]
-FIGURE_SCALE = ["full-bleed", "inscribed-in-frame", "small-centered"]
+FIGURE_SCALE = ["full-bleed", "inscribed-in-frame", "small-centered", "cross-a-frame"]
 
 BACK_PATTERN_GEOMETRIC = ["diamond", "cross-hatch", "hexgrid", "wave"]
 BACK_PATTERN_BOTANICAL = ["vine", "floral", "leaf", "branch"]
