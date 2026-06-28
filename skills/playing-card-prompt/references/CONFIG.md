@@ -190,7 +190,9 @@ consistent with it but does not restate it.
 **Back group defaults** — `layers.figure.back` = `"false"`, `layers.split.back` = `"false"`;
 all other layers default `"true"` except highlights (`"false"`). Back cards always include
 the symmetry instruction from `assets/back/symmetry/<back_symmetry>.md` in their
-STYLE_BLOCK regardless of layer settings (step 10 in REFERENCE.md).
+STYLE_BLOCK regardless of layer settings (step 10 in REFERENCE.md) —
+(`back_symmetry` itself is per-card ephemeral — see "Back design criteria" below, not a
+config.json field).
 
 ### Back design criteria
 
