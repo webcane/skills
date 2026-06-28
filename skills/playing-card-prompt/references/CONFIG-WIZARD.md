@@ -17,7 +17,7 @@ index settings if asked). Show current values for the target profile (from `prof
 show`) so the user can accept or change each one. At the end, persist each value with
 `python3 scripts/manage_config.py set <key> <value>` (it validates and writes to the
 active profile in `config.json`; pass `--profile <name>` if editing a non-active
-profile), then confirm. Do **not** proceed to card generation.
+profile), then confirm.
 
 Steps to ask in config mode (Structure moved to position 2, mirroring `SKILL.md`
 Step 1b's resequenced position right after Deck type — WIZ-03/D-12):
