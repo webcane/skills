@@ -165,7 +165,16 @@ Then:
       text is resolved fresh per-card at generation time, not looked up from a stored
       default — assembly never needs to special-case a literal `"true"` because the
       per-card resolution happens before assembly runs. If `layers.seamless.g` is
-      `"false"`, no seamless text is added (SEAM-02).
+      `"false"`, no seamless text is added (SEAM-02). **Joint composition with split:**
+      when a split phrase was also appended in sub-step d (i.e. `layers.split.g` is
+      non-`"false"`/non-`"none"` AND `layers.seamless.g` is non-`"false"`), introduce
+      the seamless phrase with an explicit transition lead-in — e.g. `and, as a
+      deck-level edge treatment, <seamless phrase>` — rather than appending it as a
+      bare, undifferentiated comma phrase. Split describes this card's own internal
+      composition; seamless describes this card's edge relationship to other cards in
+      the deck — two different scopes, so when both are active they must read as two
+      distinct instructions, not one run-on collision bleeding into the
+      `[CHARACTER_FEATURES]` phrase that follows.
 
    The entire figure block (a–e) is skipped when `layers.figure.g` is `"false"`.
    This is independent of `layers.technique.g` — a card can have Technique on with
@@ -499,12 +508,28 @@ label — engines that support a negative-prompt field can take this list verbat
 [FRAME_LINE]
 [INDEX_LINE]
 large [SUIT_COLOR] [SUIT_NAME] suit symbols centered in upper and lower card fields,
-thin black horizontal dividing line through the exact center of the card,
-reversible two-way court card layout, identical upper and lower portraits rotated 180 degrees around the central horizontal axis, symmetrical costume design,
+[COURT_SPLIT_DEFAULT_LINE]
 [CHARACTER_FEATURES], [RESOLVED_ATTRIBUTES],
 [SUIT_COLOR] [SUIT_NAME] suit symbols,
 [NEGATIVE_LIST]
 ```
+
+`[COURT_SPLIT_DEFAULT_LINE]` expands to the two-way horizontal-mirror layout text
+(`thin black horizontal dividing line through the exact center of the card,
+reversible two-way court card layout, identical upper and lower portraits rotated
+180 degrees around the central horizontal axis, symmetrical costume design,`) ONLY
+when `layers.split.court` is `"false"` or `"none"` (split off / default upright).
+When `layers.split.court` is any active value (`"true"`, `"horizontal-mirrored"`,
+`"angled-mirrored"`, or custom free text), the placeholder expands to empty (the
+line is dropped) and the split composition is owned entirely by the
+`assets/split/<mode>.md` phrase that `[STYLE_BLOCK]` step 6d already appends — so
+the prompt never carries two competing geometric framings at once. This rule holds
+under `structure: illustration` too: even though step 6d adds no split text to
+`[STYLE_BLOCK]` in that mode, `[COURT_SPLIT_DEFAULT_LINE]` still resolves off the
+same `layers.split.court` value, so a non-default split mode still suppresses the
+hardcoded horizontal clause there as well. This placeholder is unique to the COURT
+template — PIP has no such clause, and JOKER is already documented as a
+non-reversible single-figure composition with no dividing line.
 
 ---
 
