@@ -758,6 +758,18 @@ def cmd_validate(_args):
                 errors.append(f"profile '{name}': {msg}")
             elif msg:
                 notes.append(f"profile '{name}': {msg}")
+            # Cross-field guard (WR-02): character_framing and figure_scale are
+            # the two fields most likely to be swapped by a human or a
+            # copy-paste — a value that's a valid preset name for the *other*
+            # field is essentially never intentional, even though each field
+            # is independently non-strict and would otherwise pass silently
+            # as a "custom" value (see CR-01).
+            if k == "character_framing" and v_str and v_str in allowed_figure_scales():
+                notes.append(f"profile '{name}': character_framing='{v_str}' matches a "
+                             f"figure_scale preset name — likely swapped with figure_scale?")
+            elif k == "figure_scale" and v_str and v_str in allowed_character_framings():
+                notes.append(f"profile '{name}': figure_scale='{v_str}' matches a "
+                             f"character_framing preset name — likely swapped with character_framing?")
     for n in notes:
         print(n)
     if errors:
