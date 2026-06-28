@@ -117,13 +117,14 @@ Then:
    known type alias, or custom text). Resolve the type from `layers.figure.g` and
    append, in this exact order (D-15):
 
-   a. **Figure-type text** — the text from `assets/figure-type/<type>.md`, where
-      `<type>` is the `layers.figure.g` value (`character`, `building`, `animal`,
-      `custom` — the discovered alias, which resolves to a generic placeholder line —
-      or custom free text). When the cell is exactly `"true"`, the actual type/alias is not
-      looked up from a stored default — it is resolved fresh per-card at generation
-      time (the wizard asks which type this card's figure is). Applied to ALL figure
-      types.
+   a. **Figure-type text** — if `layers.figure.g` matches a discovered alias under
+      `assets/figure-type/` (`character`, `building`, `animal`, `custom` — the
+      discovered `custom` alias resolves to a generic placeholder line), append that
+      file's text; otherwise (custom free text) append the `layers.figure.g` value
+      verbatim as its own comma phrase. When the cell is exactly `"true"`, the actual
+      type/alias is not looked up from a stored default — it is resolved fresh
+      per-card at generation time (the wizard asks which type this card's figure is).
+      Applied to ALL figure types.
 
    b. **Character-only sources** — ONLY when the resolved type is `"character"`:
       append the pattern's "Figure detail" lines (skip entirely if that section is
