@@ -285,7 +285,8 @@ _Skipped if loaded from config._ Ask for the deck's overall atmosphere — this 
 List the `*.md` files in `assets/mood/` (ignore names starting with `_`) as options.
 Offer **None** as the default, plus the 3 most evocative presets as explicit choices —
 e.g.:
-- **None (default)** — no mood line; `mood` stays empty.
+- **None (default)** — no mood line; every group's `layers.mood.<group>` is left at its
+  current/default value.
 - **Gothic & Brooding**
 - **Warm & Whimsical**
 - **Eerie Nocturnal**
@@ -294,17 +295,21 @@ e.g.:
 Mysterious — name one to use it) and any custom free-text atmosphere (e.g. "celestial
 and dreamlike, soft starlight glow,").
 
-- If a preset is named, load `assets/mood/<name>.md` and use its "Mood line" text
-  verbatim as `mood`.
-- If the user gives custom text instead, save it as `mood`, phrased as its own
-  comma-separated phrase (ending in a comma) to match `[MOOD_LINE]`'s format.
-- If "None" or skipped, leave `mood` empty — `[MOOD_LINE]` is then dropped everywhere
-  regardless of `layers.mood.<group>`, so skip the group question below.
+- If a preset is named, load `assets/mood/<name>.md` and note its "Mood line" text —
+  this is the value to write into `layers.mood.<group>` for every selected group (not
+  a separate `mood` field).
+- If the user gives custom text instead, that text (phrased as its own
+  comma-separated phrase, ending in a comma) is likewise the value to write into
+  `layers.mood.<group>` for every selected group.
+- If "None" or skipped, leave every group's `layers.mood.<group>` at its
+  current/default value — skip the group question below.
 
-If `mood` is non-empty, ask which card groups should carry it — multiSelect (Court,
-Pip, Ace, Joker; default: all four selected, matching the current `layers.mood.<group>`
-defaults). Set `layers.mood.<group>` to `true` for selected groups and `false` for any
-deselected ones.
+If a mood was chosen, ask which card groups should carry it — multiSelect (Court,
+Pip, Ace, Joker, Back, Special; default: all six selected, matching the current
+`layers.mood.<group>` defaults). For each selected group, run `python3
+scripts/manage_config.py set layers.mood.<group> "<mood text>"` (this both turns the
+layer on and supplies the line). For any deselected group, run `set
+layers.mood.<group> false`.
 
 ---
 
