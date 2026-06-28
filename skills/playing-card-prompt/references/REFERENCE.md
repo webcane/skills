@@ -395,7 +395,11 @@ prompt that describes ONLY what goes in the center clip area.
      `layers.frame.<group>`. The `layers.frame.<group>` cells in `config.json` are
      **not modified or cleared** — they're simply ignored at assembly time, so
      switching back to `structure: full` restores the prior frame behavior exactly as
-     configured.
+     configured. The COURT template's `[COURT_SPLIT_DEFAULT_LINE]` placeholder (see
+     "COURT template" below) is dropped the same way: under `structure: illustration`
+     it always expands to empty, regardless of `layers.split.court`'s value — the
+     reversible-layout/dividing-line framing it carries is exactly the kind of
+     card-shape/border concern this mode removes, the same as `[FRAME_LINE]`.
   3. **Replace the templates' opening line.** Instead of:
      `[ASPECT_RATIO] aspect ratio, full card visible, transparent background outside
      the card,`
@@ -518,18 +522,18 @@ large [SUIT_COLOR] [SUIT_NAME] suit symbols centered in upper and lower card fie
 (`thin black horizontal dividing line through the exact center of the card,
 reversible two-way court card layout, identical upper and lower portraits rotated
 180 degrees around the central horizontal axis, symmetrical costume design,`) ONLY
-when `layers.split.court` is `"false"` or `"none"` (split off / default upright).
-When `layers.split.court` is any active value (`"true"`, `"horizontal-mirrored"`,
-`"angled-mirrored"`, or custom free text), the placeholder expands to empty (the
-line is dropped) and the split composition is owned entirely by the
-`assets/split/<mode>.md` phrase that `[STYLE_BLOCK]` step 6d already appends — so
-the prompt never carries two competing geometric framings at once. This rule holds
-under `structure: illustration` too: even though step 6d adds no split text to
-`[STYLE_BLOCK]` in that mode, `[COURT_SPLIT_DEFAULT_LINE]` still resolves off the
-same `layers.split.court` value, so a non-default split mode still suppresses the
-hardcoded horizontal clause there as well. This placeholder is unique to the COURT
-template — PIP has no such clause, and JOKER is already documented as a
-non-reversible single-figure composition with no dividing line.
+when `structure` is `"full"` AND `layers.split.court` is `"false"` or `"none"`
+(split off / default upright). When `layers.split.court` is any active value
+(`"true"`, `"horizontal-mirrored"`, `"angled-mirrored"`, or custom free text), the
+placeholder expands to empty (the line is dropped) and the split composition is
+owned entirely by the `assets/split/<mode>.md` phrase that `[STYLE_BLOCK]` step 6d
+already appends — so the prompt never carries two competing geometric framings at
+once. Under `structure: illustration`, it always expands to empty regardless of
+`layers.split.court`'s value — the reversible-layout/dividing-line framing is a
+card-shape concern this mode explicitly excludes (see "`structure` setting"),
+exactly like `[FRAME_LINE]`. This placeholder is unique to the COURT template —
+PIP has no such clause, and JOKER is already documented as a non-reversible
+single-figure composition with no dividing line.
 
 ---
 

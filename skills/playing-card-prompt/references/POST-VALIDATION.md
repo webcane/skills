@@ -116,6 +116,11 @@ unless the failure stems from missing/ambiguous information only they can resolv
   border, no frame, no corner index letters or numbers, no corner suit symbols`.
   `[STYLE_BLOCK]` and the Center motif are otherwise unaffected. If `structure` is
   `full` (default), none of this applies and the prompt is built as usual.
+  `[COURT_SPLIT_DEFAULT_LINE]` expands to the two-way horizontal-mirror layout text
+  ONLY when `structure` is `"full"` AND `layers.split.court` is `"false"` or
+  `"none"`. Under `structure: illustration`, it always expands to empty regardless
+  of `layers.split.court`'s value — the reversible-layout/dividing-line framing is a
+  card-shape concern this mode explicitly excludes (see "`structure` setting").
 - [ ] **Title** — under `structure: full`, every card was offered the per-card Title
   step (Step T) regardless of this card's group/figure status; the title named
   element is present only if the user supplied a title for this card, with no
