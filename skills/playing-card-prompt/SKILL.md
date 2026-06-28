@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 4.10.0
+  version: 4.11.0
   description_claudeai: Interactive wizard to build image-gen prompts for stylized playing cards. 4 deck patterns, 6 lettering systems, 3+ styles, court/pip/ace. Trigger on card design requests.
 ---
 
@@ -409,45 +409,41 @@ description here, per-card-group (UNIFY-01) — so this step still runs even if
 `layers.figure.<group>` already holds `"true"`. Per-group; asked once, then reused
 once resolved to a concrete type/custom value.
 
-Offer (default first, per 4-option AskUserQuestion limit):
+Offer (default first):
 - **Character (default)** — a person or humanoid figure. Sets
   `layers.figure.<group> = "character"`.
 - **Building** — an architectural structure. Sets
   `layers.figure.<group> = "building"`.
 - **Animal** — a creature or beast. Sets `layers.figure.<group> = "animal"`.
-- **Custom** — user-described figure type (free text). The figure cell now accepts a
-  custom free-text figure description directly (used verbatim) in addition to the
-  character/building/animal aliases — no strict-keyword-only restriction. The
-  free-text description doubles as the per-card figure description fed into
-  Steps 9–12.
 
 Save via `python3 scripts/manage_config.py set layers.figure.<group> <type>` (replace
-`<group>` with the actual group — `<type>` is `false`/`character`/`building`/`animal`,
-or any custom free-text figure description). Note that this both keeps the figure
-layer on for this group and records the figure type/description.
+`<group>` with the actual group — `<type>` is `false`/`character`/`building`/`animal`).
+Note that this both keeps the figure layer on for this group and records the figure
+type.
 
 **Step 8e applies ONLY when the group's figure type is `"character"`.** For
-`building`, `animal`, and `custom` figure types, skip Step 8e and proceed directly
-to Steps 9–12 (character description steps, adapted for the figure type). Building,
-animal, and custom figures still benefit from figure_scale (Step 8a) and split
-(Step 8b) — only the character-specific face_style and character_framing are skipped
-(FIG-08). Face Style — how a figure's face reads (typage, expression, degree of
-stylization) — comes from the chosen pattern's own "Face Style" section, folded into
-`[STYLE_BLOCK]` automatically whenever the figure type is `character`; there is no
-separate question for it, and building/animal/custom figures don't receive it.
+`building` and `animal` figure types (or any custom free-text figure description),
+skip Step 8e and proceed directly to Steps 9–12 (character description steps,
+adapted for the figure type). Building, animal, and custom-described figures still
+benefit from figure_scale (Step 8a) and split (Step 8b) — only the character-specific
+face_style and character_framing are skipped (FIG-08). Face Style — how a figure's
+face reads (typage, expression, degree of stylization) — comes from the chosen
+pattern's own "Face Style" section, folded into `[STYLE_BLOCK]` automatically
+whenever the figure type is `character`; there is no separate question for it, and
+building/animal/custom-described figures don't receive it.
 
 ### Step 8e — Character framing · _character-only persistent_
 
 _Skip this step if ANY of:_
 - `character_framing` is already set in config.
 - This group's figure type is not `"character"` (i.e. `layers.figure.<group>` is
-  `"building"`, `"animal"`, `"custom"`, or other custom text).
+  `"building"`, `"animal"`, or other custom text).
 
 Ask how much of the character figure is shown across the deck — this becomes
 `character_framing`, folded into `[STYLE_BLOCK]` for every character-type card (see
 "Figure, face style & proportion" in `references/REFERENCE.md`). This is a deck-wide
 setting; reused across every card whose group's figure type is character. Building,
-animal, and custom figures skip this step (FIG-08).
+animal, and custom-described figures skip this step (FIG-08).
 
 List the `*.md` files in `assets/character-framing/` (ignore names starting with `_`)
 as options. Offer (default first, per 4-option AskUserQuestion limit):

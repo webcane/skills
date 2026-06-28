@@ -4,6 +4,12 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
+## [Unreleased]
+
+### Removed
+- **"Custom text" free-text fallback removed from Steps B1, B5, and S2** — `references/WIZARD-BACK.md`'s Step B1 (Back purpose) and Step B5 (Back symmetry) each dropped their 4th "Custom text — ask for free text" option, leaving exactly 3 preset options apiece; `references/WIZARD-SPECIAL.md`'s Step S2 (Special card type) dropped its "Custom text" option and the matching "If 'Custom text', use the user's free text verbatim" fallback sentence, leaving exactly 2 preset options. `references/REFERENCE.md`'s SPECIAL template `[SPECIAL_TYPE_LINE]` paragraph no longer documents the removed Custom-text path. `AskUserQuestion`'s built-in "Other" slot already covers ad hoc freeform input at all three steps, so no replacement free-text affordance was added.
+- **`custom` figure-type alias removed from Step 8c and the schema (option-b)** — Step 8c (Figure type) in `SKILL.md` now offers exactly 3 options (Character/Building/Animal); the `custom` alias is fully removed from `manage_config.py`'s `FIGURE_TYPE` enum and `validate_value()`'s dedicated custom-alias note, and `assets/figure-type/custom.md` is deleted. Updated every doc reference to the former 4-member character/building/animal/custom alias set (`CONFIG.md`, `FILE-MAP.md`, `WIZARD-STEP-MAP.md`, `REFERENCE.md`, `CONFIG-WIZARD.md`, `POST-VALIDATION.md`, `assets/figure-type/_adding-a-figure-type.md`) to the 3-member set. The separate "type your own custom free-text figure description directly into the cell" capability (the non-strict `layers.figure.<group>` contract) is unaffected and remains fully supported — only the named `custom` alias/asset file is removed, since `manage_config.py validate` already tolerates an arbitrary stored figure-type string under the existing non-strict contract (confirmed via `python3 scripts/manage_config.py validate`, which still exits 0 against a config containing a legacy `"custom"` value).
+
 ## [4.10.0] - 2026-06-28
 
 ### Fixed

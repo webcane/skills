@@ -17,7 +17,7 @@ Folders under `assets/`:
 - `assets/frame/` — one file per border/frame preset, each holding a "Frame line"
   used to fill `[FRAME_LINE]` (see Step 6 and `assets/frame/_adding-a-frame.md`)
 - `assets/figure-type/` — one file per figure type (`character.md`, `building.md`,
-  `animal.md`, `custom.md`), each holding the canonical prompt phrase for that figure
+  `animal.md`), each holding the canonical prompt phrase for that figure
   type's contribution to `[STYLE_BLOCK]` (see Steps 8a–8c and
   `assets/figure-type/_adding-a-figure-type.md`)
 - `assets/split/` — one file per split mode (`horizontal-mirrored.md`,

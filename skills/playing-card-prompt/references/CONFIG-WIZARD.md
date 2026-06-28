@@ -31,7 +31,7 @@ Step 1b's resequenced position right after Deck type — WIZ-03/D-12):
 5. Card decoration layers and theme (Step 6)
 6. Mood / atmosphere (Step 7)
 7. Figure block — figure_scale (deck-wide scale), split (per-group split layout),
-   figure_type (per-group character/building/animal/custom),
+   figure_type (per-group character/building/animal, or custom free text),
    character_framing (deck-wide framing, character-only), and seamless
    (per-group connecting/seamless design) — from the figure-block steps
    (Steps 8a–8f)

@@ -55,7 +55,7 @@ unless the failure stems from missing/ambiguous information only they can resolv
   describes an obscured or mask-like treatment, `[CHARACTER_FEATURES]` contains no
   separate facial description. Otherwise (figure off) the line is absent entirely.
 - [ ] **Figure type preamble** — if `layers.figure.<group>` is a non-`"false"` value
-  (character/building/animal/custom) for this card's group, the corresponding
+  (character/building/animal, or custom free text) for this card's group, the corresponding
   `assets/figure-type/<type>.md` text appears within `[STYLE_BLOCK]` before Face Style
   and character framing, identical across all cards of the same group/deck. If
   `layers.figure.<group>` is `"false"`, no such text appears.

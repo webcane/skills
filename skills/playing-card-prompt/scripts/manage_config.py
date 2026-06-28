@@ -41,7 +41,7 @@ at generation time — not resolved here), or any other text (an alias or custom
 addition, used verbatim as that group's contribution). `layers.mood.<group>` follows
 this same schema and is the ONLY mood setting — there is no separate deck-wide
 `mood` field; the mood line, when on, is the cell's own value. `layers.figure.<group>`
-no longer has a strict type enum — "character"/"building"/"animal"/"custom" remain
+no longer has a strict type enum — "character"/"building"/"animal" remain
 valid aliases, but any other custom figure description is also accepted.
 `layers.split.<group>` accepts "false", "true", "none", "horizontal-mirrored",
 "angled-mirrored", or any custom free-text split description.
@@ -96,7 +96,7 @@ STRUCTURE = ["full", "illustration"]
 GROUPS = ("court", "pip", "ace", "joker", "back", "special")
 LAYERS = ("background", "decor", "ornaments", "highlights", "frame", "figure", "mood", "technique", "split", "seamless")
 
-FIGURE_TYPE = ["character", "building", "animal", "custom"]
+FIGURE_TYPE = ["character", "building", "animal"]
 SPLIT_VALUES = ["false", "none", "horizontal-mirrored", "angled-mirrored"]
 FIGURE_SCALE = ["full-bleed", "inscribed-in-frame", "small-centered", "cross-a-frame"]
 
@@ -298,12 +298,6 @@ def validate_value(key: str, value: str) -> tuple[bool, str]:
             return True, ""
         return False, f"aspect_ratio must be a preset ({', '.join(allowed)}) or N:M"
     if value in allowed:
-        if key.startswith("layers.figure.") and value == "custom":
-            return True, (f"note: '{value}' is the discovered figure-type alias "
-                           f"'custom' (resolves to assets/figure-type/custom.md's "
-                           f"generic placeholder line), NOT a marker for free-text "
-                           f"custom description — to use your own description, set "
-                           f"{key} to that description text directly")
         return True, ""
     if strict:
         return False, f"{key} must be one of: {', '.join(allowed)}"

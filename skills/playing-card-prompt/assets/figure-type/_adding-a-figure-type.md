@@ -17,7 +17,7 @@ central subject type. The file stem becomes an allowed value for `layers.figure.
 
 **Special case — `character.md`:** The character type is the only figure type whose
 STYLE_BLOCK also pulls in the pattern's "Face Style" section and `character_framing`
-(from `assets/character-framing/`). Building, animal, and custom types receive only
+(from `assets/character-framing/`). Building and animal types receive only
 their figure-type line plus `figure_scale` and `split`. When adding a new type that
 also needs character-specific fields, add the gate logic to step 6b ("Character-only
 sources") in `references/REFERENCE.md`'s "Resolving `[STYLE_BLOCK]`" section.
