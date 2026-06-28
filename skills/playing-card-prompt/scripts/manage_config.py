@@ -203,8 +203,9 @@ def allowed_character_framings() -> list[str]:
 
 def allowed_back_patterns(category: str) -> list[str]:
     # back_pattern's valid aliases depend on the current profile's back_design
-    # category. Falls back to "geometric" for unknown/custom categories (D-21),
-    # mirroring B3's wizard-side fallback in SKILL.md.
+    # category (D-21). See references/CONFIG.md's "Back design criteria"
+    # section for the canonical statement of the unknown/custom-category
+    # fallback behavior implemented below.
     return {
         "geometric": BACK_PATTERN_GEOMETRIC,
         "botanical": BACK_PATTERN_BOTANICAL,

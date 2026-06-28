@@ -204,7 +204,8 @@ and are never written to `config.json` (D-04). `back_purpose`/`back_pattern`/
 `[BACK_DESIGN]` in the BACK template; `back_symmetry` controls STYLE_BLOCK step 10 for
 the `back` group (its "Symmetry line" is always appended regardless of `layers.*`
 values); `back_design` is a category selector that filters which pattern aliases Step
-B3 offers (falls back to the `geometric` category for custom/unknown values) — see
+B3 offers (falls back to the `geometric` category for custom/unknown values; this
+paragraph is the canonical statement of that fallback rule — D-21) — see
 `references/REFERENCE.md` for the full per-card assembly order.
 
 The category→pattern option dependency (`back_design` → `back_pattern`) is still
