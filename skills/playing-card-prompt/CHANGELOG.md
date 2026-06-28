@@ -6,8 +6,6 @@ All notable changes to this skill. Released per skill as tag
 
 ## [4.10.0] - 2026-06-28
 
-## [4.10.0] - 2026-06-28
-
 ### Fixed
 - **First-run bootstrap stopped after config setup for every card group** — `references/CONFIG-WIZARD.md` ended its config-mode steps with a hardcoded "Do **not** proceed to card generation" line, correct for the explicit `--config`/`--init` mode but read identically when the same file is pulled into `SKILL.md`'s Generate-mode "no valid config found" bootstrap branch, which needs to continue into per-card steps afterward. Removed the terminal line so `CONFIG-WIZARD.md` is steps-only with no control-flow opinion; each caller's own ending instruction (`SKILL.md` lines 24/61 for explicit Config mode, line 96 for the Generate-mode bootstrap) already states the correct behavior.
 - **`angled-mirrored` split rendered visually indistinguishable from `horizontal-mirrored` (SPLT-03, Phase 01 UAT gap)** — the split line (`mirrored halves angled around the figure,`) named no concrete angle, axis, or seam, unlike `horizontal-mirrored`'s explicit axis (`horizontally`) + seam (`edge-to-edge`). Rewrote `assets/split/angled-mirrored.md`'s split line and SKILL.md Step 8b's matching option text to name a concrete 15-degree diagonal axis and an explicit diagonal seam descriptor, so the phrase can no longer be satisfied by a near-horizontal interpretation.
