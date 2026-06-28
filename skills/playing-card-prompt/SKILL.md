@@ -370,6 +370,9 @@ _Skip this step if ANY of:_
   setting" in `references/REFERENCE.md`). `layers.split.<group>` is preserved in
   config but ignored at assembly time, mirroring frame/seamless — this is the same
   shared structure==illustration gate as Step 8f's SEAM-05 rule.
+- `layers.split.<group>` already holds a concrete value other than `"true"` (e.g.
+  `"none"`, `"horizontal-mirrored"`, `"angled-mirrored"`, or custom free text) for
+  this group — it was already resolved on a prior card.
 
 Ask how the figures on the cards in this group should be split (per-group; asked once
 for each group, then reused). Applies to all figure types. A `"true"` cell means split
@@ -395,6 +398,8 @@ Save via `python3 scripts/manage_config.py set layers.split.<group> <value>` (re
 
 _Skip this step if ANY of:_
 - `layers.figure.<group>` is `"false"`.
+- `layers.figure.<group>` already holds a concrete type/custom value (not `"true"`)
+  for this group — it was already resolved on a prior card.
 
 Ask what kind of figure this group carries. This sets the group's figure layer
 value — the value IS the figure type, keeping the layer on while recording the type
@@ -471,6 +476,9 @@ _Skip this step if ANY of:_
   earlier (Step 1b), neither the question nor its assembled phrase apply, since
   seamless connects a card's border/motif to its neighbors, a purely SVG-template
   concern in that mode (see "`structure` setting" in `references/REFERENCE.md`).
+- `layers.seamless.<group>` already holds a concrete value other than `"true"` (e.g.
+  `"false"`, `"continuous-border"`, `"interlocking-motif"`, or custom free text) for
+  this group — it was already resolved on a prior card.
 
 Ask whether this group's cards should carry a seamless / connecting design that reads
 as one unbroken pattern across the deck (per-group; asked once for each group, then
