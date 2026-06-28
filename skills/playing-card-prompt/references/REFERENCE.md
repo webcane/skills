@@ -664,8 +664,7 @@ Special cards have no built-in forced STYLE_BLOCK addition — STYLE_BLOCK assem
 normally from whatever `layers.*.<special>` cells are configured.
 
 `[SPECIAL_TYPE_LINE]` is the "Special type line" text from the selected type's asset
-file in `assets/special/` (e.g., `prospect.md` or `marketing.md`), OR free text if the
-user chose "Custom text" in the wizard (Step S2). Drop this line if empty.
+file in `assets/special/` (e.g., `prospect.md` or `marketing.md`). Drop this line if empty.
 
 `[CARD_NAME]` is the display name the user provided for this specific card (e.g.,
 "King of Clubs" for a prospect card, or any custom name). Required.

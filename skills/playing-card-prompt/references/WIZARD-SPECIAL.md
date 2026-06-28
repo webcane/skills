@@ -21,12 +21,9 @@ names starting with `_`) as options — same discovery pattern as `assets/frame/
   Load `assets/special/prospect.md`; use its "Special type line" as `[SPECIAL_TYPE_LINE]`.
 - **Marketing** — a promotional or marketing card with custom branding.
   Load `assets/special/marketing.md`; use its "Special type line" as `[SPECIAL_TYPE_LINE]`.
-- **Custom text** — user describes the special card type in free text. Use that text
-  verbatim as `[SPECIAL_TYPE_LINE]` (bypasses asset lookup).
 
 If a preset is named, load `assets/special/<name>.md` and use its "Special type line"
-text as `[SPECIAL_TYPE_LINE]`. If "Custom text", use the user's free text verbatim as
-`[SPECIAL_TYPE_LINE]`.
+text as `[SPECIAL_TYPE_LINE]`.
 
 **Step S3 — Visual content / layout description · _per-card_**
 

@@ -13,11 +13,10 @@ and fed into `[BACK_DESIGN]`/STYLE_BLOCK assembly; nothing about B1–B5 is writ
 
 **Step B1 — Back purpose · _per-card_**
 
-Ask: "What is this deck back designed for?" Options (4):
+Ask: "What is this deck back designed for?" Options (3):
 - **Classic** — load `assets/back/purpose/classic.md`
 - **Designer** — load `assets/back/purpose/designer.md`
 - **Casino** — load `assets/back/purpose/casino.md`
-- **Custom text** — ask for free text
 
 The chosen value is used for this card's `[BACK_DESIGN]` only — not saved.
 
@@ -64,11 +63,10 @@ card's `[BACK_DESIGN]` only — not saved.
 
 **Step B5 — Back symmetry · _per-card_**
 
-Ask: "Symmetry type?" Options (4):
+Ask: "Symmetry type?" Options (3):
 - **180° rotational** — load `assets/back/symmetry/rotational-180.md`
 - **Bilateral** — load `assets/back/symmetry/bilateral.md`
 - **Asymmetric** — load `assets/back/symmetry/asymmetric.md`
-- **Custom text** — ask for free text
 
 This value is used in STYLE_BLOCK step 10 (see `references/REFERENCE.md` — back-group
 symmetry is always appended from this card's B5 answer) for this card only — not
