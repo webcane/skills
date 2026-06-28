@@ -261,11 +261,11 @@ any other custom text (used verbatim as the type description):
   presets resolve to the "Scale phrase" text in `assets/figure-scale/<value>.md`;
   custom text is appended verbatim. Appended after `character_framing` (or right
   after figure-type text for non-character types).
-- **Deck-wide (split, outer wrapper, all types)** — `layers.split.<group>` (`false`,
-  `true` resolved per-card, `horizontal-mirrored`, `angled-mirrored`): the
+- **Deck-wide (split, compositional wrapper, all types)** — `layers.split.<group>`
+  (`false`, `true` resolved per-card, `horizontal-mirrored`, `angled-mirrored`): the
   compositional split layout from `assets/split/<mode>.md`. Applied to all figure
-  types; appended as the outermost wrapper after `figure_scale`. No split text for
-  `"false"`.
+  types; appended after `figure_scale` and before seamless (the actual outermost
+  figure-block item). No split text for `"false"`.
 - **Deck-wide (seamless, all figure-bearing groups)** — `layers.seamless.<group>`
   (`false`, `true` resolved per-card, `<alias>`, or `<custom_text>`): the connecting/
   seamless design phrase from `assets/seamless/<alias>.md`, or custom text verbatim.
