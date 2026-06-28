@@ -234,7 +234,7 @@ def allowed_engines() -> list[str]:
     return _discover("engines") or ["nanobanana", "stable-diffusion", "midjourney", "dalle", "kaze"]
 
 
-def options_for(key: str, profile: dict | None = None):
+def options_for(key: str):
     # NOTE (BACK-EPH-01): back_pattern (and the other back_* fields) are no
     # longer persistent keys, so they intentionally do NOT resolve here —
     # options_for/PERSISTENT_KEYS only cover persisted config schema. A
@@ -283,8 +283,8 @@ def options_for(key: str, profile: dict | None = None):
 
 # --- validation ------------------------------------------------------------
 
-def validate_value(key: str, value: str, profile: dict | None = None) -> tuple[bool, str]:
-    opt = options_for(key, profile)
+def validate_value(key: str, value: str) -> tuple[bool, str]:
+    opt = options_for(key)
     if opt is None:
         return False, f"unknown key '{key}' (valid: {', '.join(sorted(PERSISTENT_KEYS))})"
     allowed, strict = opt
@@ -678,9 +678,7 @@ def cmd_set(args):
     name = profile or active_profile_name(cfg)
     if name not in cfg["profiles"]:
         sys.exit(f"error: unknown profile '{name}' (see: profile list)")
-    # Use the effective (defaults + overrides) profile so any category-aware
-    # validation sees active values even when they were never explicitly set (WR-01).
-    ok, msg = validate_value(key, value, effective(cfg, name))
+    ok, msg = validate_value(key, value)
     if not ok:
         sys.exit(f"error: {msg}")
     parts = key.split(".")
@@ -750,13 +748,12 @@ def cmd_validate(_args):
     if active not in cfg.get("profiles", {}):
         errors.append(f"active_profile '{active}' is not a defined profile")
     for name, prof in cfg.get("profiles", {}).items():
-        eff = effective(cfg, name)
         for k, v in _flatten(prof).items():
             if k not in PERSISTENT_KEYS:
                 errors.append(f"profile '{name}': unknown key '{k}'")
                 continue
             v_str = "true" if v is True else "false" if v is False else str(v)
-            ok, msg = validate_value(k, v_str, eff)
+            ok, msg = validate_value(k, v_str)
             if not ok:
                 errors.append(f"profile '{name}': {msg}")
             elif msg:
@@ -774,16 +771,10 @@ def cmd_path(_args):
 
 
 def cmd_options(args):
-    args, profile = _pop_profile_flag(args)
+    args, _profile = _pop_profile_flag(args)
     keys = [args[0]] if args else sorted(PERSISTENT_KEYS)
-    if CONFIG_PATH.exists():
-        cfg = load_raw()
-        name = profile or active_profile_name(cfg)
-        eff = effective(cfg, name)
-    else:
-        eff = DEFAULTS
     for k in keys:
-        opt = options_for(k, eff)
+        opt = options_for(k)
         if opt is None:
             sys.exit(f"error: unknown key '{k}'")
         allowed, strict = opt
