@@ -4,6 +4,15 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
+## [4.7.0] - 2026-06-28
+
+### Fixed
+- **Step 7 (Mood/atmosphere) wrote to a nonexistent `mood` config key and only offered 4 of 6 groups (CR-01)** — `SKILL.md` Step 7 instructed `manage_config.py set mood ...`, a key removed by MOOD-01 in v4.0.0 (`set mood` fails with "unknown key"), and separately instructed `layers.mood.<group> = "true"` (which the unified contract defines as "on, no line") instead of writing the mood text into the cell. The group multiSelect also only listed 4 of 6 card groups. Rewrote Step 7 to use the unified `layers.mood.<group>` contract directly (mood text stored as the cell's custom value) and expanded the multiSelect to all six groups (added Back/Special).
+- **Steps 8b/8c/8f's formal skip-condition lists omitted the "already resolved to a concrete value" case (WR-01)** — the bullet lists looked complete but didn't match the steps' own body prose. Added the missing condition to all three.
+- **`manage_config.py`'s `options_for()`/`validate_value()` carried a dead `profile` parameter (WR-02)** — unused since the category-aware `back_pattern` validation it supported was removed by BACK-EPH-01. Removed the parameter and its stale describing comment from all call sites (`cmd_set`, `cmd_validate`, `cmd_options`).
+- **`REFERENCE.md` assembly step 6a (figure-type) lacked the explicit custom-text-verbatim fallback (WR-03)** — sibling steps 6c (figure_scale) and 6e (seamless) both state it explicitly; step 6a now does too.
+- **`_adding-a-figure-type.md` pointed authors to "STYLE_BLOCK assembly in SKILL.md," which doesn't contain that logic (IN-01)** — corrected the pointer to its actual location, `REFERENCE.md` step 6b.
+
 ## [4.6.0] - 2026-06-27
 
 ### Fixed
