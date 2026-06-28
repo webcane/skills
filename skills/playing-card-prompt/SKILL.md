@@ -3,7 +3,7 @@ name: playing-card-prompt
 description: Interactive wizard that builds image-generation prompts for stylized playing cards across multiple deck systems (French/International, German, Swiss, Italo-Spanish) and regional court-lettering systems, with auto-loaded traditional attributes for court cards (King/Queen/Jack) plus pip and ace cards. Use this skill whenever the user wants to create, design, or generate a playing card, a court card, a deck card with a custom character, or asks for a "playing card prompt" or "card generator", or to turn a person/character/reference image into a playing card. Trigger it even if the user only says they want to "make a card" — walk them through the wizard (deck, lettering, rank, suit, style, attributes, reference transfers, aspect ratio) and output a finished prompt.
 metadata:
   author: webcane
-  version: 4.7.0
+  version: 4.8.0
   description_claudeai: Interactive wizard to build image-gen prompts for stylized playing cards. 4 deck patterns, 6 lettering systems, 3+ styles, court/pip/ace. Trigger on card design requests.
 ---
 
@@ -386,7 +386,8 @@ Offer (default first):
   `layers.split.<group> = "none"`.
 - **Horizontal mirrored** — two mirror-image halves meeting at a horizontal edge
   through the center. Sets `layers.split.<group> = "horizontal-mirrored"`.
-- **Angled mirrored** — two mirror-image halves angled around the figure. Sets
+- **Angled mirrored** — two mirror-image halves split along a 15-degree
+  diagonal axis corner-to-corner, meeting along that diagonal seam. Sets
   `layers.split.<group> = "angled-mirrored"`.
 - **Other** — any custom split/mirror description (free text).
 

@@ -4,6 +4,11 @@ All notable changes to this skill. Released per skill as tag
 `playing-card-prompt/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
+## [Unreleased]
+
+### Fixed
+- **`angled-mirrored` split rendered visually indistinguishable from `horizontal-mirrored` (SPLT-03, Phase 01 UAT gap)** — the split line (`mirrored halves angled around the figure,`) named no concrete angle, axis, or seam, unlike `horizontal-mirrored`'s explicit axis (`horizontally`) + seam (`edge-to-edge`). Rewrote `assets/split/angled-mirrored.md`'s split line and SKILL.md Step 8b's matching option text to name a concrete 15-degree diagonal axis and an explicit diagonal seam descriptor, so the phrase can no longer be satisfied by a near-horizontal interpretation.
+
 ## [4.7.0] - 2026-06-28
 
 ### Fixed
