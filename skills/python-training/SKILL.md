@@ -11,8 +11,9 @@ description: >
   «mock interview», «технический вопрос», «разбери тему», «python собеседование».
 color: blue
 metadata:
-  version: 1.0.0
+  version: 1.0.1
   author: mniedre
+  description_claudeai: Тренажёр Python-интервью уровня Middle+/Senior. Задаёт вопросы, разбирает ошибки, даёт теорию и задачи на код. Для подготовки к собеседованию и mock-интервью.
 ---
 
 # Python Interview Coach
