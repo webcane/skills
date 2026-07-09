@@ -10,7 +10,7 @@ description: >
   reference docs from the chat.
 color: blue
 metadata:
-  version: 1.1.1
+  version: 1.2.0
   author: mniedre
   description_claudeai: >
     Turns the current chat into wiki-style Markdown pages saved to your project. Use when you
@@ -70,27 +70,33 @@ paraphrase the reasoning, don't just bullet-list facts.
 
 ## Ключевые сценарии
 
-Describe 2–4 situations where this topic applies. Ground them in the actual use cases from
-the conversation.
+_(Brief overview table — one line per scenario. Followed by a full section for each.)_
 
 | Сценарий | Когда использовать |
 |----------|-------------------|
 | ...      | ...               |
 
-## Практические примеры
+---
 
-### Пример 1 — <short label>
+# <Scenario 1 name>
 
-Reproduce or reconstruct code/commands from the chat. Include the surrounding context: what
-problem was being solved, what the input was, what the output looked like.
+Full expanded explanation of this scenario. What exactly happens, why it works this way, what
+to watch out for. Include code from the chat — inputs, outputs, what the example demonstrates.
+Explain the reasoning, not just the mechanics.
 
 ```<lang>
 # code here
 ```
 
-Explain what the example demonstrates in 1–3 sentences.
+---
 
-_(Add more examples as needed — one per distinct concept variation shown in the chat.)_
+# <Scenario 2 name>
+
+_(Repeat for each scenario. Use H1 (`#`) for scenario headings so they stand out as
+self-contained reference sections — like in the example above with "Во что разворачивается
+@decorator", "Простейший декоратор", etc.)_
+
+---
 
 ## Где применяется
 

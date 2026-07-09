@@ -1,5 +1,12 @@
 # Changelog — session-notes
 
+## [Unreleased]
+
+## [1.2.0] - 2026-07-09
+
+### Changed
+- Each scenario now gets its own expanded H1 section (with code, reasoning, output) in addition to the overview table
+
 ## [1.1.1] - 2026-07-09
 
 ## [1.1.0] - 2026-07-09
