@@ -30,16 +30,22 @@ metadata:
   version: 1.0.0
 ```
 
-## 2. Package & Release
+## 2. Release a New Version
+
+Four steps — package, package for Claude.ai, install locally, then release:
 
 ```bash
-# Version is read from SKILL.md frontmatter (omit to use it; pass to override)
-bash scripts/package-skill.sh content-writer-linkedin
+# 1. Package as .skill (tar.gz) for Claude Code / agentskills.io
+bash scripts/package-skill.sh <skill-name>
 
-git tag -a content-writer-linkedin/v1.0.0 -m "content-writer-linkedin v1.0.0"
-git push origin content-writer-linkedin/v1.0.0
-gh release create content-writer-linkedin/v1.0.0 \
-  -t "content-writer-linkedin v1.0.0"
+# 2. Package as .zip for Claude.ai upload
+bash scripts/package-skill-claudeai.sh <skill-name>
+
+# 3. Install/reinstall locally (optional — validates the package works)
+bash scripts/install-local.sh <skill-name>
+
+# 4. Tag, push, and create GitHub release (version read from SKILL.md frontmatter)
+bash scripts/release-skill.sh <skill-name>
 ```
 
 On a published release, CI packages and uploads only the tagged skill and
@@ -49,11 +55,13 @@ promotes its `[Unreleased]` CHANGELOG section — so you don't need to attach th
 ## 3. Update Later
 
 ```bash
-vim skills/content-writer-linkedin/SKILL.md          # bump metadata.version to 1.1.0
-# add the change under ## [Unreleased] in skills/content-writer-linkedin/CHANGELOG.md
-git add skills/ && git commit -m "feat: ..."
+vim skills/<skill-name>/SKILL.md          # bump metadata.version (e.g. 1.1.0 → 1.2.0)
+# add the change under ## [Unreleased] in skills/<skill-name>/CHANGELOG.md
+git add skills/ && git commit -m "<skill-name>: description of change"
 
-git tag -a content-writer-linkedin/v1.1.0 -m "content-writer-linkedin v1.1.0"
-git push origin content-writer-linkedin/v1.1.0
-gh release create content-writer-linkedin/v1.1.0 -t "content-writer-linkedin v1.1.0"
+# Then repeat the 4 release steps:
+bash scripts/package-skill.sh <skill-name>
+bash scripts/package-skill-claudeai.sh <skill-name>
+bash scripts/install-local.sh <skill-name>
+bash scripts/release-skill.sh <skill-name>
 ```

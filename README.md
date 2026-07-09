@@ -11,16 +11,12 @@ skills/          →   package-skill.sh   →   dist/*.skill   →   GitHub Rele
 
 ## Quick Setup
 
+See **[QUICK_START.md](QUICK_START.md)** for the full release workflow
+(4 commands: package → package-claudeai → install-local → release).
+
+Users install a skill with:
+
 ```bash
-# 1. Set metadata.version in skills/<skillname>/SKILL.md, then package
-bash scripts/package-skill.sh <skillname>          # version read from frontmatter
-
-# 2. Release (per-skill, namespaced tag)
-git tag -a <skillname>/v1.0.0 -m "<skillname> v1.0.0"
-git push origin <skillname>/v1.0.0
-gh release create <skillname>/v1.0.0 --title "<skillname> v1.0.0"
-
-# 3. Users install
 curl -L https://raw.githubusercontent.com/webcane/skills/main/dist/<skillname>.skill \
   -o <skillname>.skill
 ```
