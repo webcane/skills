@@ -1,6 +1,11 @@
-# Changelog — session-wiki
+# Changelog — session-notes
 
 ## [Unreleased]
+
+## [1.1.0] - 2026-07-09
+
+### Added
+- Ask user where to save files (current directory or custom path) before writing
 
 ## [1.0.0] - 2026-07-09
 

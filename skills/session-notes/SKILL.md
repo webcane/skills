@@ -10,7 +10,7 @@ description: >
   reference docs from the chat.
 color: blue
 metadata:
-  version: 1.0.0
+  version: 1.1.0
   author: mniedre
 ---
 
@@ -43,9 +43,10 @@ Show the proposed topic list before writing any files:
 2. **Async/await patterns** → `async-await.md`
 
 Можно добавить, убрать или переименовать темы.
+Куда сохранить файлы — в текущую директорию (`./`) или указать другой путь?
 ```
 
-Wait for confirmation. Adjust the list if the user edits it. Then proceed.
+Wait for the user's response. Accept either a confirmation (use `./`) or a custom path. Then proceed.
 
 ## Step 3 — Write the wiki files
 
