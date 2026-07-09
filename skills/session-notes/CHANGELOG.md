@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-07-09
+
+### Added
+- File conflict handling: if a file already exists, ask user to keep, replace, save both, or choose another path
+
 ## [1.2.0] - 2026-07-09
 
 ### Changed

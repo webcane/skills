@@ -10,7 +10,7 @@ description: >
   reference docs from the chat.
 color: blue
 metadata:
-  version: 1.2.0
+  version: 1.2.1
   author: mniedre
   description_claudeai: >
     Turns the current chat into wiki-style Markdown pages saved to your project. Use when you
@@ -140,3 +140,20 @@ and technical terms as-is.
 - **No code in the chat** → skip the code examples section; focus on concepts and scenarios.
 - **Ambiguous topic boundaries** → prefer fewer, broader pages over many narrow ones. Merge
   if two topics are closely related and appeared together in the chat.
+
+## File conflicts
+
+Before writing each file, check whether it already exists at the chosen path. If it does, ask:
+
+```
+Файл `python-decorators.md` уже существует. Что сделать?
+
+1. Оставить прежний (пропустить этот файл)
+2. Заменить (перезаписать)
+3. Сохранить оба (`python-decorators-2.md`)
+4. Указать другой путь
+```
+
+Wait for the answer before writing. Apply the chosen action. If the user picks option 3,
+append `-2` to the filename (or `-3` if `-2` also exists, etc.). If multiple files conflict,
+ask once per file — don't batch them into a single question.
