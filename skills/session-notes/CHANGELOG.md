@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-07-09
+
+### Changed
+- `language-reference.md`: added "Основные сценарии" with H1 expanded sections (was missing vs python-template)
+- `python-template.md`: now only Python-specific additions (closures, functools.wraps, GIL, gotchas, Эквивалент patterns); extends language-reference.md via include instruction
+- Routing: Python = language-reference.md + python-template.md
+
 ## [2.0.0] - 2026-07-09
 
 ### Added

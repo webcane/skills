@@ -1,167 +1,42 @@
-# Python Wiki Template
+# Python Template
 
-Use this template for all Python topics. Sections marked _(optional)_ are omitted if the
-topic or chat doesn't warrant them. Keep section order fixed — readers build a mental model
-top-down: concept → syntax → mechanics → usage → pitfalls → summary.
-
----
-
-```markdown
-# <Название>
+**Extends `language-reference.md`.**
+Read that file first for the full section structure, then apply the Python-specific additions below.
 
 ---
 
-## Что это
+## Python-specific additions
 
-Краткое определение. Не только что это, но зачем существует и какую проблему решает.
+### Синтаксис → code blocks
 
-Ментальная модель — как представить в голове. Разделяй **концепцию** (что означает) и
-**синтаксис** (как пишется). Используй диаграмму или аналогию, если помогает.
+Use ` ```python ` (not ` ```<lang> `).
 
-```
-вход
-↓
-шаг 1
-   ↓
-шаг 2
-   ↓
-результат
-```
+### Эквивалент — Python patterns
 
----
+Common cases where the short form should always be shown alongside the explicit equivalent:
 
-## Как работает
+- List / dict / set comprehensions vs `for` loop + `.append()`
+- Generator expressions vs explicit generator function
+- `@decorator` vs `func = decorator(func)`
+- `with` statement vs `try/finally`
+- Walrus operator `:=` vs pre-assignment
 
-Что происходит под капотом. Объясняй через "почему": не "генератор экономит память", а
-"генератор хранит только текущее состояние итерации, а не всю коллекцию — поэтому не
-расходует память на элементы, которые ещё не нужны".
+### Как работает — Python-specific mechanics to cover when relevant
 
----
+- **Замыкания (closures):** inner function captures a reference to the variable, not its value at definition time
+- **`*args / **kwargs`:** always use in wrapper functions so the decorator works with any signature
+- **`functools.wraps`:** preserves `__name__`, `__doc__`, and signature — omitting it silently breaks introspection and tools like `help()`
+- **GIL:** relevant for threading topics — CPU-bound threads don't run in parallel, I/O-bound do
+- **Mutable default arguments:** `def f(x=[])` — the list is created once at function definition, not per call
+- **Late binding in closures:** variables in closures are looked up at call time, not at definition
 
-## Синтаксис
+### Подводные камни — recurring Python gotchas
 
-Минимальная форма. Только то, что нужно знать, чтобы начать.
+Flag these when they are relevant to the topic:
 
-```python
-# минимальный пример
-```
-
-**Эквивалент** _(optional — для сложных конструкций: comprehensions, декораторы, генераторы)_
-
-```python
-# короткая форма
-[x * 2 for x in nums if x > 0]
-
-# эквивалент через for
-result = []
-for x in nums:
-    if x > 0:
-        result.append(x * 2)
-```
-
----
-
-## Примеры
-
-От простого к сложному. Каждый пример — отдельный H3 с кодом из чата, входными данными,
-выводом и объяснением что демонстрирует.
-
-### Пример 1 — <название>
-
-```python
-# код
-```
-
-Вывод:
-```
-...
-```
-
-Почему так: ...
-
-### Пример 2 — <название> _(optional)_
-
----
-
-## Основные сценарии _(optional — если сценарии отличаются достаточно, чтобы заслуживать отдельного разбора)_
-
-Краткая таблица — потом развёрнутый раздел (H1) на каждый пункт.
-
-| Сценарий | Когда использовать |
-|----------|-------------------|
-| ...      | ...               |
-
----
-
-# <Сценарий 1>
-
-Полное объяснение: что происходит, почему именно так, что важно учесть. Код → вывод → вывод.
-
-```python
-# пример
-```
-
----
-
-# <Сценарий 2>
-
-_(повторять для каждого сценария)_
-
----
-
-## Где применяется
-
-Конкретные практические кейсы. Не "в Python-проектах", а "при парсинге больших файлов",
-"при написании middleware", "при работе с БД через ORM".
-
----
-
-## Когда НЕ использовать _(optional)_
-
-Ситуации, где эта конструкция — неправильный выбор, и что использовать вместо.
-
----
-
-## С чем часто путают _(optional)_
-
-Похожие конструкции, тонкие различия в поведении, путаница в названиях.
-
-| Конструкция | Отличие |
-|-------------|---------|
-| ...         | ...     |
-
----
-
-## Сложность / Производительность _(optional — для коллекций и алгоритмов)_
-
-Временна́я и пространственная сложность. Объяснять через "почему": какая операция её определяет.
-
-| Операция | Сложность | Почему |
-|----------|-----------|--------|
-| ...      | O(?)      | ...    |
-
----
-
-## Подводные камни _(optional)_
-
-Типичные ошибки и неожиданное поведение из чата.
-
----
-
-## Частые вопросы с собеседований _(optional)_
-
-На что обычно спрашивают. Ключевые тезисы для ответа.
-
-- **Вопрос?** — ответ / что важно упомянуть.
-
----
-
-## Summary
-
-5–10 тезисов. Самое важное, что нужно вспомнить первым.
-
-- ...
-
----
-_Составлено из сессии: <дата>_
-```
+- Mutable default argument (`def f(x=[])`)
+- Late binding in closures (`lambda i=i` workaround)
+- `is` vs `==` for identity vs equality
+- Modifying a list while iterating over it
+- `__name__` lost without `functools.wraps`
+- Shallow vs deep copy (`copy` vs `copy.deepcopy`)

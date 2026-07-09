@@ -1,6 +1,7 @@
 # Language Reference Template
 
-Generic template for programming languages. For Python, use `python-template.md` instead.
+Base template for any programming language concept.
+Python topics extend this via `python-template.md`.
 
 ---
 
@@ -13,7 +14,11 @@ Generic template for programming languages. For Python, use `python-template.md`
 
 Определение. Зачем существует, какую проблему решает.
 
-Ментальная модель: концепция отдельно от синтаксиса.
+Ментальная модель: концепция отдельно от синтаксиса. Диаграмма если помогает:
+
+```
+вход → [шаг 1] → [шаг 2] → результат
+```
 
 ---
 
@@ -31,10 +36,12 @@ Generic template for programming languages. For Python, use `python-template.md`
 // минимальный пример
 ```
 
-Эквивалент _(optional — для сложных конструкций)_:
+**Эквивалент** _(optional — для сложных конструкций)_:
 
 ```<lang>
-// короткая форма vs явная форма
+// короткая форма
+
+// явный эквивалент
 ```
 
 ---
@@ -47,8 +54,36 @@ Generic template for programming languages. For Python, use `python-template.md`
 // код
 ```
 
-Вывод / результат: ...
+Вывод: ...
 Почему так: ...
+
+### Пример 2 — <название> _(optional)_
+
+---
+
+## Основные сценарии _(optional — если сценарии различаются настолько, что заслуживают отдельного разбора)_
+
+Краткая таблица — потом развёрнутый раздел (H1) на каждый пункт.
+
+| Сценарий | Когда использовать |
+|----------|-------------------|
+| ...      | ...               |
+
+---
+
+# <Сценарий 1>
+
+Полное объяснение: что происходит, почему именно так, что важно учесть.
+
+```<lang>
+// код → вывод
+```
+
+---
+
+# <Сценарий 2>
+
+_(повторять для каждого сценария)_
 
 ---
 

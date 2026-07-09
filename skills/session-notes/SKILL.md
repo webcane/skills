@@ -10,7 +10,7 @@ description: >
   reference docs from the chat.
 color: blue
 metadata:
-  version: 2.0.0
+  version: 2.0.1
   author: mniedre
   description_claudeai: >
     Turns the current chat into wiki-style Markdown pages saved to your project. Use when you
@@ -69,7 +69,7 @@ or conversation doesn't warrant them.
 
 | Type | Template |
 |------|----------|
-| Language Reference — Python | `references/python-template.md` |
+| Language Reference — Python | `references/language-reference.md` + `references/python-template.md` |
 | Language Reference — other | `references/language-reference.md` |
 | CS / System Design | `references/cs-system-design.md` |
 | Tool Cookbook | `references/tool-cookbook.md` |
