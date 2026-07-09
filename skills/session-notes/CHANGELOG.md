@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-07-09
+
+### Fixed
+- python-template.md: added missing `## Что это` and `## Примеры` sections, fixed order (Как работает before Синтаксис), renamed "Типичные" → "Частые вопросы с собеседований"
+
 ## [1.3.0] - 2026-07-09
 
 ### Added

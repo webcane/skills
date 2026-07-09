@@ -10,7 +10,7 @@ description: >
   reference docs from the chat.
 color: blue
 metadata:
-  version: 1.3.0
+  version: 1.3.1
   author: mniedre
   description_claudeai: >
     Turns the current chat into wiki-style Markdown pages saved to your project. Use when you
