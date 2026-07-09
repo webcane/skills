@@ -1,6 +1,6 @@
 # Changelog — session-notes
 
-## [Unreleased]
+## [2.1.0] - 2026-07-09
 
 ## [2.1.0] - 2026-07-09
 
