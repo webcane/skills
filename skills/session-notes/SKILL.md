@@ -10,7 +10,7 @@ description: >
   reference docs from the chat.
 color: blue
 metadata:
-  version: 1.3.1
+  version: 2.0.0
   author: mniedre
   description_claudeai: >
     Turns the current chat into wiki-style Markdown pages saved to your project. Use when you
@@ -18,198 +18,96 @@ metadata:
     this session".
 ---
 
-# session-wiki
+# session-notes
 
-Turn the current conversation into one or more wiki-style Markdown reference pages, saved to
-the project root. Each file covers exactly one topic and is written to be useful standalone —
-someone who wasn't in the chat should be able to read it and understand the concept with
-working examples.
+Turn the current conversation into one or more Markdown reference pages. Each file covers
+one topic, uses a structure matched to its type, and is written to be useful standalone.
 
-## Step 1 — Identify topics
+## Step 1 — Identify topics and classify types
 
-Scan the entire conversation (everything visible in context). Extract the distinct topics or
-concepts discussed. A topic is a coherent technical or conceptual subject the participants
-explored together — not every message, but meaningful clusters of learning.
+Scan the entire conversation. For each topic, determine:
 
-Good signals: repeated questions about the same thing, code snippets around a shared concept,
-a "how does X work" thread, a decision made with reasoning.
+1. **Topic name** → proposed `kebab-case.md` filename
+2. **Note type** from the list below
 
-Draft a short list: one line per topic with a proposed filename (`kebab-case.md`).
+| # | Type | When |
+|---|------|------|
+| 1 | Language Reference | concept/syntax in a programming language |
+| 2 | CS / System Design | algorithm, data structure, protocol, pattern, distributed systems |
+| 3 | Tool Cookbook | CLI tool, framework, library, API — "how to use X" |
+| 4 | Reading Notes | book |
+| 5 | Article Notes | blog post, paper, talk, docs page |
+| 6 | Cheat Sheet | dense lookup reference, commands, flags |
+| 7 | Terms | glossary entry / definition |
+| 8 | Recipes | step-by-step procedure, runbook |
+| 9 | Interview Notes | interview prep or debrief |
+| 10 | Personal Knowledge | observation, lesson learned, decision |
 
-## Step 2 — Confirm with the user
+If the type is unclear, use the closest match or note "Unknown" — you'll propose a new type
+to the user in Step 2.
 
-Show the proposed topic list before writing any files:
+## Step 2 — Confirm with user
+
+Show topics, types, and filenames before writing anything. Ask where to save:
 
 ```
-Я нашёл следующие темы в нашем чате. Создать wiki-страницы для них?
+Я нашёл следующие темы:
 
-1. **Python decorators** → `python-decorators.md`
-2. **Async/await patterns** → `async-await.md`
+1. **Python decorators** (Language Reference → Python) → `python-decorators.md`
+2. **CAP theorem** (CS / System Design) → `cap-theorem.md`
 
-Можно добавить, убрать или переименовать темы.
-Куда сохранить файлы — в текущую директорию (`./`) или указать другой путь?
+Куда сохранить — текущая директория (`./`) или другой путь?
 ```
 
-Wait for the user's response. Accept either a confirmation (use `./`) or a custom path. Then proceed.
+Wait for confirmation. Adjust if the user edits topics, types, or path. Then proceed.
 
-## Step 3 — Write the wiki files
+## Step 3 — Write files using the right template
 
-For each confirmed topic, write a Markdown file to the **current working directory** (project
-root). Use this structure — adapt section depth and length to what the chat actually covered,
-but keep all seven sections:
+For each topic, read the matching template from `references/` and use it as the structure.
+Adapt sections to what the chat actually covered — omit _(optional)_ sections if the topic
+or conversation doesn't warrant them.
 
-For Python topics, use `references/python-template.md` as the base structure — read it before
-writing. For other languages/domains, use the generic structure below.
-
-```markdown
-# <Topic Name>
-
-> One-sentence definition. Not just what it is — why it exists and what problem it solves.
-
-## Ментальная модель
-
-How to picture this in your head. Use a diagram, analogy, or step-by-step flow where it helps.
-Separate the **concept** (what it means) from the **syntax** (how you write it).
-
-Example flow diagram:
-```
-данные
-↓
-фильтр
-   ↓
-преобразование
-   ↓
-результат
-```
-
-## Основные концепции
-
-Explain the core ideas. Draw from explanations in the chat — paraphrase the reasoning.
-Prefer "Почему" over just the fact: not "generator экономит память" but
-"generator хранит только текущее состояние итерации, а не всю коллекцию целиком — поэтому
-не тратит память на элементы, которые ещё не нужны".
-
-## Ключевые сценарии
-
-_(Overview table — followed by a full expanded section for each.)_
-
-| Сценарий | Когда использовать |
-|----------|-------------------|
-| ...      | ...               |
-
----
-
-# <Scenario 1 name>
-
-Full expanded explanation. What happens, why it works this way, what to watch for.
-Include code from the chat with inputs, outputs, and explanation of what the example shows.
-
-```<lang>
-# code here
-```
-
----
-
-# <Scenario 2 name>
-
-_(Repeat per scenario using H1 headings so each reads as a standalone reference section.)_
-
----
-
-## Эквивалент
-
-_(Include only for complex syntax constructs — comprehensions, decorators, generators, etc.)_
-
-Show the equivalent written with simpler/more explicit constructs (e.g. a plain `for` loop),
-so the reader understands what the shorthand actually expands to.
-
-```<lang>
-# shorthand
-[x * 2 for x in nums if x > 0]
-
-# equivalent
-result = []
-for x in nums:
-    if x > 0:
-        result.append(x * 2)
-```
-
-## Где применяется
-
-Real situations where this is useful. Be specific: "when building X", "when debugging Y".
-
-## Когда НЕ использовать
-
-Situations where this construct is the wrong choice — and what to use instead. If nothing
-came up in the chat, omit this section.
-
-## С чем часто путают
-
-Common mix-ups: similar-looking constructs, subtle differences in behaviour, naming confusion.
-One paragraph or comparison table per pair. Omit if not discussed.
-
-## Сложность / Производительность
-
-_(Include for collections, algorithms, data structures.)_
-
-Time and space complexity. Explain *why* — not just O(n) but what operation drives it.
-Omit for topics where performance wasn't discussed and isn't relevant.
-
-## Подводные камни
-
-Gotchas and mistakes that came up (or were strongly implied) in the conversation.
-Omit if none.
-
-## Типичные вопросы с собеседований
-
-Questions commonly asked about this topic. Include the expected answer or key points
-to hit. Omit if not discussed in the session.
-
-## Summary — что важно помнить
-
-5–10 bullet points. The things to recall first when encountering this topic.
-
----
-_Составлено из сессии: <today's date>_
-```
+| Type | Template |
+|------|----------|
+| Language Reference — Python | `references/python-template.md` |
+| Language Reference — other | `references/language-reference.md` |
+| CS / System Design | `references/cs-system-design.md` |
+| Tool Cookbook | `references/tool-cookbook.md` |
+| Reading Notes | `references/reading-notes.md` |
+| Article Notes | `references/article-notes.md` |
+| Cheat Sheet | `references/cheat-sheet.md` |
+| Terms | `references/terms.md` |
+| Recipes | `references/recipes.md` |
+| Interview Notes | `references/interview-notes.md` |
+| Personal Knowledge | `references/personal-knowledge.md` |
+| Unknown | form a basic structure from the content; propose the type to the user |
 
 ## Writing quality rules
 
-**Draw from the chat, don't invent.** Every example, gotcha, and scenario should trace back to
-something that was actually discussed. If you need to fill a gap for completeness, mark it with
-`_(добавлено для контекста)_`.
+**Draw from the chat, don't invent.** Every example and scenario should trace back to the
+conversation. If you add something for completeness, mark it `_(добавлено для контекста)_`.
 
-**Code examples first.** If the chat had working code, reproduce it exactly (correcting obvious
-typos). Invented examples come last and only to fill gaps.
+**Explain the "почему".** Not "generator saves memory" but "generator stores only the current
+iteration state, not the whole collection — so it never allocates memory for elements not yet
+needed".
 
-**Match the session language.** If the chat was in Russian, write in Russian. If it mixed
-languages, match what was used for explanations (usually the user's language) but keep code
-and technical terms as-is.
+**Match the session language.** Write in the user's language; keep code and technical terms as-is.
 
-**One file per topic.** Don't merge unrelated topics. Don't split a single topic across files.
+**One file per topic.** Don't merge unrelated topics. Don't split one topic across files.
 
-**Filename convention:** name the file after the topic in kebab-case — e.g. `python-decorators.md`,
-`async-await.md`, `git-rebase.md`. All lowercase, no spaces, no generic names like `topic.md`.
-
-## Edge cases
-
-- **No code in the chat** → skip the code examples section; focus on concepts and scenarios.
-- **Ambiguous topic boundaries** → prefer fewer, broader pages over many narrow ones. Merge
-  if two topics are closely related and appeared together in the chat.
+**Filename:** kebab-case named after the topic — `python-decorators.md`, `cap-theorem.md`.
 
 ## File conflicts
 
-Before writing each file, check whether it already exists at the chosen path. If it does, ask:
+Before writing each file, check if it already exists at the chosen path. If it does, ask:
 
 ```
 Файл `python-decorators.md` уже существует. Что сделать?
 
-1. Оставить прежний (пропустить этот файл)
+1. Оставить прежний (пропустить)
 2. Заменить (перезаписать)
 3. Сохранить оба (`python-decorators-2.md`)
 4. Указать другой путь
 ```
 
-Wait for the answer before writing. Apply the chosen action. If the user picks option 3,
-append `-2` to the filename (or `-3` if `-2` also exists, etc.). If multiple files conflict,
-ask once per file — don't batch them into a single question.
+Ask once per conflicting file. If the user picks option 3, append `-2` (or `-3` etc.).

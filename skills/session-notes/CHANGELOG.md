@@ -1,5 +1,18 @@
 # Changelog — session-notes
 
+## [Unreleased]
+
+## [2.0.0] - 2026-07-09
+
+### Added
+- 10 note types with dedicated templates in `references/`: language-reference, cs-system-design, tool-cookbook, reading-notes, article-notes, cheat-sheet, terms, recipes, interview-notes, personal-knowledge
+- Type detection step: each topic is classified before writing
+- Routing table in SKILL.md: type → template file
+
+### Changed
+- SKILL.md slimmed down — structure lives in `references/` templates, not inline
+- Step 2 now shows type alongside topic name and filename
+
 ## [1.2.0] - 2026-07-09
 
 ## [1.3.1] - 2026-07-09
