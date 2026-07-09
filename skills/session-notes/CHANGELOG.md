@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-07-09
+
+### Added
+- Sections: "Когда НЕ использовать", "С чем часто путают", "Эквивалент" (for complex syntax), "Сложность / Производительность", "Типичные вопросы с собеседований"
+- Mental model block: separate concept from syntax, use flow diagrams
+- "Почему" writing rule: explain mechanisms, not just consequences
+- `references/python-template.md`: unified template for all Python topics
+
 ## [1.2.1] - 2026-07-09
 
 ### Added

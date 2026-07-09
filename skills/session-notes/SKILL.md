@@ -10,7 +10,7 @@ description: >
   reference docs from the chat.
 color: blue
 metadata:
-  version: 1.2.1
+  version: 1.3.0
   author: mniedre
   description_claudeai: >
     Turns the current chat into wiki-style Markdown pages saved to your project. Use when you
@@ -58,19 +58,40 @@ For each confirmed topic, write a Markdown file to the **current working directo
 root). Use this structure — adapt section depth and length to what the chat actually covered,
 but keep all seven sections:
 
+For Python topics, use `references/python-template.md` as the base structure — read it before
+writing. For other languages/domains, use the generic structure below.
+
 ```markdown
 # <Topic Name>
 
-> One-sentence definition. What is this and why does it matter?
+> One-sentence definition. Not just what it is — why it exists and what problem it solves.
+
+## Ментальная модель
+
+How to picture this in your head. Use a diagram, analogy, or step-by-step flow where it helps.
+Separate the **concept** (what it means) from the **syntax** (how you write it).
+
+Example flow diagram:
+```
+данные
+↓
+фильтр
+   ↓
+преобразование
+   ↓
+результат
+```
 
 ## Основные концепции
 
-Explain the core ideas and mental model. Draw directly from explanations given in the chat —
-paraphrase the reasoning, don't just bullet-list facts.
+Explain the core ideas. Draw from explanations in the chat — paraphrase the reasoning.
+Prefer "Почему" over just the fact: not "generator экономит память" but
+"generator хранит только текущее состояние итерации, а не всю коллекцию целиком — поэтому
+не тратит память на элементы, которые ещё не нужны".
 
 ## Ключевые сценарии
 
-_(Brief overview table — one line per scenario. Followed by a full section for each.)_
+_(Overview table — followed by a full expanded section for each.)_
 
 | Сценарий | Когда использовать |
 |----------|-------------------|
@@ -80,9 +101,8 @@ _(Brief overview table — one line per scenario. Followed by a full section for
 
 # <Scenario 1 name>
 
-Full expanded explanation of this scenario. What exactly happens, why it works this way, what
-to watch out for. Include code from the chat — inputs, outputs, what the example demonstrates.
-Explain the reasoning, not just the mechanics.
+Full expanded explanation. What happens, why it works this way, what to watch for.
+Include code from the chat with inputs, outputs, and explanation of what the example shows.
 
 ```<lang>
 # code here
@@ -92,26 +112,62 @@ Explain the reasoning, not just the mechanics.
 
 # <Scenario 2 name>
 
-_(Repeat for each scenario. Use H1 (`#`) for scenario headings so they stand out as
-self-contained reference sections — like in the example above with "Во что разворачивается
-@decorator", "Простейший декоратор", etc.)_
+_(Repeat per scenario using H1 headings so each reads as a standalone reference section.)_
 
 ---
 
+## Эквивалент
+
+_(Include only for complex syntax constructs — comprehensions, decorators, generators, etc.)_
+
+Show the equivalent written with simpler/more explicit constructs (e.g. a plain `for` loop),
+so the reader understands what the shorthand actually expands to.
+
+```<lang>
+# shorthand
+[x * 2 for x in nums if x > 0]
+
+# equivalent
+result = []
+for x in nums:
+    if x > 0:
+        result.append(x * 2)
+```
+
 ## Где применяется
 
-List real situations in the project or domain where this knowledge is directly useful. Be
-specific: "when building X", "when debugging Y", not generic "in Python projects".
+Real situations where this is useful. Be specific: "when building X", "when debugging Y".
+
+## Когда НЕ использовать
+
+Situations where this construct is the wrong choice — and what to use instead. If nothing
+came up in the chat, omit this section.
+
+## С чем часто путают
+
+Common mix-ups: similar-looking constructs, subtle differences in behaviour, naming confusion.
+One paragraph or comparison table per pair. Omit if not discussed.
+
+## Сложность / Производительность
+
+_(Include for collections, algorithms, data structures.)_
+
+Time and space complexity. Explain *why* — not just O(n) but what operation drives it.
+Omit for topics where performance wasn't discussed and isn't relevant.
 
 ## Подводные камни
 
-Gotchas, edge cases, or mistakes that came up (or were implied) in the conversation. If none
-were discussed, omit this section.
+Gotchas and mistakes that came up (or were strongly implied) in the conversation.
+Omit if none.
+
+## Типичные вопросы с собеседований
+
+Questions commonly asked about this topic. Include the expected answer or key points
+to hit. Omit if not discussed in the session.
 
 ## Summary — что важно помнить
 
-3–5 bullet points. The things someone should recall first when they encounter this topic.
-Keep them tight and memorable.
+5–10 bullet points. The things to recall first when encountering this topic.
 
 ---
 _Составлено из сессии: <today's date>_
