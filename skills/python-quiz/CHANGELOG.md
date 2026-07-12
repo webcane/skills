@@ -1,6 +1,6 @@
 # Changelog — python-quiz
 
-## [Unreleased]
+## [1.4.0] - 2026-07-12
 
 ## [1.4.0] - 2026-07-12
 
