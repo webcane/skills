@@ -67,6 +67,19 @@ fi
 
 echo "Releasing $SKILL_NAME v$VERSION as tag $TAG"
 
+# Promote [Unreleased] → [version] - date in the skill's CHANGELOG before tagging,
+# so the CI promotion step is always a no-op and never pushes an extra commit to master.
+if [ -f "$CHANGELOG" ] && grep -q "^## \[Unreleased\]" "$CHANGELOG"; then
+  DATE="$(date -u +%Y-%m-%d)"
+  # BSD sed (macOS) requires -i ''; GNU sed (Linux) accepts -i '' too
+  sed -i '' "s/^## \[Unreleased\]/## [${VERSION}] - ${DATE}/" "$CHANGELOG" 2>/dev/null \
+    || sed -i "s/^## \[Unreleased\]/## [${VERSION}] - ${DATE}/" "$CHANGELOG"
+  git add "$CHANGELOG"
+  git diff --cached --quiet || git commit -m "chore: promote ${SKILL_NAME} CHANGELOG for v${VERSION}"
+  git push origin master
+  echo "✓ Promoted CHANGELOG and pushed to master"
+fi
+
 git tag -a "$TAG" -m "$SKILL_NAME v$VERSION"
 git push origin "$TAG"
 gh release create "$TAG" --title "$SKILL_NAME v$VERSION" --notes-file "$NOTES_FILE"
