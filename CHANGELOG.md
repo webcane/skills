@@ -7,6 +7,9 @@ and each skill is versioned and released independently.
 ## [Unreleased]
 
 ### Added
+- `skills/python-interview/`: новый скилл — интерактивный тест Python по .md файлам в директории
+
+### Added
 - `scripts/release-skill.sh`: tags, pushes, and creates a GitHub release for a skill, with an interactive picker when no skill name is given. Reads the version from `SKILL.md` frontmatter (`metadata.version`), tags `<skill-name>/v<version>`, and runs `gh release create` non-interactively using the skill's `[Unreleased]` CHANGELOG section as release notes (falling back to a title-only message)
 - `scripts/install-local.sh`: build a skill from source and install/reinstall it into a local Claude skills directory, with an interactive picker when no skill name is given
 - Documented local build/install/reinstall workflow in `README.md`
