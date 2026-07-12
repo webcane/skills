@@ -46,8 +46,9 @@ VERSION="$(grep -E '^[[:space:]]*version:[[:space:]]*' "$SKILL_DIR/SKILL.md" \
 
 TAG="${SKILL_NAME}/v${VERSION}"
 
-# Guard 1: local master must not be behind origin
-git fetch origin master --quiet
+# Guard 1: local master must not be behind origin; also fetch tags so the
+# tag-existence check below catches tags that exist on remote but not locally
+git fetch origin master --tags --quiet
 git merge-base --is-ancestor origin/master HEAD \
   || { echo "Error: local master is behind origin/master — run 'git pull --rebase' first"; exit 1; }
 
