@@ -93,13 +93,19 @@ color: cyan
 
 1. Edit `skills/<skill-name>/SKILL.md` and bump `metadata.version` in its frontmatter.
 2. Add the change to `skills/<skill-name>/CHANGELOG.md` under `## [Unreleased]`.
+   **Never write a versioned header (`## [1.2.0]`) by hand** — `release-skill.sh`
+   promotes `[Unreleased]` → `[version] - date` automatically. Writing it manually
+   creates a duplicate entry and breaks the release flow.
 3. (Optional local check) `bash scripts/package-skill.sh <skill-name>` — version is read from frontmatter.
-4. `bash scripts/release-skill.sh [skill-name]` — tags, pushes, and creates the GitHub release (non-interactively). If `[skill-name]` is omitted, it prompts to choose from `skills/`.
+4. `bash scripts/release-skill.sh [skill-name]` — promotes the CHANGELOG locally,
+   commits and pushes to master, packages the skill, creates and pushes the tag,
+   then creates the GitHub release with `.skill` + versioned `.skill` + `.json` as assets.
+   If `[skill-name]` is omitted, it prompts to choose from `skills/`.
 
-On a published release CI parses the `<skill>/v<version>` tag, packages and
-uploads **only that skill**, and promotes that skill's `[Unreleased]` CHANGELOG
-section to `## [<version>] - YYYY-MM-DD`. On push to `main` CI also repackages
-all skills as `<name>.skill` artifacts.
+On a published release CI is a **fallback**: it packages and uploads the skill,
+and promotes `[Unreleased]` → `## [<version>] - YYYY-MM-DD` only if it wasn't
+already done locally (i.e. when a tag was pushed without using `release-skill.sh`).
+On push to `master` CI repackages all skills as `<name>.skill` artifacts.
 
 ## Adding a New Skill
 
@@ -114,7 +120,7 @@ Add it to the Skills table in `README.md`. CI packages it automatically on push.
 - Tooling/CI/layout change → add an entry to the root `CHANGELOG.md` under `## [Unreleased]`.
 - Update `CLAUDE.md` if structure/workflow changed.
 
-Releasing is handled by CI (it promotes `[Unreleased]` on a published release); only promote a CHANGELOG section by hand if releasing without CI.
+Releasing is handled by `release-skill.sh` (promotes `[Unreleased]` locally before tagging). CI is a fallback for manually-pushed tags. Never promote a CHANGELOG section by hand — always write under `[Unreleased]` and let the script do it.
 
 <!-- GSD:project-start source:PROJECT.md -->
 ## Project
