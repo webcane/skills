@@ -1,6 +1,6 @@
 # Changelog — python-quiz
 
-## [Unreleased]
+## [1.5.0] - 2026-07-12
 
 ### Added
 - Режим `python-quiz init`: строит банк вопросов через Hierarchical TOC (.md заголовки ##/###)
