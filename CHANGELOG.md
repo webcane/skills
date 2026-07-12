@@ -8,6 +8,13 @@ and each skill is versioned and released independently.
 
 ### Added
 - `skills/python-interview/`: новый скилл — интерактивный тест Python по .md файлам в директории
+- `scripts/release-skill.sh`: packages skill before release and uploads `.skill` + versioned `.skill` + `.json` metadata as release assets via `gh release create`
+
+### Fixed
+- `scripts/release-skill.sh`: promotes `[Unreleased]` CHANGELOG locally before tagging so CI's promotion step is always a no-op — eliminates post-release push that diverged local master from origin
+- `scripts/release-skill.sh`: guard — aborts if local master is behind `origin/master` before any changes are made
+- `scripts/release-skill.sh`: guard — warns when `[Unreleased]` section has no content so empty release notes are explicit, not silent
+- `.github/workflows/package-skills.yml`: `git push origin master` in the promote step is now conditional on an actual commit, avoiding a redundant no-op push when promotion was already done locally
 
 ### Added
 - `scripts/release-skill.sh`: tags, pushes, and creates a GitHub release for a skill, with an interactive picker when no skill name is given. Reads the version from `SKILL.md` frontmatter (`metadata.version`), tags `<skill-name>/v<version>`, and runs `gh release create` non-interactively using the skill's `[Unreleased]` CHANGELOG section as release notes (falling back to a title-only message)

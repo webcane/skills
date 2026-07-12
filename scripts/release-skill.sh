@@ -10,6 +10,9 @@
 # Release notes are taken from the skill's CHANGELOG.md "[Unreleased]"
 # section if present, otherwise a default title-only message is used so
 # `gh release create` never prompts for input.
+#
+# Before tagging: promotes [Unreleased] → [version] - date in the skill's
+# CHANGELOG and pushes to master, so CI's promotion step is always a no-op.
 
 set -e
 
@@ -43,12 +46,16 @@ VERSION="$(grep -E '^[[:space:]]*version:[[:space:]]*' "$SKILL_DIR/SKILL.md" \
 
 TAG="${SKILL_NAME}/v${VERSION}"
 
+# Guard 1: local master must not be behind origin
+git fetch origin master --quiet
+git merge-base --is-ancestor origin/master HEAD \
+  || { echo "Error: local master is behind origin/master — run 'git pull --rebase' first"; exit 1; }
+
 if git rev-parse "$TAG" >/dev/null 2>&1; then
   echo "Error: tag $TAG already exists" && exit 1
 fi
 
-# Pull release notes from the "[Unreleased]" section of the skill's
-# CHANGELOG.md, if any content is there.
+# Extract release notes from [Unreleased] before promotion
 NOTES_FILE="$(mktemp)"
 trap 'rm -f "$NOTES_FILE"' EXIT
 
@@ -61,14 +68,15 @@ if [ -f "$CHANGELOG" ]; then
   ' "$CHANGELOG" | sed -e '/./,$!d' -e :a -e '/^\n*$/{$d;N;ba' -e '}' > "$NOTES_FILE"
 fi
 
+# Guard 2: warn if [Unreleased] has no content
 if [ ! -s "$NOTES_FILE" ]; then
+  echo "Warning: [Unreleased] section is empty — release notes will be title-only."
   echo "Release ${SKILL_NAME} v${VERSION}" > "$NOTES_FILE"
 fi
 
 echo "Releasing $SKILL_NAME v$VERSION as tag $TAG"
 
-# Promote [Unreleased] → [version] - date in the skill's CHANGELOG before tagging,
-# so the CI promotion step is always a no-op and never pushes an extra commit to master.
+# Promote [Unreleased] → [version] - date locally before tagging so CI is a no-op
 if [ -f "$CHANGELOG" ] && grep -q "^## \[Unreleased\]" "$CHANGELOG"; then
   DATE="$(date -u +%Y-%m-%d)"
   # BSD sed (macOS) requires -i ''; GNU sed (Linux) accepts -i '' too
@@ -80,8 +88,18 @@ if [ -f "$CHANGELOG" ] && grep -q "^## \[Unreleased\]" "$CHANGELOG"; then
   echo "✓ Promoted CHANGELOG and pushed to master"
 fi
 
+# Package the skill so artifacts are ready to upload with the release
+bash "$REPO_ROOT/scripts/package-skill.sh" "$SKILL_NAME" "$VERSION"
+
 git tag -a "$TAG" -m "$SKILL_NAME v$VERSION"
 git push origin "$TAG"
-gh release create "$TAG" --title "$SKILL_NAME v$VERSION" --notes-file "$NOTES_FILE"
+
+# Guard 3: upload .skill + versioned .skill + .json metadata
+gh release create "$TAG" \
+  --title "$SKILL_NAME v$VERSION" \
+  --notes-file "$NOTES_FILE" \
+  "dist/${SKILL_NAME}.skill" \
+  "dist/${SKILL_NAME}-${VERSION}.skill" \
+  "dist/${SKILL_NAME}-${VERSION}.json"
 
 echo "✓ Released $TAG"
