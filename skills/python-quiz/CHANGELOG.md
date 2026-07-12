@@ -1,6 +1,6 @@
 # Changelog — python-quiz
 
-## [Unreleased]
+## [1.6.0] - 2026-07-12
 
 ### Fixed
 - Quiz 2.2: Claude больше не отвечает за пользователя — после short answer и coding task явный запрет на продолжение генерации до получения ответа
