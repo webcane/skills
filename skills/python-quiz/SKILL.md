@@ -14,7 +14,7 @@ description: >
 color: green
 argument-hint: "[init]"
 metadata:
-  version: 1.9.0
+  version: 1.9.1
   author: mniedre
   description_claudeai: >
     Квиз по Python из .md файлов в директории: single/multi-choice, short answer, coding.
