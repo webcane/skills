@@ -8,8 +8,9 @@
 | `max_time_minutes` | 23 | Максимальное время теста. Превышение → тест не засчитан |
 | `language` | ru | Язык вопросов и ответов (`ru` или `en`) |
 | `difficulty` | mixed | Сложность: `easy`, `medium`, `hard`, `mixed` |
-| `questions_per_topic` | 6 | Вопросов на каждую тему/подтему при `init` (диапазон 5–7) |
+| `questions_per_topic` | 4 | Вопросов на каждую тему/подтему при `init` (диапазон 3–5) |
 | `bank_file` | python-questions.json | Имя файла с банком вопросов |
+| `results_log` | python-quiz-results.json | Имя файла с логом результатов теста |
 
 ## Распределение типов вопросов
 

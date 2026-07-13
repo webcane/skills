@@ -1,0 +1,412 @@
+{
+  "ru": [
+    {
+      "topic": "Типы данных",
+      "subtopics": [
+        "Изменяемые и неизменяемые типы",
+        "Хешируемость и dict keys",
+        "Слайсы и индексация",
+        "List vs tuple: когда что использовать",
+        "Deep copy vs shallow copy"
+      ]
+    },
+    {
+      "topic": "Строки и bytes",
+      "subtopics": [
+        "Кодировки (UTF-8, ASCII)",
+        "Форматирование (f-strings, .format, %)",
+        "Методы строк (split, join, strip)",
+        "Bytes и bytearray"
+      ]
+    },
+    {
+      "topic": "Коллекции",
+      "subtopics": [
+        "list, tuple, dict, set, frozenset",
+        "defaultdict, Counter, OrderedDict",
+        "deque, heapq",
+        "Сложность операций (O-нотация для коллекций)"
+      ]
+    },
+    {
+      "topic": "Функции",
+      "subtopics": [
+        "Аргументы: *args, **kwargs",
+        "Позиционные и keyword-only аргументы",
+        "Замыкания (closures)",
+        "Функции высшего порядка (map, filter, reduce)",
+        "Лямбды"
+      ]
+    },
+    {
+      "topic": "ООП",
+      "subtopics": [
+        "Классы, объекты, self",
+        "Наследование, MRO (Method Resolution Order)",
+        "Миксины",
+        "ABC и абстрактные методы",
+        "property, classmethod, staticmethod"
+      ]
+    },
+    {
+      "topic": "Магические методы",
+      "subtopics": [
+        "__init__, __new__, __del__",
+        "__str__ vs __repr__",
+        "__eq__, __hash__, __lt__",
+        "__getattr__, __getattribute__, __setattr__",
+        "__call__, __enter__, __exit__"
+      ]
+    },
+    {
+      "topic": "Декораторы",
+      "subtopics": [
+        "Что такое декоратор",
+        "functools.wraps",
+        "Декораторы с аргументами",
+        "Декораторы класса",
+        "Встроенные декораторы (@property, @staticmethod)"
+      ]
+    },
+    {
+      "topic": "Генераторы и итераторы",
+      "subtopics": [
+        "yield vs return",
+        "Генераторные выражения",
+        "iterator protocol (__iter__, __next__)",
+        "itertools",
+        "yield from"
+      ]
+    },
+    {
+      "topic": "Контекстные менеджеры",
+      "subtopics": [
+        "with statement",
+        "__enter__ и __exit__",
+        "contextlib (contextmanager, suppress, redirect_stdout)",
+        "Вложенные контекстные менеджеры"
+      ]
+    },
+    {
+      "topic": "Исключения",
+      "subtopics": [
+        "try/except/else/finally",
+        "Иерархия исключений (BaseException, Exception)",
+        "raise from (chaining)",
+        "Создание своих исключений",
+        "warnings"
+      ]
+    },
+    {
+      "topic": "Модули и пакеты",
+      "subtopics": [
+        "import, from-import, __import__",
+        "__init__.py и namespace packages",
+        "__name__ == '__main__'",
+        "sys.path и PYTHONPATH",
+        "Относительные и абсолютные импорты"
+      ]
+    },
+    {
+      "topic": "Асинхронность",
+      "subtopics": [
+        "asyncio, async/await",
+        "Event loop",
+        "asyncio.gather vs asyncio.create_task",
+        "asyncio.Queue",
+        "async context managers (async with)"
+      ]
+    },
+    {
+      "topic": "Потоки и процессы",
+      "subtopics": [
+        "GIL — что это и ограничения",
+        "threading vs multiprocessing",
+        "concurrent.futures (ThreadPoolExecutor, ProcessPoolExecutor)",
+        "Queue, Lock, Semaphore",
+        "CPU-bound vs IO-bound"
+      ]
+    },
+    {
+      "topic": "Дескрипторы и метаклассы",
+      "subtopics": [
+        "Протокол дескриптора (__get__, __set__, __delete__)",
+        "Метаклассы (type, __new__)",
+        "__init_subclass__",
+        "Когда нужны метаклассы vs декораторы класса"
+      ]
+    },
+    {
+      "topic": "Управление памятью",
+      "subtopics": [
+        "Счётчик ссылок и сборщик мусора",
+        "gc module",
+        "Слабые ссылки (weakref)",
+        "Циклические ссылки",
+        "__slots__"
+      ]
+    },
+    {
+      "topic": "Тестирование",
+      "subtopics": [
+        "unittest",
+        "pytest (fixtures, parametrize, marks)",
+        "Mocking (unittest.mock, patch)",
+        "Coverage"
+      ]
+    },
+    {
+      "topic": "Стандартная библиотека",
+      "subtopics": [
+        "os, sys, pathlib",
+        "datetime, time",
+        "json, pickle, csv",
+        "logging",
+        "functools (lru_cache, partial, reduce)"
+      ]
+    },
+    {
+      "topic": "Файлы и IO",
+      "subtopics": [
+        "Открытие файлов (режимы r/w/a/b/+)",
+        "Построчное чтение больших файлов",
+        "io.StringIO, BytesIO",
+        "pathlib"
+      ]
+    },
+    {
+      "topic": "Паттерны проектирования",
+      "subtopics": [
+        "Singleton, Borg",
+        "Factory, Abstract Factory",
+        "Observer",
+        "Strategy",
+        "Dependency Injection"
+      ]
+    },
+    {
+      "topic": "Type hints и mypy",
+      "subtopics": [
+        "Базовые type hints (int, str, Optional, Union)",
+        "Protocol и структурная типизация",
+        "Generic, TypeVar",
+        "TypedDict, NamedTuple, dataclass",
+        "typing.overload"
+      ]
+    },
+    {
+      "topic": "Производительность и оптимизация",
+      "subtopics": [
+        "Профилирование (cProfile, timeit)",
+        "Понимание CPython internals",
+        "Cython и нативные расширения",
+        "Какие операции дорогие в Python"
+      ]
+    }
+  ],
+  "en": [
+    {
+      "topic": "Data Types",
+      "subtopics": [
+        "Mutable and immutable types",
+        "Hashability and dict keys",
+        "Slices and indexing",
+        "List vs tuple: when to use which",
+        "Deep copy vs shallow copy"
+      ]
+    },
+    {
+      "topic": "Strings and bytes",
+      "subtopics": [
+        "Encodings (UTF-8, ASCII)",
+        "Formatting (f-strings, .format, %)",
+        "String methods (split, join, strip)",
+        "Bytes and bytearray"
+      ]
+    },
+    {
+      "topic": "Collections",
+      "subtopics": [
+        "list, tuple, dict, set, frozenset",
+        "defaultdict, Counter, OrderedDict",
+        "deque, heapq",
+        "Complexity of operations (big-O for collections)"
+      ]
+    },
+    {
+      "topic": "Functions",
+      "subtopics": [
+        "Arguments: *args, **kwargs",
+        "Positional and keyword-only arguments",
+        "Closures",
+        "Higher-order functions (map, filter, reduce)",
+        "Lambdas"
+      ]
+    },
+    {
+      "topic": "OOP",
+      "subtopics": [
+        "Classes, objects, self",
+        "Inheritance, MRO (Method Resolution Order)",
+        "Mixins",
+        "ABC and abstract methods",
+        "property, classmethod, staticmethod"
+      ]
+    },
+    {
+      "topic": "Magic Methods",
+      "subtopics": [
+        "__init__, __new__, __del__",
+        "__str__ vs __repr__",
+        "__eq__, __hash__, __lt__",
+        "__getattr__, __getattribute__, __setattr__",
+        "__call__, __enter__, __exit__"
+      ]
+    },
+    {
+      "topic": "Decorators",
+      "subtopics": [
+        "What is a decorator",
+        "functools.wraps",
+        "Decorators with arguments",
+        "Class decorators",
+        "Built-in decorators (@property, @staticmethod)"
+      ]
+    },
+    {
+      "topic": "Generators and Iterators",
+      "subtopics": [
+        "yield vs return",
+        "Generator expressions",
+        "Iterator protocol (__iter__, __next__)",
+        "itertools",
+        "yield from"
+      ]
+    },
+    {
+      "topic": "Context Managers",
+      "subtopics": [
+        "with statement",
+        "__enter__ and __exit__",
+        "contextlib (contextmanager, suppress, redirect_stdout)",
+        "Nested context managers"
+      ]
+    },
+    {
+      "topic": "Exceptions",
+      "subtopics": [
+        "try/except/else/finally",
+        "Exception hierarchy (BaseException, Exception)",
+        "raise from (chaining)",
+        "Creating custom exceptions",
+        "warnings"
+      ]
+    },
+    {
+      "topic": "Modules and Packages",
+      "subtopics": [
+        "import, from-import, __import__",
+        "__init__.py and namespace packages",
+        "__name__ == '__main__'",
+        "sys.path and PYTHONPATH",
+        "Relative and absolute imports"
+      ]
+    },
+    {
+      "topic": "Async Programming",
+      "subtopics": [
+        "asyncio, async/await",
+        "Event loop",
+        "asyncio.gather vs asyncio.create_task",
+        "asyncio.Queue",
+        "Async context managers (async with)"
+      ]
+    },
+    {
+      "topic": "Threads and Processes",
+      "subtopics": [
+        "GIL — what it is and limitations",
+        "threading vs multiprocessing",
+        "concurrent.futures (ThreadPoolExecutor, ProcessPoolExecutor)",
+        "Queue, Lock, Semaphore",
+        "CPU-bound vs IO-bound"
+      ]
+    },
+    {
+      "topic": "Descriptors and Metaclasses",
+      "subtopics": [
+        "Descriptor protocol (__get__, __set__, __delete__)",
+        "Metaclasses (type, __new__)",
+        "__init_subclass__",
+        "When to use metaclasses vs class decorators"
+      ]
+    },
+    {
+      "topic": "Memory Management",
+      "subtopics": [
+        "Reference counting and garbage collector",
+        "gc module",
+        "Weak references (weakref)",
+        "Cyclic references",
+        "__slots__"
+      ]
+    },
+    {
+      "topic": "Testing",
+      "subtopics": [
+        "unittest",
+        "pytest (fixtures, parametrize, marks)",
+        "Mocking (unittest.mock, patch)",
+        "Coverage"
+      ]
+    },
+    {
+      "topic": "Standard Library",
+      "subtopics": [
+        "os, sys, pathlib",
+        "datetime, time",
+        "json, pickle, csv",
+        "logging",
+        "functools (lru_cache, partial, reduce)"
+      ]
+    },
+    {
+      "topic": "File IO",
+      "subtopics": [
+        "Opening files (modes r/w/a/b/+)",
+        "Line-by-line reading of large files",
+        "io.StringIO, BytesIO",
+        "pathlib"
+      ]
+    },
+    {
+      "topic": "Design Patterns",
+      "subtopics": [
+        "Singleton, Borg",
+        "Factory, Abstract Factory",
+        "Observer",
+        "Strategy",
+        "Dependency Injection"
+      ]
+    },
+    {
+      "topic": "Type Hints and mypy",
+      "subtopics": [
+        "Basic type hints (int, str, Optional, Union)",
+        "Protocol and structural typing",
+        "Generic, TypeVar",
+        "TypedDict, NamedTuple, dataclass",
+        "typing.overload"
+      ]
+    },
+    {
+      "topic": "Performance and Optimization",
+      "subtopics": [
+        "Profiling (cProfile, timeit)",
+        "Understanding CPython internals",
+        "Cython and native extensions",
+        "Which operations are expensive in Python"
+      ]
+    }
+  ]
+}
