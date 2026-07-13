@@ -19,7 +19,7 @@ allowed-tools:
   - Bash
   - AskUserQuestion
 metadata:
-  version: 1.10.0
+  version: 1.10.1
   author: mniedre
   description_claudeai: >
     Квиз по Python из .md файлов в директории: single/multi-choice, short answer, coding.
@@ -160,7 +160,10 @@ generators
 ```
 header: "Начать тест"
 question: "Вопросы готовы (N вопросов, лимит X мин). Начинаем?"
-options: ["Начать тест", "Отмена"]
+options: [
+  {label: "Начать тест", description: "Запустить таймер и начать вопросы"},
+  {label: "Отмена", description: "Выйти без тестирования"}
+]
 multiSelect: false
 ```
 
@@ -199,13 +202,25 @@ NOW=$(date +%s); S=$(cat /tmp/.pquiz_timer); E=$((NOW-S)); rm /tmp/.pquiz_timer;
 Не оценивай ответы в процессе — только собирай. Скажи `«✓ Принято»` и двигайся дальше.
 Таймер не проверяй — это делается только в финале.
 
-**Single / Multi-choice** — используй встроенный инструмент `question`:
+**Single / Multi-choice** — используй встроенный инструмент `question`.
+**НИКОГДА не выводи варианты простым текстом.** Для каждого вопроса с вариантами
+вызывай инструмент `question` СТРОГО с полями:
+
+- `header`: `"Вопрос X / N"`
+- `question`: только текст вопроса (без поля answer, без подсказок)
+- `options`: массив объектов `{label, description}`. Из каждого строкового варианта
+  вида `"A. текст варианта"` извлеки букву (A/B/C/D) в поле `label`,
+  остальной текст (без префикса `"X. "`) — в поле `description`.
+- `multiSelect`: `false` для single, `true` для multi
+
+Пример правильного вызова для multi-choice:
 ```
-header: "Вопрос X / N"
-question: [текст вопроса — только текст, без поля answer]
-options: [варианты из поля options в JSON]
-multiSelect: false   ← для типа "single"
-multiSelect: true    ← для типа "multi"
+options: [
+  {label: "A", description: "первый вариант"},
+  {label: "B", description: "второй вариант"},
+  {label: "C", description: "третий вариант"}
+],
+multiSelect: true
 ```
 
 **КРИТИЧЕСКИ ВАЖНО**: при показе любого вопроса — выводи ТОЛЬКО текст вопроса и варианты ответов. НИКОГДА не показывай поле `answer`, правильный ответ, подсказки или любую другую служебную информацию из JSON. Ответы нужны только в Фазе 3 для оценки.
@@ -261,7 +276,10 @@ multiSelect: true    ← для типа "multi"
 ```
 header: "Разбор ошибок"
 question: "Разобрать вопросы, на которые ответил неверно?"
-options: ["Да, разобрать", "Нет, достаточно"]
+options: [
+  {label: "Да, разобрать", description: "Показать правильные ответы с объяснениями"},
+  {label: "Нет, достаточно", description: "Завершить тест"}
+]
 multiSelect: false
 ```
 
