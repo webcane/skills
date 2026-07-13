@@ -1,6 +1,6 @@
 # Changelog — python-quiz
 
-## [Unreleased]
+## [1.12.0] - 2026-07-13
 
 ### Changed
 - **Источник тем**: стандартные темы вынесены в `references/standard-topics.json` (21 тема, ~85 подтем на ru и en) — больше не требуются .md файлы в директории
