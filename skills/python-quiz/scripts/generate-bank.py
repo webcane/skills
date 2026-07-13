@@ -80,7 +80,7 @@ def build_prompt(topics, questions_per_topic, language):
             "3. Правильный ответ соответствует реальному поведению Python 3.10+.",
             "4. Для single/multi: answer — буква или строка букв (например 'A' или 'AB').",
             "5. Для short: answer — краткий эталонный ответ (1-3 предложения).",
-            "6. Сложность: равномерно easy/medium/hard по теме.",
+            "6. Сложность: равномерно easy/medium/hard по теме (кроме coding task — он medium или easy).",
         ],
         "en": [
             "1. Each question is SELF-CONTAINED: understandable without external context.",
@@ -88,7 +88,7 @@ def build_prompt(topics, questions_per_topic, language):
             "3. Correct answer matches actual Python 3.10+ behavior.",
             "4. For single/multi: answer is a letter or string of letters (e.g. 'A' or 'AB').",
             "5. For short: answer is a concise reference answer (1-3 sentences).",
-            "6. Difficulty: evenly easy/medium/hard per topic.",
+            "6. Difficulty: evenly easy/medium/hard per topic (except coding task — it's medium or easy).",
         ],
     }[language]
 
@@ -160,7 +160,7 @@ def build_prompt(topics, questions_per_topic, language):
    "text": "Вопрос?", "options": ["A. ...", "B. ...", "C. ...", "D. ...", "E. ..."], "answer": "AB"},
   {"id": 3, "type": "short", "topic": "...", "subtopic": "...", "difficulty": "hard",
    "text": "Вопрос?", "answer": "Краткий эталонный ответ."},
-  {"id": N, "type": "coding", "topic": "coding", "subtopic": "coding", "difficulty": "hard",
+  {"id": N, "type": "coding", "topic": "coding", "subtopic": "coding", "difficulty": "medium",
    "text": "Описание задачи + пример входа/выхода.", "answer": "Ожидаемое решение."}
 ]}""")
     lines.append("```")
