@@ -1,6 +1,6 @@
 # Changelog — python-quiz
 
-## [Unreleased]
+## [1.9.0] - 2026-07-13
 
 ### Added
 - `parameters` schema в YAML frontmatter: поле `command` с `enum: ["init"]` — обеспечивает автодополнение и плейсхолдер в Claude Code и совместимых AI-клиентах
