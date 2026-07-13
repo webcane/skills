@@ -12,14 +12,7 @@ description: >
   «python test», «квиз по питону», «самотестирование», «interview test».
   Используй этот скилл когда пользователь хочет пройти тест, квиз или самопроверку по Python.
 color: green
-parameters:
-  type: object
-  properties:
-    command:
-      type: string
-      enum: ["init"]
-      description: "Режим запуска: init — создать банк вопросов из .md файлов в текущей директории"
-  required: []
+argument-hint: "[init]"
 metadata:
   version: 1.9.0
   author: mniedre

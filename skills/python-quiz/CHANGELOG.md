@@ -1,5 +1,10 @@
 # Changelog — python-quiz
 
+## [Unreleased]
+
+### Changed
+- Заменён нестандартный блок `parameters` на `argument-hint: "[init]"` — корректный механизм подсказки аргументов в Claude Code
+
 ## [1.9.0] - 2026-07-13
 
 ### Added
