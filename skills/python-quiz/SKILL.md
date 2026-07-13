@@ -13,8 +13,13 @@ description: >
   Используй этот скилл когда пользователь хочет пройти тест, квиз или самопроверку по Python.
 color: green
 argument-hint: "[init]"
+allowed-tools:
+  - Read
+  - Write
+  - Bash
+  - AskUserQuestion
 metadata:
-  version: 1.9.1
+  version: 1.10.0
   author: mniedre
   description_claudeai: >
     Квиз по Python из .md файлов в директории: single/multi-choice, short answer, coding.

@@ -1,5 +1,10 @@
 # Changelog — python-quiz
 
+## [Unreleased]
+
+### Changed
+- Добавлен `allowed-tools` в frontmatter: Read, Write, Bash, AskUserQuestion — ограничивает доступные инструменты минимально необходимым набором
+
 ## [1.9.1] - 2026-07-13
 
 ### Changed
