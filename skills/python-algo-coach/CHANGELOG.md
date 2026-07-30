@@ -5,7 +5,7 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.1.0/),
 версионирование — [SemVer](https://semver.org/lang/ru/).
 
-## [Unreleased]
+## [1.0.0] - 2026-07-30
 
 ### Added
 - Первая версия скилла `python-algo-coach` — интерактивный тренер по
