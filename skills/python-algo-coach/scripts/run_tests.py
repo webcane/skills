@@ -21,12 +21,15 @@ Exit code: 0 = all tests passed, 1 = at least one failure, 2 = usage error.
 """
 
 import argparse
+import ast
 import copy
 import importlib.util
+import inspect
 import json
 import random
 import signal
 import sys
+import textwrap
 import time
 import traceback
 from pathlib import Path
@@ -257,6 +260,37 @@ def load_solution(path, func_name):
     return fn
 
 
+def is_unimplemented(fn):
+    """Тело функции — незаполненная заглушка из скаффолда?
+
+    Нужно потому, что `pass` возвращает None молча: на задачах вроде move_zeroes
+    часть тестов тогда «проходит» (ничего не делать случайно совпадает с
+    ответом), и пользователь видит 3/5 вместо честного «решение не написано».
+    """
+    try:
+        source = textwrap.dedent(inspect.getsource(fn))
+        node = ast.parse(source).body[0]
+    except (OSError, TypeError, SyntaxError, IndexError):
+        return False
+    if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        return False
+    body = list(node.body)
+    if body and isinstance(body[0], ast.Expr) and isinstance(getattr(body[0].value, "value", None), str):
+        body = body[1:]                      # выкинуть docstring
+    if len(body) != 1:
+        return False
+    stmt = body[0]
+    if isinstance(stmt, ast.Pass):
+        return True
+    if isinstance(stmt, ast.Expr) and getattr(stmt.value, "value", "") is Ellipsis:
+        return True
+    if isinstance(stmt, ast.Raise):
+        exc = stmt.exc
+        name = getattr(exc, "id", None) or getattr(getattr(exc, "func", None), "id", None)
+        return name == "NotImplementedError"
+    return False
+
+
 def prepare_args(problem, raw_args):
     args = copy.deepcopy(raw_args)
     for i, kind in enumerate(problem.get("arg_types", [])):
@@ -272,6 +306,11 @@ def fmt(value, width=70):
 
 def run_problem(problem, solution_path, timeout=DEFAULT_TIMEOUT, verbose=True):
     fn = load_solution(solution_path, problem["func"])
+    if is_unimplemented(fn):
+        if verbose:
+            print(f"\nРешение не написано: тело {problem['func']}() — это заглушка из скаффолда.")
+            print("Тесты не запускались. Замени pass на своё решение и запусти снова.")
+        return None, None, []
     compare = COMPARATORS[problem.get("compare", "exact")]
     ret_kind = problem.get("return_type")
     passed = failed = 0
@@ -330,7 +369,7 @@ def show_problem(problem):
     print("Условие:")
     print(f"  {problem['statement']}")
     print()
-    print(f"Подпись: {problem['signature']}")
+    print(f"Подпись: {problem['signature']}:")
     print()
     print("Примеры:")
     for case in problem["tests"][:3]:
@@ -390,8 +429,7 @@ def scaffold_text(problem):
         ]
     lines.append("")
     lines.append(f"{problem['signature']}:")
-    lines.append("    # TODO")
-    lines.append("    raise NotImplementedError")
+    lines.append("    pass")
     lines.append("")
     return "\n".join(lines)
 
@@ -409,6 +447,7 @@ def main(argv=None):
     parser.add_argument("--patterns", action="store_true", help="list patterns with problem counts")
     parser.add_argument("--show", metavar="ID", help="print the problem statement")
     parser.add_argument("--hint", metavar="ID", help="print a hint")
+    parser.add_argument("--target", metavar="ID", help="reveal target complexity (Шаг 4, after the user's own estimate)")
     parser.add_argument("--level", type=int, default=1, help="hint level (1..3)")
     parser.add_argument("--scaffold", metavar="ID", help="print a starter file for a problem")
     parser.add_argument("--out", metavar="FILE", help="write --scaffold output to FILE")
@@ -456,6 +495,13 @@ def main(argv=None):
         print(f"Подсказка {level}/{len(hints)}: {hints[level - 1]}")
         return 0
 
+    if args.target:
+        problem = find_problem(problems, args.target)
+        print(f"Цель: время {problem['target']['time']}, память {problem['target']['space']}")
+        print(f"Паттерны: {', '.join(problem['patterns'])}")
+        print(f"Типичная ошибка: {problem['trap']}")
+        return 0
+
     if args.scaffold:
         problem = find_problem(problems, args.scaffold)
         text = scaffold_text(problem)
@@ -476,6 +522,10 @@ def main(argv=None):
                 bad.append(p["id"])
                 continue
             passed, failed, _ = run_problem(p, path, args.timeout, verbose=False)
+            if passed is None:
+                print(f"STUB  {p['id']:<42} эталон не реализован")
+                bad.append(p["id"])
+                continue
             mark = "ok  " if failed == 0 else "FAIL"
             print(f"{mark}  {p['id']:<42} {passed}/{passed + failed}")
             if failed:
@@ -491,6 +541,8 @@ def main(argv=None):
         path = SOLUTIONS_DIR / f"{problem['id']}.py"
         print(f"Эталонное решение: {problem['id']}")
         passed, failed, _ = run_problem(problem, path, args.timeout)
+        if passed is None:
+            return 1
         print(f"\n{passed}/{passed + failed} тестов пройдено")
         return 0 if failed == 0 else 1
 
@@ -501,10 +553,15 @@ def main(argv=None):
     problem = find_problem(problems, args.problem)
     print(f"Задача: {problem['title']} ({problem['difficulty']})  —  {problem['id']}")
     passed, failed, failures = run_problem(problem, args.solution, args.timeout)
+    if passed is None:
+        return 1
     total = passed + failed
     print(f"\n{passed}/{total} тестов пройдено")
     if failed == 0:
-        print(f"ВСЁ ЗЕЛЁНОЕ. Цель по сложности: время {problem['target']['time']}, память {problem['target']['space']}")
+        # Целевую сложность здесь НЕ печатаем: сначала оценка пользователя (Шаг 4),
+        # только потом сверка через --target.
+        print(f"ВСЁ ЗЕЛЁНОЕ. Шаг 4: оцени время и память своего решения,")
+        print(f"затем сверься:  python3 scripts/run_tests.py --target {problem['id']}")
         return 0
     print(f"Провалено тестов: {failed}")
     return 1
