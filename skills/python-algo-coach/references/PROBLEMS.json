@@ -1,0 +1,1014 @@
+{
+  "schema": {
+    "compare": "exact | unordered | groups | inplace | inplace_k",
+    "arg_types": "per-argument builder: null | linked_list | tree",
+    "return_type": "null | linked_list | tree",
+    "hints": "3 levels, from a nudge to a near-spoiler; never show level 3 first"
+  },
+  "problems": [
+    {
+      "id": "two_sum",
+      "title": "Two Sum",
+      "leetcode": 1,
+      "difficulty": "easy",
+      "patterns": ["hash_map"],
+      "func": "two_sum",
+      "signature": "def two_sum(nums: list[int], target: int) -> list[int]",
+      "statement": "Дан массив целых чисел nums и целое target. Верни индексы двух чисел, сумма которых равна target. Ровно одно решение; один элемент нельзя использовать дважды.",
+      "target": {"time": "O(n)", "space": "O(n)"},
+      "trap": "Наивный вариант — два вложенных цикла O(n²). Один проход с dict даёт O(n).",
+      "hints": [
+        "Для текущего числа x нужен напарник target - x. Как узнать за O(1), встречался ли он раньше?",
+        "Веди dict: значение -> индекс. Заполняй его по ходу единственного прохода.",
+        "Проверяй наличие target - x в dict ДО того, как положишь туда x — иначе для nums=[3,3] используешь один элемент дважды."
+      ],
+      "compare": "unordered",
+      "tests": [
+        {"args": [[2, 7, 11, 15], 9], "expected": [0, 1]},
+        {"args": [[3, 2, 4], 6], "expected": [1, 2]},
+        {"args": [[3, 3], 6], "expected": [0, 1]},
+        {"args": [[-1, -2, -3, -4, -5], -8], "expected": [2, 4]}
+      ]
+    },
+    {
+      "id": "valid_anagram",
+      "title": "Valid Anagram",
+      "leetcode": 242,
+      "difficulty": "easy",
+      "patterns": ["hash_map"],
+      "func": "valid_anagram",
+      "signature": "def valid_anagram(s: str, t: str) -> bool",
+      "statement": "Даны строки s и t. Определи, являются ли они анаграммами — содержат одинаковые символы в одинаковых количествах.",
+      "target": {"time": "O(n)", "space": "O(1) — алфавит ограничен"},
+      "trap": "sorted(s) == sorted(t) работает, но это O(n log n). Счётчик частот даёт O(n).",
+      "hints": [
+        "Что нужно сравнить, кроме длины строк?",
+        "Счётчик символов: collections.Counter или dict вручную.",
+        "Сначала отсекай по len(s) != len(t) — это бесплатная проверка, и без неё логика «вычитаем счётчики» ломается."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": ["anagram", "nagaram"], "expected": true},
+        {"args": ["rat", "car"], "expected": false},
+        {"args": ["a", "ab"], "expected": false},
+        {"args": ["", ""], "expected": true}
+      ]
+    },
+    {
+      "id": "group_anagrams",
+      "title": "Group Anagrams",
+      "leetcode": 49,
+      "difficulty": "medium",
+      "patterns": ["hash_map"],
+      "func": "group_anagrams",
+      "signature": "def group_anagrams(strs: list[str]) -> list[list[str]]",
+      "statement": "Дан массив строк strs. Сгруппируй анаграммы вместе. Порядок групп и порядок внутри группы не важны.",
+      "target": {"time": "O(n·k log k)", "space": "O(n·k)"},
+      "trap": "Попарное сравнение всех строк — O(n²·k). Нужен канонический ключ для группы.",
+      "hints": [
+        "Что общего у всех анаграмм одного слова? Придумай ключ, одинаковый для «eat», «tea», «ate».",
+        "Ключ = отсортированные символы: ''.join(sorted(word)). Или кортеж из 26 счётчиков.",
+        "defaultdict(list), ключ — sorted-строка, в конце верни list(groups.values())."
+      ],
+      "compare": "groups",
+      "tests": [
+        {"args": [["eat", "tea", "tan", "ate", "nat", "bat"]], "expected": [["bat"], ["nat", "tan"], ["ate", "eat", "tea"]]},
+        {"args": [[""]], "expected": [[""]]},
+        {"args": [["a"]], "expected": [["a"]]},
+        {"args": [["abc", "cba", "xyz"]], "expected": [["abc", "cba"], ["xyz"]]}
+      ]
+    },
+    {
+      "id": "roman_to_integer",
+      "title": "Roman to Integer",
+      "leetcode": 13,
+      "difficulty": "easy",
+      "patterns": ["hash_map", "arrays"],
+      "func": "roman_to_integer",
+      "signature": "def roman_to_integer(s: str) -> int",
+      "statement": "Преобразуй римскую строку (символы I, V, X, L, C, D, M) в целое число.",
+      "target": {"time": "O(n)", "space": "O(1)"},
+      "trap": "Вычитающая нотация (IV, IX, XL, CM). Хардкодить шесть особых пар можно, но есть приём короче.",
+      "hints": [
+        "Чем IV отличается от VI, если смотреть на пару соседних символов?",
+        "Если значение текущего символа меньше следующего — его надо вычесть, а не прибавить.",
+        "Один проход: total += value[c] если value[c] >= value[next], иначе total -= value[c]."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": ["III"], "expected": 3},
+        {"args": ["LVIII"], "expected": 58},
+        {"args": ["MCMXCIV"], "expected": 1994},
+        {"args": ["IX"], "expected": 9},
+        {"args": ["MMMCMXCIX"], "expected": 3999}
+      ]
+    },
+    {
+      "id": "unique_number_of_occurrences",
+      "title": "Unique Number of Occurrences",
+      "leetcode": 1207,
+      "difficulty": "easy",
+      "patterns": ["hash_map"],
+      "func": "unique_occurrences",
+      "signature": "def unique_occurrences(arr: list[int]) -> bool",
+      "statement": "Дан массив целых чисел. Верни True, если количество вхождений каждого значения уникально, иначе False.",
+      "target": {"time": "O(n)", "space": "O(n)"},
+      "trap": "Нужны два уровня агрегации: сначала частоты значений, потом уникальность самих частот.",
+      "hints": [
+        "Посчитай частоты. Что теперь нужно проверить про сам список частот?",
+        "Уникальность списка проверяется через set.",
+        "counts = Counter(arr).values(); return len(set(counts)) == len(counts)."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": [[1, 2, 2, 1, 1, 3]], "expected": true},
+        {"args": [[1, 2]], "expected": false},
+        {"args": [[-3, 0, 1, -3, 1, 1, 1, -3, 10, 0]], "expected": true},
+        {"args": [[1]], "expected": true}
+      ]
+    },
+    {
+      "id": "intersection_of_two_arrays",
+      "title": "Intersection of Two Arrays",
+      "leetcode": 349,
+      "difficulty": "easy",
+      "patterns": ["hash_map"],
+      "func": "intersection",
+      "signature": "def intersection(nums1: list[int], nums2: list[int]) -> list[int]",
+      "statement": "Даны два массива. Верни массив уникальных элементов, присутствующих в обоих. Порядок не важен.",
+      "target": {"time": "O(n + m)", "space": "O(min(n, m))"},
+      "trap": "Вложенный цикл с `in list` — O(n·m), потому что `in` по списку линеен.",
+      "hints": [
+        "Какая структура даёт проверку «есть ли элемент» за O(1)?",
+        "set. И у множеств уже есть операция пересечения.",
+        "list(set(nums1) & set(nums2)) — но убедись, что понимаешь, почему уникальность получается бесплатно."
+      ],
+      "compare": "unordered",
+      "tests": [
+        {"args": [[1, 2, 2, 1], [2, 2]], "expected": [2]},
+        {"args": [[4, 9, 5], [9, 4, 9, 8, 4]], "expected": [9, 4]},
+        {"args": [[1, 2], [3, 4]], "expected": []},
+        {"args": [[], [1]], "expected": []}
+      ]
+    },
+    {
+      "id": "missing_number",
+      "title": "Missing Number",
+      "leetcode": 268,
+      "difficulty": "easy",
+      "patterns": ["hash_map", "bit_manipulation", "arrays"],
+      "func": "missing_number",
+      "signature": "def missing_number(nums: list[int]) -> int",
+      "statement": "Дан массив nums из n различных чисел из диапазона [0, n]. Найди пропущенное число.",
+      "target": {"time": "O(n)", "space": "O(1)"},
+      "trap": "Через set — O(n) памяти. Есть два решения за O(1) памяти: сумма Гаусса и XOR.",
+      "hints": [
+        "Ты знаешь, какой должна быть сумма чисел от 0 до n. Что даёт разница с фактической суммой?",
+        "n·(n+1)//2 - sum(nums).",
+        "Альтернатива без риска переполнения в других языках: XOR всех индексов 0..n со всеми элементами — парные сократятся."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": [[3, 0, 1]], "expected": 2},
+        {"args": [[0, 1]], "expected": 2},
+        {"args": [[9, 6, 4, 2, 3, 5, 7, 0, 1]], "expected": 8},
+        {"args": [[0]], "expected": 1},
+        {"args": [[1]], "expected": 0}
+      ]
+    },
+    {
+      "id": "valid_parentheses",
+      "title": "Valid Parentheses",
+      "leetcode": 20,
+      "difficulty": "easy",
+      "patterns": ["stack"],
+      "func": "valid_parentheses",
+      "signature": "def valid_parentheses(s: str) -> bool",
+      "statement": "Дана строка из символов (){}[]. Определи, корректно ли расставлены скобки: каждая открывающая имеет соответствующую закрывающую в правильном порядке.",
+      "target": {"time": "O(n)", "space": "O(n)"},
+      "trap": "Подсчёт количеств не работает: «([)]» имеет верные счётчики, но невалидна. Нужен порядок — то есть стек.",
+      "hints": [
+        "Какая закрывающая скобка допустима в данный момент? От чего это зависит?",
+        "От последней незакрытой открывающей — это LIFO, то есть стек.",
+        "Открывающую кладём в стек; закрывающую сверяем с pop(). Не забудь два конца: пустой стек при закрывающей и непустой стек в конце строки."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": ["()"], "expected": true},
+        {"args": ["()[]{}"], "expected": true},
+        {"args": ["(]"], "expected": false},
+        {"args": ["([)]"], "expected": false},
+        {"args": ["{[]}"], "expected": true},
+        {"args": ["]"], "expected": false},
+        {"args": ["("], "expected": false},
+        {"args": [""], "expected": true}
+      ]
+    },
+    {
+      "id": "next_greater_element_i",
+      "title": "Next Greater Element I",
+      "leetcode": 496,
+      "difficulty": "easy",
+      "patterns": ["stack", "hash_map"],
+      "func": "next_greater_element",
+      "signature": "def next_greater_element(nums1: list[int], nums2: list[int]) -> list[int]",
+      "statement": "nums1 — подмножество nums2, все элементы уникальны. Для каждого x из nums1 найди первый элемент справа от x в nums2, который больше x. Если такого нет — -1.",
+      "target": {"time": "O(n + m)", "space": "O(n)"},
+      "trap": "Это монотонный стек — базовая техника для «следующий больший/меньший». Наивно — O(n·m).",
+      "hints": [
+        "Пройди nums2 один раз. Какие элементы всё ещё «ждут» своего следующего большего?",
+        "Держи стек убывающих значений. Новый элемент разрешает всех, кто меньше его — их и снимай.",
+        "Проходя nums2: пока stack и num > stack[-1]: ans[stack.pop()] = num. Потом stack.append(num). Ответы храни в dict значение -> следующий больший."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": [[4, 1, 2], [1, 3, 4, 2]], "expected": [-1, 3, -1]},
+        {"args": [[2, 4], [1, 2, 3, 4]], "expected": [3, -1]},
+        {"args": [[1], [1]], "expected": [-1]}
+      ]
+    },
+    {
+      "id": "move_zeroes",
+      "title": "Move Zeroes",
+      "leetcode": 283,
+      "difficulty": "easy",
+      "patterns": ["two_pointers", "arrays"],
+      "func": "move_zeroes",
+      "signature": "def move_zeroes(nums: list[int]) -> None",
+      "statement": "Дан массив nums. Перемести все нули в конец, сохранив относительный порядок ненулевых элементов. Изменения делаются in-place, дополнительная память — O(1).",
+      "target": {"time": "O(n)", "space": "O(1)"},
+      "trap": "Создать новый список и вернуть его — не in-place. Удаление нулей через remove() внутри цикла портит индексы.",
+      "hints": [
+        "Два указателя: один читает, второй указывает, куда положить следующий ненулевой элемент.",
+        "Медленный указатель write; при nums[read] != 0 пиши в nums[write] и двигай write.",
+        "После прохода заполни хвост от write до конца нулями. Или сразу делай swap(nums[read], nums[write]) — тогда хвост дописывать не нужно."
+      ],
+      "compare": "inplace",
+      "tests": [
+        {"args": [[0, 1, 0, 3, 12]], "expected": [1, 3, 12, 0, 0]},
+        {"args": [[0]], "expected": [0]},
+        {"args": [[1, 2, 3]], "expected": [1, 2, 3]},
+        {"args": [[0, 0, 1]], "expected": [1, 0, 0]},
+        {"args": [[]], "expected": []}
+      ]
+    },
+    {
+      "id": "remove_element",
+      "title": "Remove Element",
+      "leetcode": 27,
+      "difficulty": "easy",
+      "patterns": ["two_pointers", "arrays"],
+      "func": "remove_element",
+      "signature": "def remove_element(nums: list[int], val: int) -> int",
+      "statement": "Дан массив nums и значение val. Удали все вхождения val in-place и верни новую длину k. Первые k элементов массива должны содержать оставшиеся значения в любом порядке.",
+      "target": {"time": "O(n)", "space": "O(1)"},
+      "trap": "Возврат правильного k при неправильном содержимом nums[:k] — половина решения. Тесты проверяют и то, и другое.",
+      "hints": [
+        "Указатель записи k: сколько «хороших» элементов уже уложено в начало.",
+        "for x in nums: if x != val: nums[k] = x; k += 1.",
+        "Порядок не важен — поэтому есть и второй приём: при совпадении подменяй элемент последним и уменьшай границу, что даёт меньше записей."
+      ],
+      "compare": "inplace_k",
+      "tests": [
+        {"args": [[3, 2, 2, 3], 3], "expected": {"k": 2, "remaining": [2, 2]}},
+        {"args": [[0, 1, 2, 2, 3, 0, 4, 2], 2], "expected": {"k": 5, "remaining": [0, 1, 3, 0, 4]}},
+        {"args": [[], 1], "expected": {"k": 0, "remaining": []}},
+        {"args": [[1], 1], "expected": {"k": 0, "remaining": []}},
+        {"args": [[1], 2], "expected": {"k": 1, "remaining": [1]}}
+      ]
+    },
+    {
+      "id": "squares_of_a_sorted_array",
+      "title": "Squares of a Sorted Array",
+      "leetcode": 977,
+      "difficulty": "easy",
+      "patterns": ["two_pointers"],
+      "func": "sorted_squares",
+      "signature": "def sorted_squares(nums: list[int]) -> list[int]",
+      "statement": "Дан массив целых чисел, отсортированный по возрастанию (могут быть отрицательные). Верни массив квадратов, тоже отсортированный по возрастанию.",
+      "target": {"time": "O(n)", "space": "O(n)"},
+      "trap": "sorted(x*x for x in nums) даёт верный ответ за O(n log n). Задача — уложиться в O(n).",
+      "hints": [
+        "Где в исходном массиве находятся самые большие квадраты?",
+        "На концах: либо самое отрицательное, либо самое большое положительное. Значит, встречные указатели.",
+        "Заполняй результат С КОНЦА: сравнивай abs(nums[left]) и abs(nums[right]), больший квадрат ставь в текущую позицию справа."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": [[-4, -1, 0, 3, 10]], "expected": [0, 1, 9, 16, 100]},
+        {"args": [[-7, -3, 2, 3, 11]], "expected": [4, 9, 9, 49, 121]},
+        {"args": [[-5, -3, -2]], "expected": [4, 9, 25]},
+        {"args": [[1]], "expected": [1]}
+      ]
+    },
+    {
+      "id": "valid_palindrome",
+      "title": "Valid Palindrome",
+      "leetcode": 125,
+      "difficulty": "easy",
+      "patterns": ["two_pointers"],
+      "func": "is_palindrome",
+      "signature": "def is_palindrome(s: str) -> bool",
+      "statement": "Дана строка s. Считая только буквы и цифры и игнорируя регистр, определи, является ли она палиндромом.",
+      "target": {"time": "O(n)", "space": "O(1)"},
+      "trap": "Вариант «отфильтровать и сравнить с реверсом» — O(n) памяти. Встречные указатели дают O(1).",
+      "hints": [
+        "Два указателя с концов. Что делать, если под указателем не буква и не цифра?",
+        "Пропускать: двигать указатель дальше, не сравнивая.",
+        "Внутри while left < right — два внутренних while для пропуска мусора, потом сравнение с .lower(). Проверь строку из одних пробелов."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": ["A man, a plan, a canal: Panama"], "expected": true},
+        {"args": ["race a car"], "expected": false},
+        {"args": [" "], "expected": true},
+        {"args": ["0P"], "expected": false},
+        {"args": ["aa"], "expected": true}
+      ]
+    },
+    {
+      "id": "container_with_most_water",
+      "title": "Container With Most Water",
+      "leetcode": 11,
+      "difficulty": "medium",
+      "patterns": ["two_pointers", "greedy"],
+      "func": "max_area",
+      "signature": "def max_area(height: list[int]) -> int",
+      "statement": "Дан массив height длины n, где height[i] — высота вертикальной линии в точке i. Найди две линии, которые вместе с осью X образуют контейнер максимального объёма. Верни максимальную площадь.",
+      "target": {"time": "O(n)", "space": "O(1)"},
+      "trap": "Здесь двигать нужно указатель на МЕНЬШЕЙ стороне — и это требует обоснования, а не угадывания.",
+      "hints": [
+        "Площадь = min(height[l], height[r]) · (r - l). Начни с самых широких границ. Какой указатель имеет смысл двигать?",
+        "Сдвиг более высокой стороны не может увеличить площадь: ширина уменьшилась, а высота ограничена меньшей стороной. Значит, двигаем меньшую.",
+        "while l < r: считай площадь, обновляй максимум, потом if height[l] < height[r]: l += 1 else: r -= 1."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": [[1, 8, 6, 2, 5, 4, 8, 3, 7]], "expected": 49},
+        {"args": [[1, 1]], "expected": 1},
+        {"args": [[4, 3, 2, 1, 4]], "expected": 16},
+        {"args": [[1, 2, 1]], "expected": 2}
+      ]
+    },
+    {
+      "id": "three_sum",
+      "title": "3Sum",
+      "leetcode": 15,
+      "difficulty": "medium",
+      "patterns": ["two_pointers", "sorting_plus_pointers"],
+      "func": "three_sum",
+      "signature": "def three_sum(nums: list[int]) -> list[list[int]]",
+      "statement": "Дан массив nums. Найди все уникальные тройки, сумма которых равна нулю. Порядок троек и порядок чисел внутри тройки не важны, но дубликатов троек быть не должно.",
+      "target": {"time": "O(n²)", "space": "O(1) без учёта ответа"},
+      "trap": "Дедупликация — главная сложность. Три вложенных цикла плюс set троек «работает», но это O(n³).",
+      "hints": [
+        "Отсортируй массив. Зафиксируй первое число — во что превратилась задача для остатка?",
+        "В two-sum на отсортированном срезе: встречные указатели ищут сумму -nums[i].",
+        "Дедуп в двух местах: пропускай i, если nums[i] == nums[i-1]; после найденной тройки сдвигай left и right через все равные значения."
+      ],
+      "compare": "groups",
+      "tests": [
+        {"args": [[-1, 0, 1, 2, -1, -4]], "expected": [[-1, -1, 2], [-1, 0, 1]]},
+        {"args": [[0, 1, 1]], "expected": []},
+        {"args": [[0, 0, 0]], "expected": [[0, 0, 0]]},
+        {"args": [[-2, 0, 1, 1, 2]], "expected": [[-2, 0, 2], [-2, 1, 1]]},
+        {"args": [[0, 0, 0, 0]], "expected": [[0, 0, 0]]}
+      ]
+    },
+    {
+      "id": "binary_search",
+      "title": "Binary Search",
+      "leetcode": 704,
+      "difficulty": "easy",
+      "patterns": ["binary_search"],
+      "func": "binary_search",
+      "signature": "def binary_search(nums: list[int], target: int) -> int",
+      "statement": "Дан отсортированный по возрастанию массив целых чисел nums и целое target. Верни индекс target, если он есть, иначе -1.",
+      "target": {"time": "O(log n)", "space": "O(1)"},
+      "trap": "Границы. Определись раз и навсегда: [left, right] включительно с while left <= right, или [left, right) с while left < right. Смешивать нельзя.",
+      "hints": [
+        "Инвариант: если target есть, он лежит в [left, right]. Что делать с mid?",
+        "mid = (left + right) // 2. Если nums[mid] < target — весь левый кусок вместе с mid не нужен: left = mid + 1.",
+        "Условие цикла while left <= right, и right = mid - 1 в другой ветке. Проверь массив из одного элемента и отсутствующий target."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": [[-1, 0, 3, 5, 9, 12], 9], "expected": 4},
+        {"args": [[-1, 0, 3, 5, 9, 12], 2], "expected": -1},
+        {"args": [[5], 5], "expected": 0},
+        {"args": [[5], -5], "expected": -1},
+        {"args": [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 1], "expected": 0},
+        {"args": [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 10], "expected": 9},
+        {"args": [[], 1], "expected": -1}
+      ]
+    },
+    {
+      "id": "search_a_2d_matrix",
+      "title": "Search a 2D Matrix",
+      "leetcode": 74,
+      "difficulty": "medium",
+      "patterns": ["binary_search"],
+      "func": "search_matrix",
+      "signature": "def search_matrix(matrix: list[list[int]], target: int) -> bool",
+      "statement": "Дана матрица, где каждая строка отсортирована по возрастанию, а первое число строки больше последнего числа предыдущей. Определи, содержится ли в ней target.",
+      "target": {"time": "O(log(m·n))", "space": "O(1)"},
+      "trap": "Двухшаговый поиск (найти строку, потом в строке) — тоже логарифмический и это ок. Но одношаговый вариант короче и меньше шансов ошибиться в границах.",
+      "hints": [
+        "Из условия следует, что матрица — это один отсортированный массив, просто нарезанный на строки.",
+        "Индекс i в «плоском» массиве соответствует matrix[i // cols][i % cols].",
+        "Обычный бинарный поиск по 0..m·n-1 с этим преобразованием индекса."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": [[[1, 3, 5, 7], [10, 11, 16, 20], [23, 30, 34, 60]], 3], "expected": true},
+        {"args": [[[1, 3, 5, 7], [10, 11, 16, 20], [23, 30, 34, 60]], 13], "expected": false},
+        {"args": [[[1]], 1], "expected": true},
+        {"args": [[[1, 3]], 2], "expected": false},
+        {"args": [[[1, 3, 5, 7], [10, 11, 16, 20], [23, 30, 34, 60]], 60], "expected": true},
+        {"args": [[[1, 3, 5, 7], [10, 11, 16, 20], [23, 30, 34, 60]], 0], "expected": false}
+      ]
+    },
+    {
+      "id": "find_minimum_in_rotated_sorted_array",
+      "title": "Find Minimum in Rotated Sorted Array",
+      "leetcode": 153,
+      "difficulty": "medium",
+      "patterns": ["binary_search"],
+      "func": "find_min",
+      "signature": "def find_min(nums: list[int]) -> int",
+      "statement": "Дан массив, изначально отсортированный по возрастанию, а затем повёрнутый неизвестное число раз. Все элементы уникальны. Найди минимальный элемент.",
+      "target": {"time": "O(log n)", "space": "O(1)"},
+      "trap": "Массив не отсортирован целиком — но он кусочно-монотонен, и это достаточное условие для бинарного поиска. Случай «поворота не было» ([11,13,15,17]) обязателен в тестах.",
+      "hints": [
+        "Сравни nums[mid] с nums[right]. Что это говорит о том, в какой половине находится точка перелома?",
+        "Если nums[mid] > nums[right] — минимум строго правее mid. Иначе он на mid или левее.",
+        "while left < right (без равенства!): if nums[mid] > nums[right]: left = mid + 1 else: right = mid. В конце left == right — это ответ."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": [[3, 4, 5, 1, 2]], "expected": 1},
+        {"args": [[4, 5, 6, 7, 0, 1, 2]], "expected": 0},
+        {"args": [[11, 13, 15, 17]], "expected": 11},
+        {"args": [[2, 1]], "expected": 1},
+        {"args": [[1]], "expected": 1}
+      ]
+    },
+    {
+      "id": "single_element_in_a_sorted_array",
+      "title": "Single Element in a Sorted Array",
+      "leetcode": 540,
+      "difficulty": "medium",
+      "patterns": ["binary_search"],
+      "aliases": ["single_element"],
+      "func": "single_non_duplicate",
+      "signature": "def single_non_duplicate(nums: list[int]) -> int",
+      "statement": "Дан отсортированный массив, где каждый элемент встречается дважды, кроме одного. Найди этот единственный элемент.",
+      "target": {"time": "O(log n)", "space": "O(1)"},
+      "trap": "XOR всего массива даёт ответ за O(n) — но условие «отсортирован» намекает на O(log n). Ключ — чётность индексов.",
+      "hints": [
+        "До одиночки пары начинаются на чётных индексах. После неё — на нечётных. Это монотонный признак.",
+        "Приведи mid к чётному (mid -= mid & 1) и сравни nums[mid] с nums[mid+1].",
+        "Если равны — одиночка правее: left = mid + 2. Иначе right = mid. Цикл while left < right."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": [[1, 1, 2, 3, 3, 4, 4, 8, 8]], "expected": 2},
+        {"args": [[3, 3, 7, 7, 10, 11, 11]], "expected": 10},
+        {"args": [[1]], "expected": 1},
+        {"args": [[1, 1, 2]], "expected": 2},
+        {"args": [[1, 2, 2]], "expected": 1}
+      ]
+    },
+    {
+      "id": "find_k_closest_elements",
+      "title": "Find K Closest Elements",
+      "leetcode": 658,
+      "difficulty": "medium",
+      "patterns": ["binary_search", "two_pointers"],
+      "func": "find_closest_elements",
+      "signature": "def find_closest_elements(arr: list[int], k: int, x: int) -> list[int]",
+      "statement": "Дан отсортированный массив arr, целые k и x. Найди k ближайших к x элементов по абсолютной разности; при равных разностях выбирается меньшее значение. Верни результат, отсортированный по возрастанию.",
+      "target": {"time": "O(log(n-k) + k)", "space": "O(k)"},
+      "trap": "sorted(arr, key=lambda v: abs(v-x))[:k] даёт правильный ответ (стабильная сортировка разрешает tie-break сама), но это O(n log n). Целевое решение — бинарный поиск ЛЕВОЙ ГРАНИЦЫ окна.",
+      "hints": [
+        "Ответ — всегда непрерывное окно длины k. Значит, искать надо только его левую границу.",
+        "Границу ищи в диапазоне [0, len(arr) - k] бинарным поиском.",
+        "Условие: если x - arr[mid] > arr[mid + k] - x, окно надо сдвинуть правее (left = mid + 1), иначе right = mid. Строгое > важно для tie-break в пользу меньших значений."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": [[1, 2, 3, 4, 5], 4, 3], "expected": [1, 2, 3, 4]},
+        {"args": [[1, 1, 2, 3, 4, 5], 4, -1], "expected": [1, 1, 2, 3]},
+        {"args": [[1, 2, 3, 4, 5], 4, -1], "expected": [1, 2, 3, 4]},
+        {"args": [[1], 1, 1], "expected": [1]},
+        {"args": [[0, 0, 1, 2, 3, 3, 4, 7, 7, 8], 3, 5], "expected": [3, 3, 4]}
+      ]
+    },
+    {
+      "id": "longest_substring_without_repeating",
+      "title": "Longest Substring Without Repeating Characters",
+      "leetcode": 3,
+      "difficulty": "medium",
+      "patterns": ["sliding_window", "hash_map"],
+      "aliases": ["longest_substring"],
+      "func": "length_of_longest_substring",
+      "signature": "def length_of_longest_substring(s: str) -> int",
+      "statement": "Найди длину самой длинной подстроки без повторяющихся символов.",
+      "target": {"time": "O(n)", "space": "O(min(n, alphabet))"},
+      "trap": "Классическая ошибка — при повторе присваивать left = last_seen[c] + 1 БЕЗ max(). Тогда на «abba» левая граница прыгает НАЗАД и ответ становится 3 вместо 2. Тест «abba» ловит ровно это; «dvdf» — нет, он проходит и с багом.",
+      "hints": [
+        "Окно [left, right] без повторов. Правая граница всегда идёт вперёд. Когда и куда двигать левую?",
+        "Храни last_seen: символ -> последний индекс. При повторе внутри окна двигай left.",
+        "left = max(left, last_seen[c] + 1) — max обязателен: без него на «abba» left уедет назад, окно «расширится» в прошлое и даст 3."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": ["abcabcbb"], "expected": 3},
+        {"args": ["bbbbb"], "expected": 1},
+        {"args": ["pwwkew"], "expected": 3},
+        {"args": [""], "expected": 0},
+        {"args": [" "], "expected": 1},
+        {"args": ["dvdf"], "expected": 3},
+        {"args": ["abba"], "expected": 2}
+      ]
+    },
+    {
+      "id": "find_all_anagrams_in_a_string",
+      "title": "Find All Anagrams in a String",
+      "leetcode": 438,
+      "difficulty": "medium",
+      "patterns": ["sliding_window", "hash_map"],
+      "func": "find_anagrams",
+      "signature": "def find_anagrams(s: str, p: str) -> list[int]",
+      "statement": "Даны строки s и p. Верни все начальные индексы анаграмм p в s, по возрастанию.",
+      "target": {"time": "O(n)", "space": "O(1) — алфавит ограничен"},
+      "trap": "Пересчитывать Counter для каждого окна — O(n·k). Окно фиксированной длины нужно обновлять инкрементально.",
+      "hints": [
+        "Длина окна фиксирована — len(p). Что меняется при сдвиге окна на один символ?",
+        "Ровно два счётчика: входящий символ +1, выходящий -1.",
+        "Удаляй ключи с нулевым значением из dict, иначе сравнение window == need будет ложно-отрицательным."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": ["cbaebabacd", "abc"], "expected": [0, 6]},
+        {"args": ["abab", "ab"], "expected": [0, 1, 2]},
+        {"args": ["a", "ab"], "expected": []},
+        {"args": ["aa", "a"], "expected": [0, 1]}
+      ]
+    },
+    {
+      "id": "number_of_islands",
+      "title": "Number of Islands",
+      "leetcode": 200,
+      "difficulty": "medium",
+      "patterns": ["bfs_dfs"],
+      "aliases": ["cybersec"],
+      "func": "num_islands",
+      "signature": "def num_islands(grid: list[list[str]]) -> int",
+      "statement": "Дана двумерная сетка grid из символов '1' (земля) и '0' (вода). Остров — группа смежных по горизонтали или вертикали '1'. Подсчитай количество островов.",
+      "target": {"time": "O(m·n)", "space": "O(m·n) в худшем случае"},
+      "trap": "Без пометки посещённых клеток обход зациклится. Диагонали НЕ считаются смежными.",
+      "hints": [
+        "Идея: находим непосещённую '1', считаем +1 остров и «затапливаем» всю связную область.",
+        "Затопление — DFS или BFS от этой клетки, помечая клетки как посещённые.",
+        "Проще всего писать grid[r][c] = '0' вместо отдельного visited — но тогда ты портишь вход, и это стоит проговорить на интервью. Итеративный BFS на deque спасает от переполнения стека на больших сетках."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": [[["1", "1", "0", "0", "0"], ["1", "1", "0", "0", "0"], ["0", "0", "1", "0", "0"], ["0", "0", "0", "1", "1"]]], "expected": 3},
+        {"args": [[["1", "1"], ["1", "1"]]], "expected": 1},
+        {"args": [[["0"]]], "expected": 0},
+        {"args": [[["1", "0", "1", "0", "1"]]], "expected": 3},
+        {"args": [[["1", "0"], ["0", "1"]]], "expected": 2}
+      ]
+    },
+    {
+      "id": "max_depth_binary_tree",
+      "title": "Maximum Depth of Binary Tree",
+      "leetcode": 104,
+      "difficulty": "easy",
+      "patterns": ["bfs_dfs"],
+      "func": "max_depth",
+      "signature": "def max_depth(root) -> int",
+      "statement": "Дан корень бинарного дерева. Верни его максимальную глубину — число узлов на самом длинном пути от корня до листа. Узел — объект с полями val, left, right; пустое дерево — None.",
+      "target": {"time": "O(n)", "space": "O(h)"},
+      "trap": "База рекурсии — None, а не лист. Если писать базу «если нет детей — вернуть 1», нужно отдельно обрабатывать пустое дерево.",
+      "hints": [
+        "Глубина дерева выражается через глубины поддеревьев. Как именно?",
+        "1 + max(глубина слева, глубина справа), а для None — 0.",
+        "Три строки рекурсии. Итеративная альтернатива — BFS по уровням со счётчиком уровней."
+      ],
+      "arg_types": ["tree"],
+      "compare": "exact",
+      "tests": [
+        {"args": [[3, 9, 20, null, null, 15, 7]], "expected": 3},
+        {"args": [[1, null, 2]], "expected": 2},
+        {"args": [[]], "expected": 0},
+        {"args": [[1]], "expected": 1}
+      ]
+    },
+    {
+      "id": "binary_tree_level_order_traversal",
+      "title": "Binary Tree Level Order Traversal",
+      "leetcode": 102,
+      "difficulty": "medium",
+      "patterns": ["bfs_dfs"],
+      "func": "level_order",
+      "signature": "def level_order(root) -> list[list[int]]",
+      "statement": "Дан корень бинарного дерева. Верни обход по уровням: список списков значений, сверху вниз, слева направо. Узел — объект с полями val, left, right; пустое дерево — None.",
+      "target": {"time": "O(n)", "space": "O(width)"},
+      "trap": "Обычный BFS даёт плоский список. Чтобы разбить по уровням, нужно зафиксировать размер очереди на входе в уровень.",
+      "hints": [
+        "BFS через очередь. Но как понять, где кончается уровень?",
+        "В начале итерации запомни len(queue) — столько узлов в текущем уровне.",
+        "for _ in range(len(queue)) внутри while queue. collections.deque с popleft() — O(1), в отличие от list.pop(0)."
+      ],
+      "arg_types": ["tree"],
+      "compare": "exact",
+      "tests": [
+        {"args": [[3, 9, 20, null, null, 15, 7]], "expected": [[3], [9, 20], [15, 7]]},
+        {"args": [[1]], "expected": [[1]]},
+        {"args": [[]], "expected": []},
+        {"args": [[1, 2, 3, 4, null, null, 5]], "expected": [[1], [2, 3], [4, 5]]}
+      ]
+    },
+    {
+      "id": "letter_combinations_of_a_phone_number",
+      "title": "Letter Combinations of a Phone Number",
+      "leetcode": 17,
+      "difficulty": "medium",
+      "patterns": ["backtracking", "bfs_dfs"],
+      "func": "letter_combinations",
+      "signature": "def letter_combinations(digits: str) -> list[str]",
+      "statement": "Дана строка digits из цифр 2–9. Верни все возможные комбинации букв, которые они могут представлять на телефонной клавиатуре. Порядок комбинаций не важен.",
+      "target": {"time": "O(4^n · n)", "space": "O(n) без учёта ответа"},
+      "trap": "Пустая строка на входе должна дать [], а НЕ [''] — самая частая ошибка в этой задаче.",
+      "hints": [
+        "Дерево выбора: на каждом уровне — буквы очередной цифры. Это перебор с возвратом.",
+        "backtrack(index, path): если index == len(digits) — path готов; иначе перебирай буквы digits[index].",
+        "Отдельно отсеки digits == '' в самом начале. Итеративная альтернатива: накапливай список префиксов, домножая его на буквы каждой цифры."
+      ],
+      "compare": "unordered",
+      "tests": [
+        {"args": ["23"], "expected": ["ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"]},
+        {"args": [""], "expected": []},
+        {"args": ["2"], "expected": ["a", "b", "c"]},
+        {"args": ["79"], "expected": ["pw", "px", "py", "pz", "qw", "qx", "qy", "qz", "rw", "rx", "ry", "rz", "sw", "sx", "sy", "sz"]}
+      ]
+    },
+    {
+      "id": "maximum_subarray",
+      "title": "Maximum Subarray (Kadane)",
+      "leetcode": 53,
+      "difficulty": "medium",
+      "patterns": ["dp", "arrays"],
+      "func": "max_sub_array",
+      "signature": "def max_sub_array(nums: list[int]) -> int",
+      "statement": "Дан массив nums. Найди максимальную сумму непрерывного подмассива (подмассив непустой).",
+      "target": {"time": "O(n)", "space": "O(1)"},
+      "trap": "Инициализация нулём ломает массивы из одних отрицательных чисел. Начинай с nums[0], а не с 0.",
+      "hints": [
+        "Состояние DP: максимальная сумма подмассива, ЗАКАНЧИВАЮЩЕГОСЯ в позиции i.",
+        "cur = max(nums[i], cur + nums[i]) — либо продолжаем, либо начинаем заново.",
+        "best = max(best, cur) на каждом шаге; и cur, и best инициализируй nums[0]. Проверь [-3,-2,-5] → -2."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": [[-2, 1, -3, 4, -1, 2, 1, -5, 4]], "expected": 6},
+        {"args": [[1]], "expected": 1},
+        {"args": [[5, 4, -1, 7, 8]], "expected": 23},
+        {"args": [[-3, -2, -5]], "expected": -2},
+        {"args": [[-1]], "expected": -1}
+      ]
+    },
+    {
+      "id": "climbing_stairs",
+      "title": "Climbing Stairs",
+      "leetcode": 70,
+      "difficulty": "easy",
+      "patterns": ["dp"],
+      "func": "climb_stairs",
+      "signature": "def climb_stairs(n: int) -> int",
+      "statement": "Ты поднимаешься по лестнице из n ступеней. За один шаг можно подняться на 1 или 2 ступени. Сколько существует различных способов добраться до верха?",
+      "target": {"time": "O(n)", "space": "O(1)"},
+      "trap": "Наивная рекурсия без мемоизации — O(2^n), на n=45 повиснет. Тест с n=45 это проверяет.",
+      "hints": [
+        "Откуда можно попасть на ступень n?",
+        "С n-1 и с n-2 — значит ways(n) = ways(n-1) + ways(n-2). Это Фибоначчи.",
+        "Таблица не нужна: держи две переменные и перезаписывай их в цикле — O(1) памяти."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": [1], "expected": 1},
+        {"args": [2], "expected": 2},
+        {"args": [3], "expected": 3},
+        {"args": [10], "expected": 89},
+        {"args": [45], "expected": 1836311903}
+      ]
+    },
+    {
+      "id": "house_robber",
+      "title": "House Robber",
+      "leetcode": 198,
+      "difficulty": "medium",
+      "patterns": ["dp"],
+      "func": "rob",
+      "signature": "def rob(nums: list[int]) -> int",
+      "statement": "Дан массив nums — суммы в домах, стоящих в ряд. Нельзя обкрадывать два соседних дома. Верни максимальную сумму, которую можно унести.",
+      "target": {"time": "O(n)", "space": "O(1)"},
+      "trap": "Жадность «брать все чётные или все нечётные» неверна: [2,1,1,2] → 4, а чётные дают 3. Это именно DP.",
+      "hints": [
+        "Для дома i есть два выбора. Какое состояние надо держать, чтобы выбрать?",
+        "dp[i] = max(dp[i-1], dp[i-2] + nums[i]) — пропустить дом или взять его.",
+        "Двух переменных достаточно: prev и prev_prev. Проверь массив из одного дома."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": [[1, 2, 3, 1]], "expected": 4},
+        {"args": [[2, 7, 9, 3, 1]], "expected": 12},
+        {"args": [[5]], "expected": 5},
+        {"args": [[2, 1, 1, 2]], "expected": 4},
+        {"args": [[1, 2]], "expected": 2}
+      ]
+    },
+    {
+      "id": "best_time_to_buy_and_sell_stock",
+      "title": "Best Time to Buy and Sell Stock",
+      "leetcode": 121,
+      "difficulty": "easy",
+      "patterns": ["greedy", "arrays", "dp"],
+      "func": "max_profit",
+      "signature": "def max_profit(prices: list[int]) -> int",
+      "statement": "Дан массив prices, где prices[i] — цена акции в день i. Купить можно один раз и продать позже. Верни максимальную прибыль, либо 0, если прибыли не будет.",
+      "target": {"time": "O(n)", "space": "O(1)"},
+      "trap": "Не max(prices) - min(prices): минимум может стоять ПОСЛЕ максимума. Порядок дней важен.",
+      "hints": [
+        "Иди по дням. Что достаточно помнить про прошлое, чтобы посчитать прибыль сегодня?",
+        "Минимальную цену слева. Прибыль сегодня = price - min_so_far.",
+        "Обновляй best = max(best, price - min_so_far), потом min_so_far = min(min_so_far, price). Убыточный массив должен дать 0."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": [[7, 1, 5, 3, 6, 4]], "expected": 5},
+        {"args": [[7, 6, 4, 3, 1]], "expected": 0},
+        {"args": [[1, 2]], "expected": 1},
+        {"args": [[2]], "expected": 0}
+      ]
+    },
+    {
+      "id": "partition_labels",
+      "title": "Partition Labels",
+      "leetcode": 763,
+      "difficulty": "medium",
+      "patterns": ["greedy", "hash_map", "two_pointers"],
+      "func": "partition_labels",
+      "signature": "def partition_labels(s: str) -> list[int]",
+      "statement": "Дана строка s. Разбей её на максимальное число частей так, чтобы каждая буква встречалась не более чем в одной части. Верни длины частей слева направо.",
+      "target": {"time": "O(n)", "space": "O(1) — алфавит ограничен"},
+      "trap": "Жадность здесь корректна и требует обоснования: часть можно закрыть ровно тогда, когда пройдена последняя позиция каждой встреченной буквы.",
+      "hints": [
+        "Сначала предподсчёт: для каждой буквы — её последнее вхождение.",
+        "Идя по строке, тяни границу текущей части: end = max(end, last[c]).",
+        "Когда i == end — часть закрыта, добавь её длину и начни новую со следующей позиции."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": ["ababcbacadefegdehijhklij"], "expected": [9, 7, 8]},
+        {"args": ["eccbbbbdec"], "expected": [10]},
+        {"args": ["a"], "expected": [1]},
+        {"args": ["abc"], "expected": [1, 1, 1]}
+      ]
+    },
+    {
+      "id": "subarray_sum_equals_k",
+      "title": "Subarray Sum Equals K",
+      "leetcode": 560,
+      "difficulty": "medium",
+      "patterns": ["prefix_sum", "hash_map"],
+      "func": "subarray_sum",
+      "signature": "def subarray_sum(nums: list[int], k: int) -> int",
+      "statement": "Дан массив целых чисел nums (могут быть отрицательные) и целое k. Верни количество непрерывных подмассивов с суммой, равной k.",
+      "target": {"time": "O(n)", "space": "O(n)"},
+      "trap": "Скользящее окно здесь НЕ работает — из-за отрицательных чисел сумма не монотонна. Нужны префиксные суммы плюс хеш-таблица.",
+      "hints": [
+        "Сумма подмассива (i, j] = prefix[j] - prefix[i]. Что нужно найти для текущего prefix[j]?",
+        "Сколько раз ранее встречалось значение prefix[j] - k.",
+        "Счётчик префиксных сумм, инициализированный {0: 1} — эта единица отвечает за подмассивы, начинающиеся с индекса 0."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": [[1, 1, 1], 2], "expected": 2},
+        {"args": [[1, 2, 3], 3], "expected": 2},
+        {"args": [[1, -1, 0], 0], "expected": 3},
+        {"args": [[3, 4, 7, 2, -3, 1, 4, 2], 7], "expected": 4},
+        {"args": [[1], 0], "expected": 0}
+      ]
+    },
+    {
+      "id": "reverse_bits",
+      "title": "Reverse Bits",
+      "leetcode": 190,
+      "difficulty": "easy",
+      "patterns": ["bit_manipulation"],
+      "func": "reverse_bits",
+      "signature": "def reverse_bits(n: int) -> int",
+      "statement": "Дано 32-битное целое число без знака n. Переверни порядок его двоичных бит и верни результат как число.",
+      "target": {"time": "O(1) — ровно 32 итерации", "space": "O(1)"},
+      "trap": "Ровно 32 итерации, а не «пока n не станет 0» — иначе ведущие нули потеряются и ответ сдвинется. Тест n=1 → 2147483648 это ловит.",
+      "hints": [
+        "Собирай результат бит за битом: сдвигай его влево и добавляй младший бит входа.",
+        "res = (res << 1) | (n & 1); n >>= 1.",
+        "Цикл ровно for _ in range(32). Питоновский трюк int(bin(n)[2:].zfill(32)[::-1], 2) тоже верен — но на интервью попросят объяснить побитовый вариант."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": [43261596], "expected": 964176192},
+        {"args": [4294967293], "expected": 3221225471},
+        {"args": [0], "expected": 0},
+        {"args": [1], "expected": 2147483648}
+      ]
+    },
+    {
+      "id": "sum_of_two_integers",
+      "title": "Sum of Two Integers",
+      "leetcode": 371,
+      "difficulty": "medium",
+      "patterns": ["bit_manipulation"],
+      "aliases": ["sum_of_two"],
+      "func": "get_sum",
+      "signature": "def get_sum(a: int, b: int) -> int",
+      "statement": "Даны целые a и b. Верни их сумму, не используя операторы + и - (побитовые операции разрешены).",
+      "target": {"time": "O(1)", "space": "O(1)"},
+      "trap": "В Python целые неограниченные, поэтому наивный цикл carry на отрицательных числах не завершится. Нужна маска 32 бит и обратное преобразование в знаковое число.",
+      "hints": [
+        "Сумма без переноса — это XOR. Перенос — это AND со сдвигом на 1 влево.",
+        "Цикл: while b: a, b = (a ^ b), (a & b) << 1 — но в Python это зависнет на отрицательных.",
+        "Маскируй каждый шаг & 0xFFFFFFFF, а в конце: если результат > 0x7FFFFFFF, верни ~(result ^ 0xFFFFFFFF)."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": [1, 2], "expected": 3},
+        {"args": [2, 3], "expected": 5},
+        {"args": [-2, 3], "expected": 1},
+        {"args": [-1, -1], "expected": -2},
+        {"args": [0, 0], "expected": 0},
+        {"args": [-12, -8], "expected": -20}
+      ]
+    },
+    {
+      "id": "palindrome_number",
+      "title": "Palindrome Number",
+      "leetcode": 9,
+      "difficulty": "easy",
+      "patterns": ["arrays", "two_pointers"],
+      "func": "is_palindrome_number",
+      "signature": "def is_palindrome_number(x: int) -> int",
+      "statement": "Определи, является ли целое число палиндромом — читается одинаково в обе стороны. Отрицательные числа палиндромами не считаются.",
+      "target": {"time": "O(log x)", "space": "O(1)"},
+      "trap": "str(x) == str(x)[::-1] проходит, но на интервью попросят решение без преобразования в строку.",
+      "hints": [
+        "Отрицательные отсекай сразу. Как получить перевёрнутое число арифметикой?",
+        "rev = rev * 10 + x % 10, x //= 10.",
+        "Достаточно перевернуть половину: цикл while x > rev, потом сравни x == rev или x == rev // 10 для нечётной длины."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": [121], "expected": true},
+        {"args": [-121], "expected": false},
+        {"args": [10], "expected": false},
+        {"args": [0], "expected": true},
+        {"args": [1000000001], "expected": true},
+        {"args": [1000021], "expected": false}
+      ]
+    },
+    {
+      "id": "monotonic_array",
+      "title": "Monotonic Array",
+      "leetcode": 896,
+      "difficulty": "easy",
+      "patterns": ["arrays"],
+      "func": "is_monotonic",
+      "signature": "def is_monotonic(nums: list[int]) -> bool",
+      "statement": "Определи, является ли массив монотонным — неубывающим либо невозрастающим. Равные соседние элементы монотонности не нарушают.",
+      "target": {"time": "O(n)", "space": "O(1)"},
+      "trap": "Два отдельных прохода — тоже O(n) и это нормально. Ошибка — использовать строгие сравнения: [1,1,1] монотонен.",
+      "hints": [
+        "Достаточно проверить два независимых утверждения про соседние пары.",
+        "Флаги increasing и decreasing, оба True на старте; сбрасывай при нарушении.",
+        "Верни increasing or decreasing. Сравнения нестрогие: <= и >=."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": [[1, 2, 2, 3]], "expected": true},
+        {"args": [[6, 5, 4, 4]], "expected": true},
+        {"args": [[1, 3, 2]], "expected": false},
+        {"args": [[1, 1, 1]], "expected": true},
+        {"args": [[1]], "expected": true}
+      ]
+    },
+    {
+      "id": "longest_continuous_increasing_subarray",
+      "title": "Longest Continuous Increasing Subsequence",
+      "leetcode": 674,
+      "difficulty": "easy",
+      "patterns": ["arrays", "sliding_window"],
+      "aliases": ["monotonic_subarray"],
+      "func": "find_length_of_lcis",
+      "signature": "def find_length_of_lcis(nums: list[int]) -> int",
+      "statement": "Найди длину самой длинной непрерывной строго возрастающей подпоследовательности в массиве.",
+      "target": {"time": "O(n)", "space": "O(1)"},
+      "trap": "Пустой массив должен дать 0, а не 1 — если инициализировать ответ единицей, тест провалится.",
+      "hints": [
+        "Один проход со счётчиком текущей серии. Когда его сбрасывать?",
+        "Когда nums[i] <= nums[i-1] — серия оборвалась, счётчик снова 1.",
+        "Обновляй максимум на каждом шаге. Отдельно обработай пустой вход."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": [[1, 3, 5, 4, 7]], "expected": 3},
+        {"args": [[2, 2, 2, 2]], "expected": 1},
+        {"args": [[1, 3, 5, 7]], "expected": 4},
+        {"args": [[]], "expected": 0},
+        {"args": [[5, 4, 3]], "expected": 1}
+      ]
+    },
+    {
+      "id": "reverse_linked_list",
+      "title": "Reverse Linked List",
+      "leetcode": 206,
+      "difficulty": "easy",
+      "patterns": ["linked_list"],
+      "func": "reverse_list",
+      "signature": "def reverse_list(head)",
+      "statement": "Дан односвязный список. Переверни его и верни новую голову. Узел — объект с полями val и next; пустой список — None.",
+      "target": {"time": "O(n)", "space": "O(1)"},
+      "trap": "Классическая потеря ссылки: если сделать node.next = prev до сохранения node.next, остаток списка теряется.",
+      "hints": [
+        "Три указателя: prev, cur и запасённый next.",
+        "Порядок строго такой: nxt = cur.next; cur.next = prev; prev = cur; cur = nxt.",
+        "prev начинается с None и в конце становится новой головой. Пустой список должен вернуть None."
+      ],
+      "arg_types": ["linked_list"],
+      "return_type": "linked_list",
+      "compare": "exact",
+      "tests": [
+        {"args": [[1, 2, 3, 4, 5]], "expected": [5, 4, 3, 2, 1]},
+        {"args": [[1, 2]], "expected": [2, 1]},
+        {"args": [[]], "expected": []},
+        {"args": [[1]], "expected": [1]}
+      ]
+    },
+    {
+      "id": "add_two_numbers",
+      "title": "Add Two Numbers",
+      "leetcode": 2,
+      "difficulty": "medium",
+      "patterns": ["linked_list"],
+      "func": "add_two_numbers",
+      "signature": "def add_two_numbers(l1, l2)",
+      "statement": "Даны два непустых связных списка, представляющих неотрицательные целые числа. Цифры хранятся в обратном порядке, каждый узел — одна цифра. Сложи числа и верни результат связным списком, тоже в обратном порядке.",
+      "target": {"time": "O(max(n, m))", "space": "O(max(n, m))"},
+      "trap": "Финальный перенос. Для [9,9,9] + [1] длина ответа больше обоих входов — цикл должен продолжаться, пока carry не нулевой.",
+      "hints": [
+        "Складывай поразрядно, как в столбик. Что нужно держать между разрядами?",
+        "carry. Условие цикла — while l1 or l2 or carry.",
+        "Фиктивная голова (dummy node) избавляет от особого случая для первого узла. divmod(total, 10) даёт carry и цифру."
+      ],
+      "arg_types": ["linked_list", "linked_list"],
+      "return_type": "linked_list",
+      "compare": "exact",
+      "tests": [
+        {"args": [[2, 4, 3], [5, 6, 4]], "expected": [7, 0, 8]},
+        {"args": [[0], [0]], "expected": [0]},
+        {"args": [[9, 9, 9, 9, 9, 9, 9], [9, 9, 9, 9]], "expected": [8, 9, 9, 9, 0, 0, 0, 1]},
+        {"args": [[9, 9, 9], [1]], "expected": [0, 0, 0, 1]}
+      ]
+    },
+    {
+      "id": "middle_of_the_linked_list",
+      "title": "Middle of the Linked List",
+      "leetcode": 876,
+      "difficulty": "easy",
+      "patterns": ["linked_list", "two_pointers"],
+      "func": "middle_node",
+      "signature": "def middle_node(head)",
+      "statement": "Дан односвязный список. Верни узел из его середины. Если узлов чётное число, верни второй из двух центральных. Узел — объект с полями val и next.",
+      "target": {"time": "O(n)", "space": "O(1)"},
+      "trap": "Это техника «быстрый и медленный указатель». Условие цикла определяет, какой из двух центральных узлов ты получишь на чётной длине.",
+      "hints": [
+        "Два указателя разной скорости: один на шаг, второй на два.",
+        "while fast and fast.next: slow = slow.next; fast = fast.next.next.",
+        "Именно это условие цикла даёт ВТОРОЙ центральный узел при чётной длине — проверь на списке из 6 элементов."
+      ],
+      "arg_types": ["linked_list"],
+      "return_type": "linked_list",
+      "compare": "exact",
+      "tests": [
+        {"args": [[1, 2, 3, 4, 5]], "expected": [3, 4, 5]},
+        {"args": [[1, 2, 3, 4, 5, 6]], "expected": [4, 5, 6]},
+        {"args": [[1]], "expected": [1]},
+        {"args": [[1, 2]], "expected": [2]}
+      ]
+    }
+  ]
+}
