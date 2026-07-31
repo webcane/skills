@@ -89,7 +89,6 @@ truncated to fit, with a warning.
 |-------|-------------|
 | [content-writer-linkedin](skills/content-writer-linkedin/) | Write authentic LinkedIn articles |
 | [hr-answer-coach](skills/hr-answer-coach/) | Interactive wizard that flags HR-interview red flags and rewrites the answer |
-| [playing-card-prompt](skills/playing-card-prompt/) | Interactive wizard that builds stylized playing card image prompts |
 | [thesis-to-text](skills/thesis-to-text/) | Interactive wizard that turns raw theses/notes into a finished, audience-ready text |
 | [python-quiz](skills/python-quiz/) | Интерактивный квиз по Python по .md файлам в директории: выбор, открытые вопросы, задача на код, таймер и оценка в % |
 | [python-algo-coach](skills/python-algo-coach/) | Тренер по алгоритмам на Python (LeetCode Easy/Medium): 40 задач, 14 паттернов, прогон решений через тестовый харнесс |

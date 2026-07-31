@@ -26,7 +26,7 @@ repo-wide product version.
 
 - A skill's version is the `metadata.version` field in its `SKILL.md` frontmatter — the single source of truth.
 - Each skill keeps its own `skills/<name>/CHANGELOG.md`.
-- Release tags are namespaced: `<skill-name>/v<version>` (e.g. `playing-card-prompt/v1.0.0`).
+- Release tags are namespaced: `<skill-name>/v<version>` (e.g. `python-quiz/v1.0.0`).
 - The root `CHANGELOG.md` tracks only repo tooling (scripts, CI, layout), not skill content.
 
 ## Key Commands
@@ -42,7 +42,7 @@ Outputs `dist/<skill-name>.skill` (latest), `dist/<skill-name>-<version>.skill` 
 **Package a skill for Claude.ai (separate format):**
 ```bash
 bash scripts/package-skill-claudeai.sh <skill-name> [version]
-# e.g.: bash scripts/package-skill-claudeai.sh playing-card-prompt
+# e.g.: bash scripts/package-skill-claudeai.sh content-writer-linkedin
 ```
 Claude.ai's skill upload differs from the `.skill` format above: it requires
 a lowercase `skill.md` (not `SKILL.md`), a `description` <= 200 chars (not
@@ -62,7 +62,7 @@ bash scripts/install-skill.sh <skill-name> [version] [install-dir]
 **Release a skill (tag, push, GitHub release):**
 ```bash
 bash scripts/release-skill.sh [skill-name]
-# e.g.: bash scripts/release-skill.sh playing-card-prompt
+# e.g.: bash scripts/release-skill.sh content-writer-linkedin
 ```
 If `[skill-name]` is omitted, prompts to choose from `skills/`. Reads the
 version from `SKILL.md` frontmatter (`metadata.version`), creates and pushes
@@ -121,36 +121,6 @@ Add it to the Skills table in `README.md`. CI packages it automatically on push.
 - Update `CLAUDE.md` if structure/workflow changed.
 
 Releasing is handled by `release-skill.sh` (promotes `[Unreleased]` locally before tagging). CI is a fallback for manually-pushed tags. Never promote a CHANGELOG section by hand — always write under `[Unreleased]` and let the script do it.
-
-<!-- GSD:project-start source:PROJECT.md -->
-## Project
-
-**playing-card-prompt: Feature Expansion (v4)**
-
-The `playing-card-prompt` skill is an interactive Claude wizard that builds
-image-generation prompts for stylized playing cards. It supports four deck
-systems, six court-lettering systems, rich style/layer configuration, and
-persistent profiles. This project extends the skill with six new features:
-figure type classification, split layout control, card back generation,
-special/prospect cards, title overlay, and seamless group design.
-
-**Core Value:** Give the user precise, repeatable control over every meaningful aspect of a
-card's figure and layout — so prompts produce consistent results across a
-full deck.
-
-### Constraints
-
-- **Compatibility**: `manage_config.py` schema change (`figure_proportion` →
-  `figure_scale` + `character_framing`) must not break existing `config.json`
-  files — provide a migration/fallback read path.
-- **Scope**: No SVG or image output from this skill; output remains a text
-  prompt in a code block.
-- **Wizard UX**: AskUserQuestion max 4 options per question; new steps must
-  fit this limit.
-- **Asset file convention**: new persistent fields need entries in
-  `references/CONFIG.md`; new wizard steps need entries in
-  `references/WIZARD-STEP-MAP.md`.
-<!-- GSD:project-end -->
 
 <!-- GSD:stack-start source:codebase/STACK.md -->
 ## Technology Stack
@@ -213,12 +183,11 @@ full deck.
 - **MINOR** (x.Y.z): new features
 - **MAJOR** (X.y.z): breaking changes
 ## Git Commit Message Conventions
-- `chore:` — tooling, CI, CHANGELOG promotion (e.g., `chore: promote playing-card-prompt CHANGELOG for v3.19.0`)
-- `<skill-name>:` — skill-specific changes prefixed with skill name (e.g., `playing-card-prompt: add Joker card support (v3.20.0)`)
+- `chore:` — tooling, CI, CHANGELOG promotion (e.g., `chore: promote content-writer-linkedin CHANGELOG for v1.0.0`)
+- `<skill-name>:` — skill-specific changes prefixed with skill name (e.g., `content-writer-linkedin: add LinkedIn image generation support (v1.1.0)`)
 - `fix:` — bug fixes
 - `Merge ...` — merge commits (standard git format)
 ## Git Tag Convention
-- `playing-card-prompt/v3.20.0`
 - `content-writer-linkedin/v1.0.0`
 ## CHANGELOG Conventions
 - `CHANGELOG.md` (root) — repo tooling only (scripts, CI, layout). Never skill content.
@@ -300,10 +269,10 @@ full deck.
 ### CI Push-to-master Flow
 ## Key Abstractions
 - Purpose: A named, versioned Claude Code extension distributed as a markdown file with YAML frontmatter
-- Examples: `skills/playing-card-prompt/SKILL.md`, `skills/content-writer-linkedin/SKILL.md`
+- Examples: `skills/content-writer-linkedin/SKILL.md`
 - Pattern: YAML frontmatter block (`---`) containing `name`, `description`, `color`, `metadata.version`, `metadata.author`; followed by free-form markdown instructions
 - Purpose: Allows per-skill independent releases within a single git repo
-- Pattern: `<skill-name>/v<semver>` — e.g., `playing-card-prompt/v3.20.0`
+- Pattern: `<skill-name>/v<semver>` — e.g., `content-writer-linkedin/v1.0.0`
 - Used by: `release-skill.sh`, CI workflow tag parser
 - `.skill` (tar.gz): for Claude Code CLI / agentskills.io; files at archive root; `SKILL.md` uppercase; description up to 1024 chars
 - `-claudeai.zip`: for Claude.ai upload; files nested under `<skill-name>/` folder; `skill.md` lowercase; description ≤ 200 chars
