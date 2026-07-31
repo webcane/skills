@@ -89,6 +89,7 @@ truncated to fit, with a warning.
 |-------|-------------|
 | [content-writer-linkedin](skills/content-writer-linkedin/) | Write authentic LinkedIn articles |
 | [hr-answer-coach](skills/hr-answer-coach/) | Interactive wizard that flags HR-interview red flags and rewrites the answer |
+| [hypothes-to-concept](skills/hypothes-to-concept/) | Structured reasoning: analyze, clarify, or solve a problem via a rigorous method, surfacing assumptions and resolving contradictions |
 | [thesis-to-text](skills/thesis-to-text/) | Interactive wizard that turns raw theses/notes into a finished, audience-ready text |
 | [python-quiz](skills/python-quiz/) | Интерактивный квиз по Python по .md файлам в директории: выбор, открытые вопросы, задача на код, таймер и оценка в % |
 | [python-algo-coach](skills/python-algo-coach/) | Тренер по алгоритмам на Python (LeetCode Easy/Medium): 40 задач, 14 паттернов, прогон решений через тестовый харнесс |
@@ -99,6 +100,8 @@ truncated to fit, with a warning.
 # Latest
 curl -L https://raw.githubusercontent.com/webcane/skills/main/dist/content-writer-linkedin.skill \
   -o content-writer-linkedin.skill
+curl -L https://raw.githubusercontent.com/webcane/skills/main/dist/hypothes-to-concept.skill \
+  -o hypothes-to-concept.skill
 
 # Pinned version (release tag is <skill>/v<version>)
 curl -L https://github.com/webcane/skills/releases/download/content-writer-linkedin/v1.0.0/content-writer-linkedin-1.0.0.skill \
