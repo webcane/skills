@@ -1,8 +1,16 @@
-# Changelog — hypothes-to-concept
+# Changelog — idea-to-concept
 
 All notable changes to this skill. Released per skill as tag
-`hypothes-to-concept/v<version>`. The version in `SKILL.md` frontmatter
+`idea-to-concept/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
+
+## [Unreleased]
+
+### Changed
+- Renamed skill from **hypothes-to-concept** to **idea-to-concept** (v1.1.0): broader
+  input naming (idea/problem/proposal/decision) and explicit mention of the structured
+  reasoning methods (socratic, TRIZ, Einstein, working-backwards, scientific-method)
+  in the description.
 
 ## [1.0.0] - 2026-07-31
 
