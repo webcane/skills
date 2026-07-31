@@ -4,7 +4,7 @@ All notable changes to this skill. Released per skill as tag
 `hypothes-to-concept/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
-## [Unreleased]
+## [1.0.0] - 2026-07-31
 
 ### Added
 - Initial release of the **hypothes-to-concept** skill (v1.0.0) — structured reasoning:
