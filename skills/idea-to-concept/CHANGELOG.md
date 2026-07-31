@@ -4,6 +4,14 @@ All notable changes to this skill. Released per skill as tag
 `idea-to-concept/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
+## [Unreleased]
+
+### Added
+- `--help` mode (Mode 0): prints the full method catalog — all 7 methods, when to use
+  each, and the routing decision rule — then stops without running an analysis. Invoke
+  as `/idea-to-concept --help` (user) or `mode: help` in an `analyze:` block
+  (sub-agent) (v1.2.0).
+
 ## [1.1.0] - 2026-07-31
 
 ### Changed

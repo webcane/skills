@@ -10,7 +10,7 @@ description: >
   skills — pass a structured analyze: block and receive a structured result.
 metadata:
   author: webcane
-  version: 1.1.0
+  version: 1.2.0
   description_claudeai: >
     Analyze, clarify, or solve problems with structured reasoning methods (socratic, TRIZ,
     Einstein, etc.). Stress-test proposals, surface assumptions, resolve contradictions,
@@ -23,7 +23,13 @@ A problem (or raw idea, proposal, or decision) enters. A well-formed result leav
 problem restated, analyzed through a rigorous method, with assumptions surfaced,
 contradictions resolved or named, and a reformulated concept or recommendation.
 
-## Two Modes
+## Three Modes
+
+### Mode 0 — Help (`--help`)
+Print the full method catalog — all available methods, when to use each, and the routing
+decision rule — then stop. No analysis is run. Invoke with `--help` (user mode) or
+`mode: help` (sub-agent mode). This is the built-in reference; useful before choosing a
+method.
 
 ### Mode 1 — Auto (recommend and run)
 Classify the problem type from the description, route to the best-fit method (see
@@ -44,11 +50,13 @@ idea-to-concept analyze:
   context: "<optional project constraints, prior decisions, relevant docs>"
 ```
 
-Parse the block. `mode: auto` triggers Mode 1; a method name triggers Mode 2.
+Parse the block. `mode: auto` triggers Mode 1; a method name triggers Mode 2;
+`mode: help` (or `mode: --help`) triggers Mode 0.
 
 ## Input Format (User Mode)
 
 The user describes the problem directly, or invokes `/idea-to-concept <problem>`.
+`/idea-to-concept --help` (or asking "help" / "list the methods") triggers Mode 0.
 If `mode` is not given, default to auto.
 
 ## Method Selection (Mode 1)
@@ -109,6 +117,42 @@ assumption, or gap, name it precisely and, when possible, offer the resolution.
 
 ### Recommendation
 <what to do next, if any>
+```
+
+## Help Output Format (Mode 0)
+
+When `--help` is invoked, return this catalog and stop — do not restate the problem, do
+not load or run any method.
+
+```
+## idea-to-concept Help
+
+**Usage:** `/idea-to-concept <problem>` · `/idea-to-concept <method> <problem>` · `/idea-to-concept --help`
+
+**Modes:** `auto` (recommend + run) · `<method-name>` (explicit) · `--help` (this catalog)
+
+### Methods — when to use which
+
+| Method | Use when… |
+|---|---|
+| socratic | Terms ambiguous, assumptions hidden, contradictions possible ("it should work", "obviously") — lowest-cost probe; default tie-breaker |
+| triz | Two requirements in tension, both must hold ("can't have both", "trade-off between X and Y") |
+| einstein | Concept too complex, unclear, or must age well ("too complex", "hard to explain") |
+| working-backwards | Value unclear — "is this actually useful?", "who benefits?" |
+| scientific-method | A simplicity/capability claim needs testing ("this is the simplest", "obviously better") |
+| logical-analysis | Fit with existing architecture or stated premises ("does this fit?", "consistent with our architecture") |
+| empirical-analysis | An empirically verifiable behavior claim ("always works", "no failure mode") |
+
+### Decision rule (quick)
+1. Names a tension ("but…", "conflicts with") → **triz**
+2. Fuzzy terms / hidden assumption → **socratic**
+3. "Is it worth it / who benefits" → **working-backwards**
+4. Complexity / clarity / longevity → **einstein**
+5. Simplicity or capability claim to test → **scientific-method**
+6. Architectural fit → **logical-analysis**
+7. Behavior measurable empirically → **empirical-analysis**
+
+Ties → **socratic**
 ```
 
 ## Usage Notes
