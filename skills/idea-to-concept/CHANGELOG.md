@@ -4,7 +4,7 @@ All notable changes to this skill. Released per skill as tag
 `idea-to-concept/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
-## [Unreleased]
+## [1.1.0] - 2026-07-31
 
 ### Changed
 - Renamed skill from **hypothes-to-concept** to **idea-to-concept** (v1.1.0): broader
