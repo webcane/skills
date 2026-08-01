@@ -2,7 +2,7 @@
 
 All notable changes to the `mm-wiki-lint` skill are documented here.
 
-## [Unreleased]
+## [1.0.0] - 2026-08-01
 
 ### Added
 - Initial release: structural health check (orphans, stale pages, broken
