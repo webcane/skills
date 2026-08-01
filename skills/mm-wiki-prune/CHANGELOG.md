@@ -2,7 +2,7 @@
 
 All notable changes to the `mm-wiki-prune` skill are documented here.
 
-## [Unreleased]
+## [1.0.0] - 2026-08-01
 
 ### Added
 - Initial release: LRU-Demote workflow that evicts cold pages from Logseq hub
