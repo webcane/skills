@@ -4,7 +4,7 @@ All notable changes to this skill. Released per skill as tag
 `idea-to-concept/v<version>`. The version in `SKILL.md` frontmatter
 (`metadata.version`) is the source of truth.
 
-## [Unreleased]
+## [1.3.0] - 2026-08-01
 
 ### Added
 - 13 new methods across three roles (v1.3.0):
