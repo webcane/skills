@@ -93,6 +93,12 @@ truncated to fit, with a warning.
 | [thesis-to-text](skills/thesis-to-text/) | Interactive wizard that turns raw theses/notes into a finished, audience-ready text |
 | [python-quiz](skills/python-quiz/) | Интерактивный квиз по Python по .md файлам в директории: выбор, открытые вопросы, задача на код, таймер и оценка в % |
 | [python-algo-coach](skills/python-algo-coach/) | Тренер по алгоритмам на Python (LeetCode Easy/Medium): 40 задач, 14 паттернов, прогон решений через тестовый харнесс |
+| [mm-wiki-ingest](skills/mm-wiki-ingest/) | Distill source material into a Logseq wiki with hub-index routing and cross-references |
+| [mm-wiki-query](skills/mm-wiki-query/) | Read-only two-stage (hub-index then targeted-read) search and synthesis over a Logseq wiki |
+| [mm-wiki-prune](skills/mm-wiki-prune/) | LRU-Demote: evict cold pages from live hub indexes into an archive section |
+| [mm-wiki-lint](skills/mm-wiki-lint/) | Structural health check for a Logseq wiki (orphans, broken links, index drift, credential leaks) |
+| [mm-wiki-status](skills/mm-wiki-status/) | Metrics, health, and hot/cold access-profile dashboard for a Logseq wiki |
+| [mm-wiki-import](skills/mm-wiki-import/) | Bulk-import existing markdown notes (incl. Slab exports) into a Logseq wiki |
 
 ## Installation URLs
 
