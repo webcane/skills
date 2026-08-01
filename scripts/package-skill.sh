@@ -13,6 +13,9 @@ VERSION="${2:-}"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SKILL_DIR="$REPO_ROOT/skills/$SKILL_NAME"
 DIST_DIR="$REPO_ROOT/dist"
+# Artifact names stay flat even when the skill lives under a family directory
+# (e.g. skills/mm-wiki/mm-wiki-ingest → artifact name mm-wiki-ingest).
+ARTIFACT_NAME="$(basename "$SKILL_NAME")"
 
 [ -z "$SKILL_NAME" ] && echo "Usage: $0 <skill-name> [version]" && exit 1
 [ ! -f "$SKILL_DIR/SKILL.md" ] && echo "Error: $SKILL_DIR/SKILL.md not found" && exit 1
@@ -27,18 +30,18 @@ fi
 mkdir -p "$DIST_DIR"
 
 cd "$SKILL_DIR"
-SKILL_FILE="$DIST_DIR/${SKILL_NAME}.skill"
+SKILL_FILE="$DIST_DIR/${ARTIFACT_NAME}.skill"
 tar -czf "$SKILL_FILE" --exclude='.DS_Store' --exclude='*.swp' --exclude='config.json' --exclude='config.json.bak*' .
 
-cp "$SKILL_FILE" "$DIST_DIR/${SKILL_NAME}-${VERSION}.skill"
+cp "$SKILL_FILE" "$DIST_DIR/${ARTIFACT_NAME}-${VERSION}.skill"
 
-cat > "$DIST_DIR/${SKILL_NAME}-${VERSION}.json" << JSON
+cat > "$DIST_DIR/${ARTIFACT_NAME}-${VERSION}.json" << JSON
 {
-  "name": "${SKILL_NAME}",
+  "name": "${ARTIFACT_NAME}",
   "version": "${VERSION}",
   "created": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 }
 JSON
 
-echo "✓ dist/${SKILL_NAME}.skill"
-echo "✓ dist/${SKILL_NAME}-${VERSION}.skill (v${VERSION})"
+echo "✓ dist/${ARTIFACT_NAME}.skill"
+echo "✓ dist/${ARTIFACT_NAME}-${VERSION}.skill (v${VERSION})"

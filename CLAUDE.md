@@ -9,15 +9,41 @@ A distribution system for Claude skills. Skills are Claude Code extensions defin
 ## Repo Structure
 
 ```
-skills/<skill-name>/    # Skill source files (git-tracked)
+skills/<skill-name>/    # Skill source files (git-tracked) — flat by default
   SKILL.md              # Required: skill definition with YAML frontmatter (holds metadata.version)
   CHANGELOG.md          # Per-skill changelog (this skill's history only)
   README.md             # Optional: user-facing documentation
+skills/mm-wiki/         # Logical family home for the mm-wiki-* skills
+  shared/               # Canonical shared assets (conventions, scanner) — single source of truth
+  overrides/            # Per-skill variants of shared files (e.g. ingest's extended conventions)
+  mm-wiki-<skill>/      # Member skill dirs (packaged/installed as flat mm-wiki-<skill>)
 dist/                   # Generated output (gitignored for .skill files)
 scripts/                # Packaging and installation shell scripts
 CHANGELOG.md            # Repo-tooling changelog only (scripts/CI/layout)
 .github/workflows/      # CI: auto-packages skills on push to main
 ```
+
+### Skill family directories
+
+A group of closely-related skills (e.g. the `mm-wiki-*` Logseq family) may be
+grouped under a logical home directory `skills/<family>/`. Inside it, `shared/`
+holds canonical assets that the member skills consume, and each member lives in
+`skills/<family>/<family>-<name>/`.
+
+- On the command line, a nested skill is addressed by its full path relative to
+  `skills/` — e.g. `bash scripts/package-skill.sh mm-wiki/mm-wiki-ingest`.
+- Artifact and install names are always the **flat basename** — e.g.
+  `dist/mm-wiki-ingest.skill`, `~/.claude/skills/mm-wiki-ingest`, tag
+  `mm-wiki/mm-wiki-ingest/v1.2.0`.
+- Shared assets are single-sourced in `skills/<family>/shared/` (and
+  `overrides/`) and pushed into member skill dirs by a family sync script:
+  `bash scripts/sync-mm-wiki.sh` (or `--check` to verify no drift). **Never
+  hand-edit the managed copies** inside a member skill — they are generated.
+- The packaging scripts (`package-skill.sh`, `package-skill-claudeai.sh`,
+  `install-local.sh`, `release-skill.sh`) and CI already resolve nested skills:
+  they locate skills by `SKILL.md` (recursive) and derive flat artifact names
+  with `basename`. Non-skill dirs inside `skills/` (family homes with no
+  `SKILL.md`) are ignored.
 
 ## Versioning Model
 

@@ -13,11 +13,15 @@ INSTALL_DIR="${INSTALL_DIR:-$HOME/.claude/skills}"
 
 SKILL_NAME="${1:-}"
 
+# Build the list of available skills by locating every SKILL.md, so nested
+# family dirs (skills/mm-wiki/mm-wiki-ingest) are found and non-skill dirs
+# (skills/mm-wiki, the family home) are excluded. The name offered is the
+# path relative to skills/ (e.g. mm-wiki/mm-wiki-ingest).
 if [ -z "$SKILL_NAME" ]; then
   SKILL_NAMES=()
-  for dir in "$SKILLS_DIR"/*/; do
-    SKILL_NAMES+=("$(basename "$dir")")
-  done
+  while IFS= read -r f; do
+    SKILL_NAMES+=("${f#$SKILLS_DIR/}")
+  done < <(find "$SKILLS_DIR" -name SKILL.md | sort)
 
   echo "Choose available skills:"
   select choice in "${SKILL_NAMES[@]}"; do
@@ -33,9 +37,11 @@ fi
 
 bash "$REPO_ROOT/scripts/package-skill.sh" "$SKILL_NAME"
 
-TARGET="$INSTALL_DIR/$SKILL_NAME"
+# Install dir is the flat basename even for nested skills.
+ARTIFACT_NAME="$(basename "$SKILL_NAME")"
+TARGET="$INSTALL_DIR/$ARTIFACT_NAME"
 rm -rf "$TARGET"
 mkdir -p "$TARGET"
-tar -xzf "$REPO_ROOT/dist/${SKILL_NAME}.skill" -C "$TARGET"
+tar -xzf "$REPO_ROOT/dist/${ARTIFACT_NAME}.skill" -C "$TARGET"
 
 echo "✓ Installed $SKILL_NAME to $TARGET"

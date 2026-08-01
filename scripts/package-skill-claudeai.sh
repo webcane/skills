@@ -22,7 +22,11 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SKILL_DIR="$REPO_ROOT/skills/$SKILL_NAME"
 DIST_DIR="$REPO_ROOT/dist"
 STAGE_ROOT="$DIST_DIR/claudeai-stage"
-STAGE_DIR="$STAGE_ROOT/$SKILL_NAME"
+# Claude.ai requires a single top-level folder named after the skill inside the
+# zip. When the skill lives under a family dir (skills/mm-wiki/mm-wiki-ingest),
+# the zip folder must be the flat basename, not the nested path.
+ARTIFACT_NAME="$(basename "$SKILL_NAME")"
+STAGE_DIR="$STAGE_ROOT/$ARTIFACT_NAME"
 
 [ -z "$SKILL_NAME" ] && echo "Usage: $0 <skill-name> [version]" && exit 1
 [ ! -f "$SKILL_DIR/SKILL.md" ] && echo "Error: $SKILL_DIR/SKILL.md not found" && exit 1
@@ -52,12 +56,12 @@ rm "$STAGE_DIR/SKILL.md"
 mv "$STAGE_DIR/.skill.md.tmp" "$STAGE_DIR/skill.md"
 
 # Zip with the skill folder at the root of the archive
-ZIP_FILE="$DIST_DIR/${SKILL_NAME}-claudeai.zip"
+ZIP_FILE="$DIST_DIR/${ARTIFACT_NAME}-claudeai.zip"
 rm -f "$ZIP_FILE"
-( cd "$STAGE_ROOT" && zip -rq "$ZIP_FILE" "$SKILL_NAME" )
+( cd "$STAGE_ROOT" && zip -rq "$ZIP_FILE" "$ARTIFACT_NAME" )
 
-cp "$ZIP_FILE" "$DIST_DIR/${SKILL_NAME}-claudeai-${VERSION}.zip"
+cp "$ZIP_FILE" "$DIST_DIR/${ARTIFACT_NAME}-claudeai-${VERSION}.zip"
 rm -rf "$STAGE_ROOT"
 
-echo "✓ dist/${SKILL_NAME}-claudeai.zip"
-echo "✓ dist/${SKILL_NAME}-claudeai-${VERSION}.zip (v${VERSION})"
+echo "✓ dist/${ARTIFACT_NAME}-claudeai.zip"
+echo "✓ dist/${ARTIFACT_NAME}-claudeai-${VERSION}.zip (v${VERSION})"

@@ -14,9 +14,13 @@ and each skill is versioned and released independently.
 - `scripts/package-skill-claudeai.sh` (with helper `scripts/build_claudeai_skill_md.py`): packages a skill for Claude.ai's skill upload — lowercase `skill.md`, description ≤ 200 chars, zip with files nested in `<skill-name>/` folder. Honors `metadata.description_claudeai` frontmatter field; otherwise truncates `description` with a warning
 - Documented local build/install/reinstall and Claude.ai packaging workflows in `README.md` and `CLAUDE.md`
 - `dist/*.zip` added to `.gitignore`
+- **mm-wiki family grouping**: moved the six `mm-wiki-*` skills under a logical family home `skills/mm-wiki/` (with `shared/` canonical assets, `overrides/`, `README.md`, `MANIFEST.md`). Added `scripts/sync-mm-wiki.sh` to push canonical shared assets into member skills (run with `--check` to verify no drift). Nested skills are addressed as `mm-wiki/<skill>` on the command line; artifacts/install dirs/tags keep the flat basename (`mm-wiki-ingest`)
 
 ### Changed
 - `scripts/install-local.sh`: interactive picker now lists skill names instead of full directory paths
+- `scripts/install-local.sh`, `scripts/release-skill.sh`: picker now finds skills recursively (via `find` on `SKILL.md`) so nested family skills are listed and family-home dirs without a `SKILL.md` are skipped
+- `scripts/package-skill.sh`, `scripts/package-skill-claudeai.sh`: derive flat artifact names via `basename` so nested skills (`mm-wiki/mm-wiki-ingest`) still produce `dist/mm-wiki-ingest.skill` / `dist/mm-wiki-ingest-claudeai.zip` with a single top-level zip folder
+- CI (`package-skills.yml`): `package-all` now finds every `SKILL.md` recursively and tars from each skill's parent dir with the flat basename; `release-skill` parses nested tags (`mm-wiki/mm-wiki-ingest/v1.2.0`) and uploads assets under the flat basename
 - Bumped CI actions to Node.js 24-compatible versions: `actions/checkout@v5`, `actions/upload-artifact@v6`
 - Switched to **per-skill versioning**: each skill carries its version in `SKILL.md` frontmatter (`metadata.version`), keeps its own `CHANGELOG.md`, and is released under a namespaced tag `<skill>/v<version>`
 - `package-skill.sh` now reads the version from `SKILL.md` frontmatter when no version argument is passed

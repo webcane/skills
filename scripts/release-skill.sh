@@ -23,9 +23,9 @@ SKILL_NAME="${1:-}"
 
 if [ -z "$SKILL_NAME" ]; then
   SKILL_NAMES=()
-  for dir in "$SKILLS_DIR"/*/; do
-    SKILL_NAMES+=("$(basename "$dir")")
-  done
+  while IFS= read -r f; do
+    SKILL_NAMES+=("${f#$SKILLS_DIR/}")
+  done < <(find "$SKILLS_DIR" -name SKILL.md | sort)
 
   echo "Choose a skill to release:"
   select choice in "${SKILL_NAMES[@]}"; do
@@ -40,6 +40,9 @@ fi
 SKILL_DIR="$SKILLS_DIR/$SKILL_NAME"
 [ ! -f "$SKILL_DIR/SKILL.md" ] && echo "Error: $SKILL_DIR/SKILL.md not found" && exit 1
 
+# Tag is <skill>/v<version> where <skill> may itself be a family path
+# (mm-wiki/mm-wiki-ingest/v1.2.0). CI parses the last segment as the version.
+ARTIFACT_NAME="$(basename "$SKILL_NAME")"
 VERSION="$(grep -E '^[[:space:]]*version:[[:space:]]*' "$SKILL_DIR/SKILL.md" \
   | head -1 | sed -E 's/^[[:space:]]*version:[[:space:]]*//; s/[[:space:]]*$//')"
 [ -z "$VERSION" ] && echo "Error: no version found in $SKILL_NAME/SKILL.md (metadata.version)" && exit 1
@@ -95,12 +98,12 @@ bash "$REPO_ROOT/scripts/package-skill.sh" "$SKILL_NAME" "$VERSION"
 git tag -a "$TAG" -m "$SKILL_NAME v$VERSION"
 git push origin "$TAG"
 
-# Guard 3: upload .skill + versioned .skill + .json metadata
+# Guard 3: upload .skill + versioned .skill + .json metadata (flat artifact names)
 gh release create "$TAG" \
   --title "$SKILL_NAME v$VERSION" \
   --notes-file "$NOTES_FILE" \
-  "dist/${SKILL_NAME}.skill" \
-  "dist/${SKILL_NAME}-${VERSION}.skill" \
-  "dist/${SKILL_NAME}-${VERSION}.json"
+  "dist/${ARTIFACT_NAME}.skill" \
+  "dist/${ARTIFACT_NAME}-${VERSION}.skill" \
+  "dist/${ARTIFACT_NAME}-${VERSION}.json"
 
 echo "✓ Released $TAG"

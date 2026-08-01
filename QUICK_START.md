@@ -37,6 +37,12 @@ Four steps — package, package for Claude.ai, install locally, then release:
 ```bash
 # 1. Package as .skill (tar.gz) for Claude Code / agentskills.io
 bash scripts/package-skill.sh <skill-name>
+```
+
+`<skill-name>` is the path relative to `skills/` — flat for most skills
+(`content-writer-linkedin`), nested for family members
+(`mm-wiki/mm-wiki-ingest`). Artifacts and install dirs always use the flat
+basename (`dist/mm-wiki-ingest.skill`, `~/.claude/skills/mm-wiki-ingest`).
 
 # 2. Package as .zip for Claude.ai upload
 bash scripts/package-skill-claudeai.sh <skill-name>

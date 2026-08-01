@@ -16,11 +16,17 @@ jobs:
       - name: Package all skills
         run: |
           mkdir -p dist
-          for skill_dir in skills/*/; do
-            name=$(basename "$skill_dir")
-            [ -f "skills/$name/SKILL.md" ] || continue
-            tar -czf "dist/${name}.skill" -C skills "$name"
-          done
+          # Find every SKILL.md recursively so nested family dirs
+          # (skills/mm-wiki/mm-wiki-ingest) are included. Non-skill dirs
+          # (skills/mm-wiki — the family home) have no SKILL.md and are skipped.
+          while IFS= read -r skill_md; do
+            dir="$(dirname "$skill_md")"
+            name="$(basename "$dir")"
+            parent="$(dirname "$dir")"
+            # tar from the skill's parent with the flat basename so the .skill
+            # archive has the skill contents at its root (not nested).
+            tar -czf "dist/${name}.skill" -C "$parent" "$name"
+          done < <(find skills -name SKILL.md | sort)
       - name: Upload artifacts
         uses: actions/upload-artifact@v6
         with:
@@ -49,7 +55,10 @@ jobs:
           SKILL_NAME="${TAG%/*}"
           VERSION="${TAG##*/}"; VERSION="${VERSION#v}"
           [ -f "skills/$SKILL_NAME/SKILL.md" ] || { echo "::error::skills/$SKILL_NAME/SKILL.md not found"; exit 1; }
+          # Flat artifact name: skills/mm-wiki/mm-wiki-ingest -> mm-wiki-ingest.
+          SKILL_ID="$(basename "$SKILL_NAME")"
           echo "skill=$SKILL_NAME" >> "$GITHUB_OUTPUT"
+          echo "skill_id=$SKILL_ID" >> "$GITHUB_OUTPUT"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
       - name: Package the released skill
         run: bash scripts/package-skill.sh "${{ steps.parse.outputs.skill }}" "${{ steps.parse.outputs.version }}"
@@ -57,8 +66,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/${{ steps.parse.outputs.skill }}.skill
-            dist/${{ steps.parse.outputs.skill }}-${{ steps.parse.outputs.version }}.skill
+            dist/${{ steps.parse.outputs.skill_id }}.skill
+            dist/${{ steps.parse.outputs.skill_id }}-${{ steps.parse.outputs.version }}.skill
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Promote skill CHANGELOG
