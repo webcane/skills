@@ -7,10 +7,17 @@ All notable changes to this skill. Released per skill as tag
 ## [Unreleased]
 
 ### Added
-- `--help` mode (Mode 0): prints the full method catalog — all 7 methods, when to use
-  each, and the routing decision rule — then stops without running an analysis. Invoke
-  as `/idea-to-concept --help` (user) or `mode: help` in an `analyze:` block
-  (sub-agent) (v1.2.0).
+- 13 new methods across three roles (v1.3.0):
+  - **Analysis:** `feynman`, `deduction`, `five-whys`, `three-questions`.
+  - **Generation:** `dialectic`, `six-hats`, `reframing`, `inversion`, `analogy`,
+    `mind-map`.
+  - **Validation:** `hadi`, `ice`, `rat` — offered after a hypothesis is formed.
+- Execution Protocol Step 5: after a hypothesis is formed, offer hypothesis validation
+  (hadi / ice / rat); output format gains a "Hypothesis validation" section (v1.3.0).
+- `--help` mode (Mode 0): prints the full method catalog — all 20 methods grouped by
+  role, when to use each, and the routing decision rule — then stops without running an
+  analysis. Invoke as `/idea-to-concept --help` (user) or `mode: help` in an
+  `analyze:` block (sub-agent) (v1.3.0).
 
 ## [1.1.0] - 2026-07-31
 
