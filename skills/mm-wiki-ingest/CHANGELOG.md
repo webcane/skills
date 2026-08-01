@@ -2,6 +2,13 @@
 
 All notable changes to the `mm-wiki-ingest` skill are documented here.
 
+## [Unreleased]
+
+### Added
+- Language policy: page content, hub-index descriptions, and tags follow the
+  source material's language (do not translate); only structural keys (property
+  names, page filenames, `[[links]]`) stay in English.
+
 ## [1.0.0] - 2026-08-01
 
 ### Added

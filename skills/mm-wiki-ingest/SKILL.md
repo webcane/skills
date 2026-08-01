@@ -13,7 +13,7 @@ description: >
   (mm-wiki-ingest/query/prune/lint/status/import) targeting Logseq; works from any coding agent or
   chat, not only Claude Code.
 metadata:
-  version: 1.0.0
+  version: 1.1.0
 ---
 
 # mm-wiki-ingest
@@ -63,6 +63,10 @@ re-derive later — deep knowledge, not standing rules.
 Target 5-15 page touches per ingest run. Fewer than 5 often means you under-extracted (re-check the
 source for findings you skipped); more than 20 usually means you're over-fragmenting — group related
 facts onto fewer, richer pages instead of one page per sentence.
+
+Write page content in the **same language as the source material** — do not translate. Only the
+structural keys stay in English (property names, page filenames, `[[links]]`), per the conventions
+reference.
 
 - **New pages**: include every property the Schema requires for that type (`type::`, `created::`,
   plus type-specific ones — see the conventions reference's Schema table if this wiki has none of its

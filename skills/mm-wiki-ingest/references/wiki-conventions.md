@@ -171,4 +171,8 @@ that instead — this table is only the fallback for a brand-new wiki.
   structural change (new/changed pages, hub index edits, archived:: changes). If
   there's no git repo, or the agent has no git access, skip silently — this family
   does not require git.
+- **Language of content**: page content, hub-index descriptions, and tags are
+  written in the **same language as the source material** — do not translate. Only
+  the structural keys stay in English: property names (`type::`, `created::`, …),
+  page filenames, and `[[links]]`, which the Logseq format requires.
 - Dates: ISO 8601, always.
