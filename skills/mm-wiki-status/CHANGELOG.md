@@ -2,7 +2,7 @@
 
 All notable changes to the `mm-wiki-status` skill are documented here.
 
-## [Unreleased]
+## [1.0.0] - 2026-08-01
 
 ### Added
 - Initial release: read-only metrics, lightweight health summary, and
