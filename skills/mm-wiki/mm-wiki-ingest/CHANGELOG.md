@@ -4,6 +4,25 @@ All notable changes to the `mm-wiki-ingest` skill are documented here.
 
 ## [Unreleased]
 
+### Changed
+- Distillation Depth (golden middle): ingest now keeps one short code example
+  per key idea, preserves comparison tables, retains one "why" per block, files
+  gotchas as their own block, and ends pages with a depth-pointer to the raw
+  source — see the new Content Depth section in `references/wiki-conventions.md`.
+- Enrichment carve-out: a page materially thinner than its source may be
+  rewritten to meet the depth bar (guarded by not touching user-authored blocks,
+  an `enriched::` marker, and append-and-flag when unsure) — previously the
+  never-overwrite rule made over-compressed pages unfixable.
+- Language: section headings are structural keys and may follow the wiki's
+  canonical heading language (e.g. EN headings over a RU body); body stays in
+  the source language.
+- Conventions layout: ingest now reads the synced family-wide
+  `references/wiki-conventions.md` plus a hand-maintained
+  `references/wiki-conventions.extra.md` (ingest flow, `inbox_dir`/`raw_dir`,
+  language policy). The `overrides/` mechanism was removed; shared assets are
+  synced generically from `shared/*`.
+- Version bumped to 1.3.0.
+
 ### Added
 - Language policy: page content, hub-index descriptions, and tags follow the
   source material's language (do not translate); only structural keys (property

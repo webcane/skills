@@ -14,9 +14,11 @@ skills/<skill-name>/    # Skill source files (git-tracked) — flat by default
   CHANGELOG.md          # Per-skill changelog (this skill's history only)
   README.md             # Optional: user-facing documentation
 skills/mm-wiki/         # Logical family home for the mm-wiki-* skills
-  shared/               # Canonical shared assets (conventions, scanner) — single source of truth
-  overrides/            # Per-skill variants of shared files (e.g. ingest's extended conventions)
+  shared/               # Canonical conventions/docs — copied to every member's references/
+  scripts/              # Canonical family scripts (e.g. wiki_scan.py) — copied to scanner members' scripts/
   mm-wiki-<skill>/      # Member skill dirs (packaged/installed as flat mm-wiki-<skill>)
+                        #   references/* and scripts/* synced; per-skill extras (e.g. ingest's
+                        #   wiki-conventions.extra.md) are hand-maintained
 dist/                   # Generated output (gitignored for .skill files)
 scripts/                # Packaging and installation shell scripts
 CHANGELOG.md            # Repo-tooling changelog only (scripts/CI/layout)
@@ -35,10 +37,14 @@ holds canonical assets that the member skills consume, and each member lives in
 - Artifact and install names are always the **flat basename** — e.g.
   `dist/mm-wiki-ingest.skill`, `~/.claude/skills/mm-wiki-ingest`, tag
   `mm-wiki/mm-wiki-ingest/v1.2.0`.
-- Shared assets are single-sourced in `skills/<family>/shared/` (and
-  `overrides/`) and pushed into member skill dirs by a family sync script:
-  `bash scripts/sync-mm-wiki.sh` (or `--check` to verify no drift). **Never
-  hand-edit the managed copies** inside a member skill — they are generated.
+- Shared assets are single-sourced in `skills/<family>/shared/` and
+  `skills/<family>/scripts/`: the family sync script `scripts/sync-mm-wiki.sh`
+  copies **every file in `shared/*`** into each member skill's `references/`,
+  and **every file in `scripts/*`** into the scanner members' `scripts/` (lint /
+  prune / status). Run with `--check` to verify no drift. **Never hand-edit the
+  synced copies** inside a member skill — they are generated. Per-skill custom
+  files (e.g. `mm-wiki-ingest/references/wiki-conventions.extra.md`) are
+  hand-maintained and never overwritten by the sync.
 - The packaging scripts (`package-skill.sh`, `package-skill-claudeai.sh`,
   `install-local.sh`, `release-skill.sh`) and CI already resolve nested skills:
   they locate skills by `SKILL.md` (recursive) and derive flat artifact names

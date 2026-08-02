@@ -23,28 +23,34 @@ assets.
 skills/mm-wiki/
 ├── README.md                  ← this file (family overview)
 ├── MANIFEST.md                ← which skill consumes which shared asset
-├── shared/                    ← canonical shared assets (single source of truth)
-│   ├── wiki-conventions.md    ← canonical conventions (5 skills)
-│   └── wiki_scan.py           ← shared scanner (lint / prune / status)
-├── overrides/                 ← per-skill variants of shared files
-│   └── mm-wiki-ingest.wiki-conventions.md   ← ingest's extended conventions
+├── shared/                    ← canonical conventions/docs (single source of truth)
+│   └── wiki-conventions.md    ← copied to every member's references/
+├── scripts/                   ← canonical family scripts
+│   └── wiki_scan.py           ← single scanner (lint / prune / status)
 └── mm-wiki-<skill>/           ← self-contained skill dirs (packaged as-is)
+    ├── references/
+    │   ├── wiki-conventions.md         ← synced from shared/
+    │   └── wiki-conventions.extra.md   ← INGEST ONLY: hand-maintained ingest rules
+    └── scripts/wiki_scan.py            ← lint / prune / status only, synced from scripts/
 ```
 
 ## Editing shared assets
 
-Do **not** hand-edit the copies inside `skills/mm-wiki/mm-wiki-<skill>/` — they
-are generated from `shared/` (and `overrides/`) by `scripts/sync-mm-wiki.sh`.
-Edit the canonical file here, then run:
+Do **not** hand-edit the synced copies inside a member skill (`references/` and
+`scripts/`) — they are generated from `shared/*` and `scripts/*` by
+`scripts/sync-mm-wiki.sh`. Edit the canonical file in `shared/` (or `scripts/`),
+then run:
 
 ```bash
 bash scripts/sync-mm-wiki.sh          # push canonical → all member skills
 bash scripts/sync-mm-wiki.sh --check  # verify no drift (exit 1 if any)
 ```
 
-`sync-mm-wiki.sh` only ever writes the *managed* files listed in `MANIFEST.md`
-(`references/wiki-conventions.md`, `scripts/wiki_scan.py`). `SKILL.md` and
-`CHANGELOG.md` are never touched by the sync.
+`sync-mm-wiki.sh` only ever writes files that exist in the canonical pools:
+`shared/*` → every member's `references/`, `scripts/*` → the scanner members'
+`scripts/` (lint / prune / status). `SKILL.md`, `CHANGELOG.md`, and per-skill
+custom references (e.g. `mm-wiki-ingest/references/wiki-conventions.extra.md`)
+are never touched by the sync.
 
 ## Packaging note
 

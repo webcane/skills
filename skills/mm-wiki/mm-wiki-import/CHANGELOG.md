@@ -2,6 +2,14 @@
 
 All notable changes to the `mm-wiki-import` skill are documented here.
 
+## [Unreleased]
+
+### Changed
+- Adopts the family-wide Content Depth (Distillation Depth) standard from the
+  shared conventions: bulk-imported pages keep code examples, comparison tables,
+  one "why" per block, gotchas blocks, and a depth-pointer to the source instead
+  of being compressed to fact-headings.
+
 ## [1.0.0] - 2026-08-01
 
 ### Added

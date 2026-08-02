@@ -23,6 +23,10 @@ and each skill is versioned and released independently.
 - CI (`package-skills.yml`): `package-all` now finds every `SKILL.md` recursively and tars from each skill's parent dir with the flat basename; `release-skill` parses nested tags (`mm-wiki/mm-wiki-ingest/v1.2.0`) and uploads assets under the flat basename
 - Bumped CI actions to Node.js 24-compatible versions: `actions/checkout@v5`, `actions/upload-artifact@v6`
 - Switched to **per-skill versioning**: each skill carries its version in `SKILL.md` frontmatter (`metadata.version`), keeps its own `CHANGELOG.md`, and is released under a namespaced tag `<skill>/v<version>`
+- `scripts/sync-mm-wiki.sh`: generalized — copies **every file in `skills/mm-wiki/shared/*`** into every member skill's `references/`, and **every file in `skills/mm-wiki/scripts/*`** into the scanner members' `scripts/` (lint / prune / status) — a single `wiki_scan.py`, not copied to everyone (replaces the hardcoded file→destination table). Dropped the `overrides/` mechanism; ingest-specific rules moved to a hand-maintained `mm-wiki-ingest/references/wiki-conventions.extra.md`
+
+### Removed
+- `skills/mm-wiki/overrides/` — the per-skill override mechanism; shared assets are now single-sourced in `shared/` and synced generically into all members' `references/`
 - `package-skill.sh` now reads the version from `SKILL.md` frontmatter when no version argument is passed
 - CI (`package-skills.yml`) parses the release tag, packages and uploads only the tagged skill, and promotes that skill's `[Unreleased]` CHANGELOG section to a versioned one
 - Synced `README.md`, `QUICK_START.md`, and `CLAUDE.md` to the per-skill release workflow

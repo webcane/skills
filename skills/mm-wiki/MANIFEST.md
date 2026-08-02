@@ -1,26 +1,33 @@
 # mm-wiki shared-asset manifest
 
-Managed files are copied from `shared/` (or `overrides/`) into each member
-skill by `scripts/sync-mm-wiki.sh`. **Only these files are managed** — anything
-else inside a member skill dir (`SKILL.md`, `CHANGELOG.md`, per-skill
-references) is hand-maintained and never overwritten by the sync.
+Managed files are copied from two canonical pools by `scripts/sync-mm-wiki.sh`:
+
+1. `shared/*` — conventions/docs: copied into **every member's `references/`**
+   (only `wiki-conventions.md` today).
+2. `scripts/*` (family-level) — executable helpers: copied only into the
+   scanner members' `scripts/` (lint, prune, status) — a single scanner, not
+   duplicated to everyone.
+
+**Only files that exist in these pools are managed** — anything else inside a
+member skill dir (`SKILL.md`, `CHANGELOG.md`, and per-skill custom references)
+is hand-maintained and never overwritten by the sync.
 
 ## File → consumers
 
 | Canonical source | Destinations (inside each `skills/mm-wiki/mm-wiki-<skill>/`) |
 |---|---|
-| `shared/wiki-conventions.md` | `mm-wiki-import/references/wiki-conventions.md`, `mm-wiki-query/references/wiki-conventions.md`, `mm-wiki-lint/references/wiki-conventions.md`, `mm-wiki-prune/references/wiki-conventions.md`, `mm-wiki-status/references/wiki-conventions.md` |
-| `overrides/mm-wiki-ingest.wiki-conventions.md` | `mm-wiki-ingest/references/wiki-conventions.md` (canonical + ingest-flow section) |
-| `shared/wiki_scan.py` | `mm-wiki-lint/scripts/wiki_scan.py`, `mm-wiki-prune/scripts/wiki_scan.py`, `mm-wiki-status/scripts/wiki_scan.py` |
+| `shared/wiki-conventions.md` | `references/wiki-conventions.md` — in ALL six members (ingest, import, query, lint, prune, status) |
+| `scripts/wiki_scan.py` | `scripts/wiki_scan.py` — in the scanner members only (mm-wiki-lint, mm-wiki-prune, mm-wiki-status) |
 
-## Why ingest has an override
+## Per-skill custom files (hand-maintained, not synced)
 
 `mm-wiki-ingest` is the only member that reads `inbox/` and writes `raw/` (the
-dropzone cycle). Its `wiki-conventions.md` therefore extends the canonical file
-with the "Ingest Flow: inbox → raw → pages" section and the `inbox_dir` /
-`raw_dir` config keys. Rather than making the canonical file carry
-ingest-specific content for all five other skills, the extended variant lives
-in `overrides/` and is copied verbatim to `mm-wiki-ingest`.
+dropzone cycle). Its ingest-specific rules live in a hand-maintained sibling
+file that the sync never touches:
+
+- `mm-wiki-ingest/references/wiki-conventions.extra.md` — the "Ingest Flow:
+  inbox → raw → pages" section, the `inbox_dir` / `raw_dir` config keys, and the
+  language policy. Read alongside the synced `wiki-conventions.md`.
 
 ## Drift detection
 

@@ -148,6 +148,35 @@ if the wiki has none yet:
 If the wiki's own `Wiki/Schema` page defines different types/properties, follow
 that instead — this table is only the fallback for a brand-new wiki.
 
+## Content Depth (Distillation Depth)
+
+Distillation is compression, not amputation. Terseness applies to prose and
+redundancy, never to demonstrations — dropping a working example or a comparison
+table throws away the source's payload, not its fluff. A page should be
+self-sufficient to re-read, not an index of fact-headings. Apply this bar
+whenever content is written or updated (ingest, import).
+
+- **One short code example per key idea**, for sources with runnable concepts
+  (code, commands, config). A 5-10 line snippet usually teaches more than five
+  bullets. Code blocks are first-class Logseq blocks (fenced triple-backticks
+  inside a block).
+- **Preserve comparison tables.** A side-by-side table is more compact AND more
+  informative than flattened bullets — do not unfold it into a list or drop it.
+- **Keep one "why" per meaningful block.** Where the source explains rationale,
+  keep at least one reason, not just the conclusion. A fact without its "why"
+  is a shard; a shard does not compound.
+- **Gotchas / pitfalls get their own block**, not a compressed one-liner. These
+  are usually the highest-value lines on the page.
+- **End with a depth-pointer to the raw source** when one exists:
+  `Полный разбор с примерами → raw/<filename>` (in the page's language). Raw is
+  append-only and never re-read — the pointer keeps it reachable for depth
+  without routing through it.
+- **When to stop:** keep it scannable. Enrich with demonstrations and rationale,
+  not with restated prose. If the source is thin, the page is thin — do not pad.
+
+Compression is one-way unless a page is materially thinner than its source; for
+the repair path see the enrichment carve-out under Constraints.
+
 ## Constraints (apply to every skill in this family)
 
 - **Never store credentials, tokens, or passwords in the wiki.** It is normally
@@ -157,6 +186,13 @@ that instead — this table is only the fallback for a brand-new wiki.
   contradicts an existing one, add a new block noting the contradiction and the
   date rather than deleting the old one. The user edits pages by hand too — don't
   clobber that.
+  - **Enrichment carve-out:** a page that is materially thinner than its own
+    source (missing demonstrations, tables, "why" — see Content Depth above)
+    MAY be rewritten/expanded to meet the depth bar. Guardrails: never touch
+    blocks the user wrote by hand; mark the enrichment with an
+    `enriched:: YYYY-MM-DD` property; when unsure whether a block is
+    user-authored, append + flag instead of rewriting. This is how
+    already-distilled pages get un-compressed.
 - **Never touch files outside the wiki** (journals, unrelated notes, source repos).
 - **Demotion (`archived::`) is never a rename or a move.** Logseq links by page
   name; moving or renaming a file breaks every incoming `[[link]]` across the whole

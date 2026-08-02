@@ -14,7 +14,7 @@ description: >
   (mm-wiki-ingest/query/prune/lint/status/import) targeting Logseq; works from any coding agent or
   chat, not only Claude Code.
 metadata:
-  version: 1.2.0
+  version: 1.3.0
 ---
 
 # mm-wiki-ingest
@@ -29,10 +29,12 @@ This skill runs on a **dropzone-driven cycle**: sources land in the wiki's `inbo
 `inbox/`, and once a source is fully processed you archive it byte-for-byte into `raw/` (append-only,
 never re-read). Nothing gets re-read on a later run — the read-path stays tiny.
 
-Read **`references/wiki-conventions.md`** now if you haven't already this session — it defines the
-inbox/raw layout, the Logseq file format, the Hub-Index-Routing scheme, the Access-Log, and the
-constraints (never overwrite content, never store credentials, dates in ISO 8601) that every step
-below assumes.
+Read **`references/wiki-conventions.md`** and **`references/wiki-conventions.extra.md`** now if you
+haven't already this session. The first is the synced family-wide reference: the Logseq file format,
+the Hub-Index-Routing scheme, the Access-Log, the Content Depth standard (how much demonstration to
+keep — the "golden middle"), and the constraints (never overwrite content, never store credentials,
+dates in ISO 8601). The second is the ingest-only supplement: the inbox → raw → pages flow, the
+`inbox_dir`/`raw_dir` config keys, and the language policy.
 
 ## Step 0: Find and Read the Config
 
@@ -95,8 +97,20 @@ source for findings you skipped); more than 20 usually means you're over-fragmen
 facts onto fewer, richer pages instead of one page per sentence.
 
 Write page content in the **same language as the source material** — do not translate. Only the
-structural keys stay in English (property names, page filenames, `[[links]]`), per the conventions
-reference.
+structural keys stay in English (property names, page filenames, `[[links]]`, and section headings,
+which may follow the wiki's canonical heading language — e.g. EN headings over a RU body), per the
+conventions reference.
+
+**Distillation Depth — the golden middle.** Follow the Content Depth section in
+`references/wiki-conventions.md`: compression applies to prose and redundancy, never to
+demonstrations. Concretely, when the source has runnable concepts:
+
+- **1 short code example per key idea** (5-10 lines) — it usually teaches more than five bullets.
+- **Preserve comparison tables** — do not flatten into bullets or drop them.
+- **Keep one "why" per meaningful block** where the source explains rationale.
+- **Gotchas / pitfalls as their own block**, not a compressed one-liner.
+- **End with a depth-pointer** when a `raw/` source exists: `Полный разбор с примерами → raw/<name>`.
+- A page that only lists fact-headings is under-distilled; a page that re-reads well is the goal.
 
 - **New pages**: include every property the Schema requires for that type (`type::`, `created::`,
   plus type-specific ones — see the conventions reference's Schema table if this wiki has none of its
@@ -106,6 +120,10 @@ reference.
   block — if new information contradicts something already there, add a block noting the contradiction
   and today's date, and let a human resolve it later. The user edits this wiki by hand too; silently
   overwriting their edits breaks trust in the whole system.
+  - **Enrichment carve-out**: a page materially thinner than its own source (missing
+    demonstrations/tables/"why" — see Content Depth) MAY be rewritten to meet the depth bar.
+    Guardrails: never touch blocks the user wrote by hand; mark with `enriched:: YYYY-MM-DD`; when
+    unsure a block is user-authored, append + flag instead of rewriting.
 - **Hub routing line (required for every page you create or meaningfully refocus)**: in the page's
   namespace hub, under `### Index`, add or refresh the line:
   `[[Wiki/NS/Page]] -- <one-sentence description, <=120 chars> #tag #tag`.
@@ -146,6 +164,11 @@ drifted. (If this wiki prefers, a section in `Wiki/Schema` instead.)
 - [ ] Page-touch count is in the 5-15 range, or you have a good reason it isn't
 - [ ] Every fully-processed source file was archived to `raw/` byte-for-byte; nothing processed was
       left behind in `inbox/`
+- [ ] Pages with runnable concepts carry ≥1 code example (or a justified exception — a pure-concept
+      page with nothing to demonstrate)
+- [ ] Comparisons the source presented as tables are still tables, not flattened bullets
+- [ ] Key blocks carry a "why" where the source explains rationale
+- [ ] Enriched pages carry an `enriched::` marker and a depth-pointer to `raw/<source>`
 
 If `wiki_path` is a git repository, commit the change now (`inbox/` and `raw/` are gitignored, so the
 commit carries only pages/hub/workflow-doc changes — skip silently if there's no git repo or your
@@ -156,3 +179,5 @@ environment has no git access).
 Tell the user: pages created (with names), pages updated (with a one-line summary of what was added to
 each), cross-references added, files archived to `raw/` (with names), any files left in `inbox/` and
 why, and anything you skipped (credentials, judged-not-worth-filing, or L1 recommendations instead).
+Also report depth for spot-checking: which pages were enriched (`enriched::` marker), and how many
+code examples, tables, and depth-pointers were added.
