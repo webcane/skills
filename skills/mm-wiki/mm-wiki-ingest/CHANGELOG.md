@@ -2,7 +2,7 @@
 
 All notable changes to the `mm-wiki-ingest` skill are documented here.
 
-## [Unreleased]
+## [1.3.0] - 2026-08-03
 
 ### Changed
 - Distillation Depth (golden middle): ingest now keeps one short code example
