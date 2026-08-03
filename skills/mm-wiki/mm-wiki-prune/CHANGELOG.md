@@ -2,7 +2,7 @@
 
 All notable changes to the `mm-wiki-prune` skill are documented here.
 
-## [Unreleased]
+## [1.0.0] - 2026-08-03
 
 ### Changed
 - Adopts the family-wide Content Depth (Distillation Depth) standard from the
