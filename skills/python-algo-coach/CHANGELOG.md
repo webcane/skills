@@ -5,6 +5,12 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.1.0/),
 версионирование — [SemVer](https://semver.org/lang/ru/).
 
+## [1.1.0] - 2026-08-04
+
+### Added
+- Задача `reverse_string` (LeetCode 344, Easy, паттерн «два указателя»): банк
+  вырос до 41 задачи, добавлено 6 тест-кейсов и эталонное решение.
+
 ## [1.0.0] - 2026-07-30
 
 ### Added
