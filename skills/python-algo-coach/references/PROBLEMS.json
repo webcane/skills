@@ -1009,6 +1009,32 @@
         {"args": [[1]], "expected": [1]},
         {"args": [[1, 2]], "expected": [2]}
       ]
+    },
+    {
+      "id": "reverse_string",
+      "title": "Reverse String",
+      "leetcode": 344,
+      "difficulty": "easy",
+      "patterns": ["two_pointers"],
+      "func": "reverse_string",
+      "signature": "def reverse_string(s: str) -> str",
+      "statement": "Напиши функцию, которая разворачивает строку s и возвращает результат.",
+      "target": {"time": "O(n)", "space": "O(n)"},
+      "trap": "s[::-1] даёт верный ответ, но на интервью часто просят без встроенных методов. Ключ — техника «два указателя» на списке символов.",
+      "hints": [
+        "Строки в Python неизменяемы. Во что удобно превратить строку, чтобы менять символы местами?",
+        "Два указателя: left с начала, right с конца. Меняй символы и сдвигайся к центру.",
+        "chars = list(s); while left < right: chars[left], chars[right] = chars[right], chars[left]; left += 1; right -= 1; return ''.join(chars)."
+      ],
+      "compare": "exact",
+      "tests": [
+        {"args": ["hello"], "expected": "olleh"},
+        {"args": ["Hello, World!"], "expected": "!dlroW ,olleH"},
+        {"args": ["a"], "expected": "a"},
+        {"args": [""], "expected": ""},
+        {"args": ["racecar"], "expected": "racecar"},
+        {"args": ["1234567890"], "expected": "0987654321"}
+      ]
     }
   ]
 }

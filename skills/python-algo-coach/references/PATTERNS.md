@@ -171,7 +171,8 @@ while fast and fast.next:      # это условие даёт ВТОРОЙ ц�
 Условие в fast/slow определяет, какой из двух центральных узлов ты получишь.
 
 Задачи: `container_with_most_water`, `move_zeroes`, `remove_element`,
-`squares_of_a_sorted_array`, `valid_palindrome`, `middle_of_the_linked_list`.
+`squares_of_a_sorted_array`, `valid_palindrome`, `middle_of_the_linked_list`,
+`reverse_string`.
 
 ---
 
