@@ -24,7 +24,10 @@ SKILL_NAME="${1:-}"
 if [ -z "$SKILL_NAME" ]; then
   SKILL_NAMES=()
   while IFS= read -r f; do
-    SKILL_NAMES+=("${f#$SKILLS_DIR/}")
+    # Strip skills/ prefix and trailing /SKILL.md so the offered name is the
+    # skill's directory relative to skills/ (e.g. mm-wiki/mm-wiki-ingest).
+    rel="${f#$SKILLS_DIR/}"
+    SKILL_NAMES+=("${rel%/SKILL.md}")
   done < <(find "$SKILLS_DIR" -name SKILL.md | sort)
 
   echo "Choose a skill to release:"

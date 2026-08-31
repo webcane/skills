@@ -33,6 +33,7 @@ and each skill is versioned and released independently.
 - `CLAUDE.md`: updated release workflow docs — clarified that `release-skill.sh` promotes CHANGELOG locally; added explicit rule against writing versioned headers by hand; repositioned CI as fallback for manual tag pushes
 
 ### Fixed
+- `scripts/install-local.sh`, `scripts/release-skill.sh`: interactive picker built the skill list from full `find` paths including the trailing `/SKILL.md`, so selecting a nested skill (e.g. `mm-wiki/mm-wiki-import`) produced `$SKILLS_DIR/mm-wiki/mm-wiki-import/SKILL.md/SKILL.md` and failed with "not found". The picker now strips the `/SKILL.md` suffix, offering the skill's directory relative to `skills/` (e.g. `mm-wiki/mm-wiki-import`), matching how `package-skill.sh` and the rest of the pipeline resolve the path
 - `scripts/release-skill.sh`: promotes `[Unreleased]` CHANGELOG locally before tagging so CI's promotion step is always a no-op — eliminates post-release push that diverged local master from origin
 - `scripts/release-skill.sh`: `git fetch origin master --tags` so remote-only tags are detected by the tag-existence guard before any modifications are made
 - `scripts/release-skill.sh`: guard — aborts if local master is behind `origin/master` before any changes are made
