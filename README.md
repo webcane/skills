@@ -93,6 +93,7 @@ truncated to fit, with a warning.
 | [thesis-to-text](skills/thesis-to-text/) | Interactive wizard that turns raw theses/notes into a finished, audience-ready text |
 | [python-quiz](skills/python-quiz/) | Интерактивный квиз по Python по .md файлам в директории: выбор, открытые вопросы, задача на код, таймер и оценка в % |
 | [python-algo-coach](skills/python-algo-coach/) | Тренер по алгоритмам на Python (LeetCode Easy/Medium): 41 задача, 14 паттернов, прогон решений через тестовый харнесс |
+| [pes](skills/pes/) | Personal Management Lifecycle (Strategic/Tactical/Operational) agent over Apple Reminders + Calendar via MCP — WIP limits, Expected-Outcome gates, Results-vs-Activity tracking |
 | [mm-wiki-ingest](skills/mm-wiki/mm-wiki-ingest/) | Distill source material into a Logseq wiki with hub-index routing and cross-references |
 | [mm-wiki-query](skills/mm-wiki/mm-wiki-query/) | Read-only two-stage (hub-index then targeted-read) search and synthesis over a Logseq wiki |
 | [mm-wiki-prune](skills/mm-wiki/mm-wiki-prune/) | LRU-Demote: evict cold pages from live hub indexes into an archive section |
