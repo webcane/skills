@@ -16,6 +16,14 @@ assets.
 | `mm-wiki-lint` | Structural health check: orphans, stale content, broken links, index drift, credentials |
 | `mm-wiki-status` | Metrics + health overview (page counts, hot/cold profile) |
 | `mm-wiki-import` | Bulk-import a whole folder of pre-existing markdown (e.g. Slab export) |
+| `mm-wiki-reading-list` | Pull books from a macOS Reminders list, generate conspects from the wiki's own prompts, file them through `mm-wiki-ingest` |
+
+The family is agent-agnostic with one deliberate exception: `mm-wiki-reading-list` drives
+macOS **Reminders** through the `apple-events` MCP server and uses the host agent's
+`Skill` / `Agent` tools, so it runs in Claude Code only — with the sibling
+`mm-wiki-ingest` (the only writer) and `mm-wiki-query` (duplicate detection) installed
+alongside it. What it can't take from a sibling (the MCP schemas, the tag caveat) is
+vendored into its own `references/`, so it carries no runtime dependency on `pes`.
 
 ## Layout
 
@@ -29,8 +37,10 @@ skills/mm-wiki/
 │   └── wiki_scan.py           ← single scanner (lint / prune / status)
 └── mm-wiki-<skill>/           ← self-contained skill dirs (packaged as-is)
     ├── references/
-    │   ├── wiki-conventions.md         ← synced from shared/
-    │   └── wiki-conventions.extra.md   ← INGEST ONLY: hand-maintained ingest rules
+    │   ├── wiki-conventions.md         ← synced from shared/ (every member)
+    │   ├── wiki-conventions.extra.md   ← INGEST ONLY: hand-maintained ingest rules
+    │   ├── mcp-apple-events.md         ← READING-LIST ONLY: vendored MCP subset
+    │   └── role-prompts.md             ← READING-LIST ONLY: category criteria
     └── scripts/wiki_scan.py            ← lint / prune / status only, synced from scripts/
 ```
 

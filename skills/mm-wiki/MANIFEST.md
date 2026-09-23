@@ -16,7 +16,7 @@ is hand-maintained and never overwritten by the sync.
 
 | Canonical source | Destinations (inside each `skills/mm-wiki/mm-wiki-<skill>/`) |
 |---|---|
-| `shared/wiki-conventions.md` | `references/wiki-conventions.md` — in ALL six members (ingest, import, query, lint, prune, status) |
+| `shared/wiki-conventions.md` | `references/wiki-conventions.md` — in ALL seven members (ingest, import, query, lint, prune, status, reading-list) |
 | `scripts/wiki_scan.py` | `scripts/wiki_scan.py` — in the scanner members only (mm-wiki-lint, mm-wiki-prune, mm-wiki-status) |
 
 ## Per-skill custom files (hand-maintained, not synced)
@@ -28,6 +28,17 @@ file that the sync never touches:
 - `mm-wiki-ingest/references/wiki-conventions.extra.md` — the "Ingest Flow:
   inbox → raw → pages" section, the `inbox_dir` / `raw_dir` config keys, and the
   language policy. Read alongside the synced `wiki-conventions.md`.
+
+`mm-wiki-reading-list` carries two hand-maintained references of its own — the sync
+never touches them and no other member reads them:
+
+- `mm-wiki-reading-list/references/mcp-apple-events.md` — the Apple Events MCP
+  subset this skill depends on (pre-flight and permission errors,
+  `reminders_lists` / `reminders_tasks` fields, the `[#tag]`-in-`note` tag caveat),
+  vendored so the skill is self-contained and needs no `pes` rule files at runtime.
+- `mm-wiki-reading-list/references/role-prompts.md` — human-readable criteria for
+  the `Wiki/Prompts/*-Book-Brief` categories; the mechanism stays the tag grep in
+  the wiki.
 
 ## Drift detection
 

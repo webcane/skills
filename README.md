@@ -101,6 +101,7 @@ truncated to fit, with a warning.
 | [mm-wiki-lint](skills/mm-wiki/mm-wiki-lint/) | Structural health check for a Logseq wiki (orphans, broken links, index drift, credential leaks) |
 | [mm-wiki-status](skills/mm-wiki/mm-wiki-status/) | Metrics, health, and hot/cold access-profile dashboard for a Logseq wiki |
 | [mm-wiki-import](skills/mm-wiki/mm-wiki-import/) | Bulk-import existing markdown notes (incl. Slab exports) into a Logseq wiki |
+| [mm-wiki-reading-list](skills/mm-wiki/mm-wiki-reading-list/) | Pull books from a macOS Reminders list via MCP, generate conspects from the wiki's own prompts, file them through mm-wiki-ingest |
 
 The mm-wiki skills are grouped under [skills/mm-wiki/](skills/mm-wiki/) — their
 [shared assets](skills/mm-wiki/MANIFEST.md) (conventions, scanner) are kept there

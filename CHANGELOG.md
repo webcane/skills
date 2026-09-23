@@ -7,6 +7,7 @@ and each skill is versioned and released independently.
 ## [Unreleased]
 
 ### Added
+- `skills/mm-wiki/mm-wiki-reading-list/`: новый член семейства mm-wiki — книги из macOS Reminders через MCP `apple-events` → конспекты в вики через `mm-wiki-ingest`; три режима (`list`/`single`/`full`), MCP-справка и критерии категорий вендорены в `references/` (без рантайм-зависимости от `pes`), зависимости объявлены в `compatibility`
 - `skills/python-quiz/`: новый скилл — интерактивный тест Python по .md файлам в директории (single/multi-choice, short answer, coding task, bash-таймер, разбор ошибок)
 - `scripts/release-skill.sh`: packages skill before release and uploads `.skill` + versioned `.skill` + `.json` metadata as release assets via `gh release create`
 - `scripts/release-skill.sh`: tags, pushes, and creates a GitHub release for a skill, with an interactive picker when no skill name is given. Reads the version from `SKILL.md` frontmatter (`metadata.version`), tags `<skill-name>/v<version>`, and runs `gh release create` non-interactively using the skill's `[Unreleased]` CHANGELOG section as release notes (falling back to a title-only message)
