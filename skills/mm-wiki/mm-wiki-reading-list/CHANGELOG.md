@@ -2,7 +2,7 @@
 
 All notable changes to the `mm-wiki-reading-list` skill are documented here.
 
-## [Unreleased]
+## [1.0.0] - 2026-09-23
 
 ### Added
 - Initial release in this repository: Reminders → book conspects pipeline for a Logseq
