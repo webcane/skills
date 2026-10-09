@@ -154,7 +154,6 @@ Add it to the Skills table in `README.md`. CI packages it automatically on push.
 
 Releasing is handled by `release-skill.sh` (promotes `[Unreleased]` locally before tagging). CI is a fallback for manually-pushed tags. Never promote a CHANGELOG section by hand — always write under `[Unreleased]` and let the script do it.
 
-<!-- GSD:stack-start source:codebase/STACK.md -->
 ## Technology Stack
 
 ## Summary
@@ -203,9 +202,7 @@ Releasing is handled by `release-skill.sh` (promotes `[Unreleased]` locally befo
 - PyYAML install method not specified — assumed pre-installed or available via system Python on the developer's machine and CI runner
 - `install-skill.sh` and `install-local.sh` were not read in detail; their dependencies (e.g. curl, specific install dirs) are not fully mapped
 - No lockfile for any language runtime — Python version not pinned
-<!-- GSD:stack-end -->
 
-<!-- GSD:conventions-start source:CONVENTIONS.md -->
 ## Conventions
 
 ## Summary
@@ -248,9 +245,7 @@ Releasing is handled by `release-skill.sh` (promotes `[Unreleased]` locally befo
 - No linting or formatting tools configured (no `.eslintrc`, `.prettierrc`, `pyproject.toml`)
 - No enforced commit message hook (conventions are by practice, not tooling)
 - `color` field in frontmatter appears optional; no documented list of valid values
-<!-- GSD:conventions-end -->
 
-<!-- GSD:architecture-start source:ARCHITECTURE.md -->
 ## Architecture
 
 ## System Overview
@@ -330,30 +325,7 @@ Releasing is handled by `release-skill.sh` (promotes `[Unreleased]` locally befo
 - Missing version in frontmatter: scripts exit 1 with guidance to add `metadata.version`
 - Tag already exists: `release-skill.sh` detects and exits before pushing
 - CI tag format mismatch: workflow exits with `::error::` annotation
-<!-- GSD:architecture-end -->
 
-<!-- GSD:skills-start source:skills/ -->
 ## Project Skills
 
 No project skills found. Add skills to any of: `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, `.github/skills/`, or `.codex/skills/` with a `SKILL.md` index file.
-<!-- GSD:skills-end -->
-
-<!-- GSD:workflow-start source:GSD defaults -->
-## GSD Workflow Enforcement
-
-Before using Edit, Write, or other file-changing tools, start work through a GSD command so planning artifacts and execution context stay in sync.
-
-Use these entry points:
-- `/gsd-quick` for small fixes, doc updates, and ad-hoc tasks
-- `/gsd-debug` for investigation and bug fixing
-- `/gsd-execute-phase` for planned phase work
-
-Do not make direct repo edits outside a GSD workflow unless the user explicitly asks to bypass it.
-<!-- GSD:workflow-end -->
-
-<!-- GSD:profile-start -->
-## Developer Profile
-
-> Profile not yet configured. Run `/gsd-profile-user` to generate your developer profile.
-> This section is managed by `generate-claude-profile` -- do not edit manually.
-<!-- GSD:profile-end -->
