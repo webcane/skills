@@ -14,7 +14,8 @@ description: >
   (mm-wiki-ingest/query/prune/lint/status/import) targeting Logseq; works from any coding agent or
   chat, not only Claude Code.
 metadata:
-  version: 1.3.0
+  version: 1.4.0
+  author: mniedre
 ---
 
 # mm-wiki-ingest

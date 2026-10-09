@@ -8,7 +8,8 @@ description: >
   problems before they compound. Reports findings by severity; only writes to files when the user adds
   `--fix`. Part of the mm-wiki-* skill family, targets Logseq, works from any coding agent or chat.
 metadata:
-  version: 1.0.0
+  version: 1.1.0
+  author: mniedre
 ---
 
 # mm-wiki-lint

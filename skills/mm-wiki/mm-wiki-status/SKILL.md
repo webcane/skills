@@ -8,7 +8,8 @@ description: >
   mm-wiki-lint. Read-only — makes no changes. Part of the mm-wiki-* skill family, targets Logseq,
   works from any coding agent or chat.
 metadata:
-  version: 1.0.0
+  version: 1.1.0
+  author: mniedre
 ---
 
 # mm-wiki-status

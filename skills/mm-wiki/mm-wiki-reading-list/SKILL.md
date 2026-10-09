@@ -19,7 +19,7 @@ compatibility: >
   (mcp-server-apple-events) connected in the project; sibling skills mm-wiki-ingest and
   mm-wiki-query installed; Claude Code (uses the Skill and Agent tools).
 metadata:
-  version: 1.0.0
+  version: 1.1.0
   author: mniedre
 ---
 
