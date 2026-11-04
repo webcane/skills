@@ -1,0 +1,41 @@
+# CLAUDE.md — cane-wiki
+
+Личная база знаний на Obsidian. Этот файл загружается автоматически в Claude Code.
+
+→ Правила содержимого: **AGENTS.md** (приоритет над инструкциями скилов).
+→ Значения и настройки агента: **llm-wiki.yml**. Смысл типов страниц: **Wiki/Schema.md**.
+→ Шаблоны страниц: `templates/`. Промпты разбора по категориям: см. `prompts` в `llm-wiki.yml`.
+
+## Репозиторий
+
+```
+cane-wiki/
+  Wiki/           # содержимое вики (tracked)
+  Daily Notes/    # ежедневные заметки (tracked)
+  templates/      # шаблоны страниц
+  AGENTS.md       # правила содержимого для LLM
+  CLAUDE.md       # этот файл
+  llm-wiki.yml    # конфиг агента cane-wiki
+  inbox/          # drop-zone новых источников (gitignored)
+  raw/            # архив источников (gitignored)
+  .claude/        # агент cane-wiki и скилы
+  .obsidian/      # частично tracked (app.json, templates.json, daily-notes.json)
+```
+
+## Агент cane-wiki
+
+Вики ведёт подагент `cane-wiki` (`.claude/agents/cane-wiki.md`). Режимы: `query`, `ingest`, `update`, `lint`, `prune`.
+
+Добавить страницу:
+
+1. Положить источник в `inbox/`.
+2. Вызвать агента в режиме `ingest`. Со словом «auto» в запросе он сам сделает коммит, без него вернёт готовую команду и ждёт подтверждения.
+3. Источник переедет из `inbox/` в `raw/`, страницы появятся в `Wiki/`.
+
+## Git workflow
+
+```bash
+git add Wiki/ "Daily Notes/" templates/
+git commit -m "<операция>: <тема>"   # например: ingest: Python decorators
+# inbox/ и raw/ в .gitignore — не добавлять
+```
