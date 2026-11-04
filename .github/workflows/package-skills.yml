@@ -121,10 +121,8 @@ jobs:
         run: |
           mkdir -p dist
           cp "agents/${{ steps.parse.outputs.agent }}/${{ steps.parse.outputs.agent }}.md" "dist/${{ steps.parse.outputs.agent }}-${{ steps.parse.outputs.version }}.md"
-          if [ "${{ steps.parse.outputs.agent }}" = "cane-wiki" ]; then
-            python3 scripts/build-codex-agent.py --check
-            cp agents/cane-wiki/cane-wiki.codex.toml "dist/cane-wiki-${{ steps.parse.outputs.version }}.toml"
-          fi
+          python3 scripts/build-codex-agent.py --check "${{ steps.parse.outputs.agent }}"
+          cp "agents/${{ steps.parse.outputs.agent }}/${{ steps.parse.outputs.agent }}.codex.toml" "dist/${{ steps.parse.outputs.agent }}-${{ steps.parse.outputs.version }}.toml"
       - name: Upload to release
         uses: softprops/action-gh-release@v2
         with:

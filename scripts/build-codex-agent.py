@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render a Codex custom agent from the cane-wiki Claude agent instructions."""
+"""Render Codex custom agents from their Claude agent instructions."""
 
 import json
 import sys
@@ -9,19 +9,19 @@ import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / "agents/cane-wiki/cane-wiki.md"
-TARGET = ROOT / "agents/cane-wiki/cane-wiki.codex.toml"
+AGENTS = ("cane-wiki", "cane-wiki-critic")
 
 
-def render() -> str:
-    parts = SOURCE.read_text().split("---", 2)
+def render(name: str) -> str:
+    source = ROOT / "agents" / name / f"{name}.md"
+    parts = source.read_text().split("---", 2)
     if len(parts) != 3:
-        raise ValueError(f"Missing frontmatter: {SOURCE}")
+        raise ValueError(f"Missing frontmatter: {source}")
     front = yaml.safe_load(parts[1])
-    if not isinstance(front, dict) or not front.get("name") or not front.get("description"):
-        raise ValueError("Agent needs name and description")
+    if not isinstance(front, dict) or front.get("name") != name or not front.get("description"):
+        raise ValueError(f"Agent needs matching name and description: {source}")
     return (
-        "# Generated from agents/cane-wiki/cane-wiki.md; edit that file instead.\n"
+        f"# Generated from agents/{name}/{name}.md; edit that file instead.\n"
         f"name = {json.dumps(front['name'], ensure_ascii=False)}\n"
         f"description = {json.dumps(front['description'], ensure_ascii=False)}\n"
         f"developer_instructions = {json.dumps(parts[2].lstrip(), ensure_ascii=False)}\n"
@@ -29,16 +29,21 @@ def render() -> str:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 2 or (len(sys.argv) == 2 and sys.argv[1] != "--check"):
-        sys.exit(f"Usage: {sys.argv[0]} [--check]")
-    try:
-        output = render()
-    except ValueError as exc:
-        sys.exit(f"Error: {exc}")
-    if len(sys.argv) == 2:
-        if not TARGET.exists() or TARGET.read_text() != output:
-            sys.exit("Codex agent differs from Claude source; run scripts/build-codex-agent.py")
-        print("✓ Codex agent matches Claude source")
-    else:
-        TARGET.write_text(output)
-        print("✓ Rendered Codex agent")
+    args = sys.argv[1:]
+    check = "--check" in args
+    names = [arg for arg in args if arg != "--check"] or list(AGENTS)
+    if args.count("--check") > 1 or any(name not in AGENTS for name in names):
+        sys.exit(f"Usage: {sys.argv[0]} [--check] [cane-wiki|cane-wiki-critic ...]")
+    for name in names:
+        target = ROOT / "agents" / name / f"{name}.codex.toml"
+        try:
+            output = render(name)
+        except ValueError as exc:
+            sys.exit(f"Error: {exc}")
+        if check:
+            if not target.exists() or target.read_text() != output:
+                sys.exit(f"Codex agent differs from Claude source: {name}")
+            print(f"✓ Codex agent matches Claude source: {name}")
+        else:
+            target.write_text(output)
+            print(f"✓ Rendered Codex agent: {name}")

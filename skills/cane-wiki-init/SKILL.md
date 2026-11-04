@@ -8,7 +8,7 @@ description: >
   вики», «создай vault для cane-wiki», «настрой llm-wiki», «проверь конфиг вики», «добавь
   категорию страниц», либо когда агенту не хватает Obsidian skills.
 metadata:
-  version: 0.1.0
+  version: 0.2.0
   author: mniedre
 ---
 
@@ -74,9 +74,9 @@ npx skills add https://github.com/kepano/obsidian-skills --skill obsidian-markdo
 
 Создай:
 
-1. **`llm-wiki.yml`** по образцу ключей: `tool`, `wiki_path`, `namespaces`, `excluded_from_git`, `root_pages`, `inbox_dir`, `raw_dir`, `index`, `log`, `access_log`, `query`, `prompts`, `update_policy`, `categories`, `lint`, `git`. Категории и `update` берутся из пресетов с учётом ответов; категории `hub` и `prompt` добавляются всегда (раздел `always` в `presets.yml`).
+1. **`llm-wiki.yml`** по образцу ключей: `tool`, `wiki_path`, `namespaces`, `excluded_from_git`, `root_pages`, `inbox_dir`, `raw_dir`, `index`, `log`, `access_log`, `query`, `prompts`, `update_policy`, `categories`, `lint`, `critic`, `git`. Категории и `update` берутся из пресетов с учётом ответов; категории `hub` и `prompt` добавляются всегда (раздел `always` в `presets.yml`). Для `critic` задай `report_dir: Daily Notes`, `exclude_namespaces: [Books, People, Companies, Meta, Interview]`, `exclude_types: [application, daily, hub, prompt, feedback, decision, schema]`, `target_pages_per_run: 100`. Значения можно менять в конфиге без правки агента.
 2. **`AGENTS.md`** из шаблона, с учётом языка. **`CLAUDE.md`** создавай только при работе в Claude Code. Не добавляй в них значения из конфига и не дублируй один документ в другом.
-3. **Каталоги**: `Wiki/`, `inbox/`, `raw/`, `templates/`; `Daily Notes/`, если выбрана категория `daily`.
+3. **Каталоги**: `Wiki/`, `inbox/`, `raw/`, `templates/` и каталог `critic.report_dir` (по умолчанию `Daily Notes/`).
 4. **`Wiki/Schema.md`** из шаблона: оставь только описание выбранных категорий.
 5. **Шаблоны страниц** `templates/<категория>.md` для выбранных категорий, у которых они есть в `references/templates/`.
 6. **Индекс**: при `hubs` корневой хаб на каждый неймспейс (`Wiki/<NS>.md` по форме хаба из `Schema.md`); при `single` файл `index.path`.
@@ -84,13 +84,13 @@ npx skills add https://github.com/kepano/obsidian-skills --skill obsidian-markdo
 8. **Промпты**: каталог `prompts.namespace` с промптами для выбранных категорий, у которых они есть в `references/prompts/`, и хаб этого неймспейса. Теги страниц: `agent-prompt` и имя категории.
 9. **`.gitignore`**: `inbox/` и `raw/` (добавь недостающие строки, существующие не трогай).
 10. **`.obsidian/app.json`**: `newLinkFormat: relative` по согласию пользователя. Если файл есть, меняй только эту настройку.
-11. **Агент**: в Claude Code установи `.claude/agents/cane-wiki.md` из `~/.claude/agents/cane-wiki.md` или `agents/cane-wiki/cane-wiki.md` в checkout. В Codex убедись, что доступен `~/.codex/agents/cane-wiki.toml` либо проектный `.codex/agents/cane-wiki.toml`; если нет, предложи `bash scripts/install-cane-wiki-codex.sh` из checkout. Агент вызывает `cane-wiki-init` для vault без `llm-wiki.yml`, при явной просьбе перенастроить его или при нехватке Obsidian skills.
+11. **Агенты**: в Claude Code установи `.claude/agents/cane-wiki.md` и `.claude/agents/cane-wiki-critic.md` из пользовательской установки или checkout. В Codex убедись, что доступны `~/.codex/agents/cane-wiki.toml` и `~/.codex/agents/cane-wiki-critic.toml` либо их проектные аналоги; если нет, предложи `bash scripts/install-cane-wiki-codex.sh` из checkout. `cane-wiki` вызывает `cane-wiki-init` для vault без `llm-wiki.yml`, при явной просьбе перенастроить его или при нехватке Obsidian skills.
 12. **Git**: предложи `git init`, если каталог не репозиторий.
 
 ## Шаг R: проверка и перенастройка существующей вики
 
 1. Разбери `llm-wiki.yml` (`ruby -ryaml -e 'YAML.load_file("llm-wiki.yml")'` или `python3`, если установлен модуль yaml). Сообщи о синтаксических ошибках.
-2. Проверь, что каждый ключ, нужный агенту, на месте: `index`, `log`, `access_log`, `query`, `prompts`, `update_policy`, `categories`, `lint`, `git`.
+2. Проверь, что каждый ключ, нужный агентам, на месте: `index`, `log`, `access_log`, `query`, `prompts`, `update_policy`, `categories`, `lint`, `critic`, `git`. При отсутствии `critic` предложи добавить значения из шага 2 с показом diff.
 3. Проверь, что файлы по путям из конфига существуют (журнал, Access-Log, индекс/хабы, промпты выбранных категорий) и что у каждой категории есть шаблон или явная пометка, что его нет.
 4. Проверь расхождения: значения (пути, пороги) повторяются в прозе `AGENTS.md`, `Schema.md`, скила; если существует `CLAUDE.md`, проверь общие абзацы с `AGENTS.md`.
 5. Предложи исправления списком. Любое изменение файла делается только после показа diff и подтверждения.

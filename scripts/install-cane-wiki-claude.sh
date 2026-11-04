@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install the Claude Code cane-wiki-init skill and cane-wiki subagent.
+# Install the Claude Code cane-wiki-init skill and both cane-wiki agents.
 # Env: INSTALL_DIR (default ~/.claude/skills), AGENT_INSTALL_DIR (default ~/.claude/agents)
 set -euo pipefail
 
@@ -12,4 +12,6 @@ for name in cane-wiki-init; do
   unzip -q -o "$REPO_ROOT/dist/$name-claude-code.zip" -d "$SKILLS_DIR"
   echo "✓ Installed $name to $SKILLS_DIR/$name"
 done
-INSTALL_DIR="$AGENTS_DIR" bash "$REPO_ROOT/scripts/install-agent-local.sh" cane-wiki
+for name in cane-wiki cane-wiki-critic; do
+  INSTALL_DIR="$AGENTS_DIR" bash "$REPO_ROOT/scripts/install-agent-local.sh" "$name"
+done

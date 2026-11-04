@@ -15,8 +15,8 @@ SOURCE="$AGENT_DIR/$AGENT_NAME.md"
 VERSION_FILE="$AGENT_DIR/VERSION"
 CHANGELOG="$AGENT_DIR/CHANGELOG.md"
 [ -f "$SOURCE" ] && [ -f "$VERSION_FILE" ] || { echo "Agent or VERSION missing in $AGENT_DIR" >&2; exit 1; }
-if [ "$AGENT_NAME" = "cane-wiki" ]; then
-  python3 "$REPO_ROOT/scripts/build-codex-agent.py" --check
+if [ -f "$AGENT_DIR/$AGENT_NAME.codex.toml" ]; then
+  python3 "$REPO_ROOT/scripts/build-codex-agent.py" --check "$AGENT_NAME"
 fi
 VERSION="$(tr -d '[:space:]' < "$VERSION_FILE")"
 [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Invalid agent version: $VERSION" >&2; exit 1; }
@@ -52,7 +52,7 @@ mkdir -p dist
 ASSET="dist/$AGENT_NAME-$VERSION.md"
 cp "$SOURCE" "$ASSET"
 RELEASE_ASSETS=("$ASSET")
-if [ "$AGENT_NAME" = "cane-wiki" ]; then
+if [ -f "$AGENT_DIR/$AGENT_NAME.codex.toml" ]; then
   CODEX_ASSET="dist/$AGENT_NAME-$VERSION.toml"
   cp "$AGENT_DIR/$AGENT_NAME.codex.toml" "$CODEX_ASSET"
   RELEASE_ASSETS+=("$CODEX_ASSET")

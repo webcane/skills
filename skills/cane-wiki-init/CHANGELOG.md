@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ### Added
+- Configure the editorial critic and install its Claude and Codex agents with the main agent.
 - Initial repository distribution with vault templates and prompts.
 
 ### Changed
