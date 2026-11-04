@@ -7,6 +7,9 @@ and each skill is versioned and released independently.
 ## [Unreleased]
 
 ### Added
+- Agent-owned `cane-wiki` workflow rendered as a Codex custom agent; platform-specific packages and installers for the cane-wiki family.
+- `cane-wiki-init` skill and independently versioned `cane-wiki` agent, with local/remote agent installers and a separate agent release script.
+- Agent release routing in CI and installation guidance for external Obsidian skills.
 - `skills/mm-wiki/mm-wiki-reading-list/`: новый член семейства mm-wiki — книги из macOS Reminders через MCP `apple-events` → конспекты в вики через `mm-wiki-ingest`; три режима (`list`/`single`/`full`), MCP-справка и критерии категорий вендорены в `references/` (без рантайм-зависимости от `pes`), зависимости объявлены в `compatibility`
 - `skills/python-quiz/`: новый скилл — интерактивный тест Python по .md файлам в директории (single/multi-choice, short answer, coding task, bash-таймер, разбор ошибок)
 - `scripts/release-skill.sh`: packages skill before release and uploads `.skill` + versioned `.skill` + `.json` metadata as release assets via `gh release create`
@@ -18,6 +21,7 @@ and each skill is versioned and released independently.
 - **mm-wiki family grouping**: moved the six `mm-wiki-*` skills under a logical family home `skills/mm-wiki/` (with `shared/` canonical assets, `overrides/`, `README.md`, `MANIFEST.md`). Added `scripts/sync-mm-wiki.sh` to push canonical shared assets into member skills (run with `--check` to verify no drift). Nested skills are addressed as `mm-wiki/<skill>` on the command line; artifacts/install dirs/tags keep the flat basename (`mm-wiki-ingest`)
 
 ### Changed
+- Keep the five wiki modes in the agent and place dependency installation in `cane-wiki-init`; remove the separate `cane-wiki` skill.
 - `scripts/install-local.sh`: interactive picker now lists skill names instead of full directory paths
 - `scripts/install-local.sh`, `scripts/release-skill.sh`: picker now finds skills recursively (via `find` on `SKILL.md`) so nested family skills are listed and family-home dirs without a `SKILL.md` are skipped
 - `scripts/package-skill.sh`, `scripts/package-skill-claudeai.sh`: derive flat artifact names via `basename` so nested skills (`mm-wiki/mm-wiki-ingest`) still produce `dist/mm-wiki-ingest.skill` / `dist/mm-wiki-ingest-claudeai.zip` with a single top-level zip folder

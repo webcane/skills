@@ -98,6 +98,22 @@ fi
 # Package the skill so artifacts are ready to upload with the release
 bash "$REPO_ROOT/scripts/package-skill.sh" "$SKILL_NAME" "$VERSION"
 
+RELEASE_ASSETS=(
+  "dist/${ARTIFACT_NAME}.skill"
+  "dist/${ARTIFACT_NAME}-${VERSION}.skill"
+  "dist/${ARTIFACT_NAME}-${VERSION}.json"
+)
+case "$SKILL_NAME" in
+  cane-wiki-init)
+    bash "$REPO_ROOT/scripts/package-skill-claude-code.sh" "$SKILL_NAME" "$VERSION"
+    bash "$REPO_ROOT/scripts/package-skill-codex.sh" "$SKILL_NAME" "$VERSION"
+    RELEASE_ASSETS+=(
+      "dist/${ARTIFACT_NAME}-claude-code-${VERSION}.zip"
+      "dist/${ARTIFACT_NAME}-codex-${VERSION}.zip"
+    )
+    ;;
+esac
+
 git tag -a "$TAG" -m "$SKILL_NAME v$VERSION"
 git push origin "$TAG"
 
@@ -105,8 +121,6 @@ git push origin "$TAG"
 gh release create "$TAG" \
   --title "$SKILL_NAME v$VERSION" \
   --notes-file "$NOTES_FILE" \
-  "dist/${ARTIFACT_NAME}.skill" \
-  "dist/${ARTIFACT_NAME}-${VERSION}.skill" \
-  "dist/${ARTIFACT_NAME}-${VERSION}.json"
+  "${RELEASE_ASSETS[@]}"
 
 echo "✓ Released $TAG"

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Repo Is
 
-A distribution system for Claude skills. Skills are Claude Code extensions defined by a `SKILL.md` file (with YAML frontmatter and markdown instructions). This repo stores skill source files and provides tooling to package and distribute them as `.skill` files (tar.gz archives) for Claude Code/agentskills.io, and as `.zip` files for Claude.ai's skill upload (see `package-skill-claudeai.sh` below).
+A distribution system for Agent Skills with Claude Code, Claude.ai, and Codex packages. Canonical skills live in `skills/`; platform scripts render tool names and packaging differences without editing canonical source. Claude Code agents live separately under `agents/` and are released as versioned Markdown files.
 
 ## Repo Structure
 
@@ -19,7 +19,9 @@ skills/mm-wiki/         # Logical family home for the mm-wiki-* skills
   mm-wiki-<skill>/      # Member skill dirs (packaged/installed as flat mm-wiki-<skill>)
                         #   references/* and scripts/* synced; per-skill extras (e.g. ingest's
                         #   wiki-conventions.extra.md) are hand-maintained
-dist/                   # Generated output (gitignored for .skill files)
+agents/<agent-name>/    # Agent source, VERSION, and CHANGELOG.md
+  <agent-name>.md        # Claude Code subagent definition
+dist/                   # Generated output (gitignored)
 scripts/                # Packaging and installation shell scripts
 CHANGELOG.md            # Repo-tooling changelog only (scripts/CI/layout)
 .github/workflows/      # CI: auto-packages skills on push to main
@@ -55,6 +57,10 @@ holds canonical assets that the member skills consume, and each member lives in
 
 **Each skill is versioned and released independently.** There is no single
 repo-wide product version.
+
+Agents are also versioned independently. An agent's `VERSION` file is the
+version source; tags use `agents/<agent-name>/v<version>`. Do not add a version
+field to the Claude Code agent frontmatter.
 
 - A skill's version is the `metadata.version` field in its `SKILL.md` frontmatter — the single source of truth.
 - Each skill keeps its own `skills/<name>/CHANGELOG.md`.
@@ -144,6 +150,26 @@ On push to `master` CI repackages all skills as `<name>.skill` artifacts.
 Create `skills/<new-skill-name>/SKILL.md` with the required frontmatter (include
 `metadata.version`, start at `1.0.0`) and a `skills/<new-skill-name>/CHANGELOG.md`.
 Add it to the Skills table in `README.md`. CI packages it automatically on push.
+
+## Claude Code agents
+
+Agents live in `agents/<name>/<name>.md` with a separate `VERSION` and
+`CHANGELOG.md`. Install `cane-wiki` locally with `bash scripts/install-agent-local.sh cane-wiki`,
+or install a released version with `bash scripts/install-agent.sh cane-wiki 0.1.0`.
+After updating and committing the agent and its version, run
+`bash scripts/release-agent.sh cane-wiki` to create a tag and GitHub Release.
+Agent tags have the form `agents/<name>/v<version>`; CI routes them to the agent
+release job rather than the skill release job. The `cane-wiki` agent owns the
+wiki workflow. `scripts/build-codex-agent.py` generates the Codex custom agent
+TOML from it; run that script after editing the source, then check with
+`--check`. `cane-wiki-init` handles vault setup and missing external skill
+dependencies. It is versioned independently from the agent.
+Use `scripts/package-skill-claude-code.sh` or `scripts/package-skill-codex.sh`
+for platform packages, and `scripts/install-cane-wiki-claude.sh` or
+`scripts/install-cane-wiki-codex.sh` for a complete local cane-wiki installation.
+The Codex installer fetches the three external Obsidian skills automatically.
+The agent uses `cane-wiki-init` to install missing dependencies at first use,
+then provides manual commands if the environment prevents it.
 
 ## After Any Change
 

@@ -8,3 +8,4 @@
 ### Changed
 - Resolve the cane-wiki agent from the user installation or this repository checkout.
 - Use neutral question markers and create CLAUDE.md only for Claude Code.
+- Install missing external Obsidian skills separately from vault setup.

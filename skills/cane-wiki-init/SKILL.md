@@ -6,7 +6,7 @@ description: >
   структуру папок, шаблоны, промпты разбора и журналы. Для Claude Code создаёт CLAUDE.md. Если llm-wiki.yml уже есть,
   проверяет конфиг и предлагает изменения с показом diff. Используй, когда нужно «инициализируй
   вики», «создай vault для cane-wiki», «настрой llm-wiki», «проверь конфиг вики», «добавь
-  категорию страниц».
+  категорию страниц», либо когда агенту не хватает Obsidian skills.
 metadata:
   version: 0.1.0
   author: mniedre
@@ -25,7 +25,20 @@ metadata:
 | `templates/*.md` | Шаблоны страниц по категориям (Templater) |
 | `prompts/*.md` | Промпты разбора по категориям (теги `agent-prompt`) |
 
-Канонические шаблоны и промпты находятся в `references/` этого скила. Режимы работы вики описаны в отдельном скиле `cane-wiki`. Платформенные метки ниже имеют смысл и в исходном Agent Skill: `{{ASK_USER}}` — задай вопрос доступным способом; `{{MULTI_SELECT}}` — разреши выбрать несколько вариантов (если интерфейс не умеет, попроси перечислить их текстом). Платформенные упаковщики заменяют эти метки на конкретные вызовы.
+Канонические шаблоны и промпты находятся в `references/` этого скила. Режимы работы вики описаны в агенте `cane-wiki`. Платформенные метки ниже имеют смысл и в исходном Agent Skill: `{{ASK_USER}}` — задай вопрос доступным способом; `{{MULTI_SELECT}}` — разреши выбрать несколько вариантов (если интерфейс не умеет, попроси перечислить их текстом). Платформенные упаковщики заменяют эти метки на конкретные вызовы.
+
+## Установка зависимостей
+
+Если агент вызвал этот скил только из-за отсутствия `obsidian-markdown`, `obsidian-cli` или `defuddle`, не запускай опрос и не меняй vault. Запусти `scripts/install-obsidian-skills.sh codex` в Codex или `scripts/install-obsidian-skills.sh claude-code` в Claude Code из каталога этого скила. Скрипт ставит только отсутствующие скилы из `https://github.com/kepano/obsidian-skills`. Если сеть или запись недоступны, попроси пользователя выполнить подходящую команду:
+
+```bash
+# Codex
+npx skills add https://github.com/kepano/obsidian-skills --skill obsidian-markdown --skill obsidian-cli --skill defuddle -g -a codex -y
+# Claude Code
+npx skills add https://github.com/kepano/obsidian-skills --skill obsidian-markdown --skill obsidian-cli --skill defuddle -g -a claude-code -y
+```
+
+После установки сообщи результат агенту и закончи этот вызов скила. Если зависимости недоступны, сообщи об этом явно.
 
 ## Шаг 0: определить состояние каталога
 
@@ -71,7 +84,7 @@ metadata:
 8. **Промпты**: каталог `prompts.namespace` с промптами для выбранных категорий, у которых они есть в `references/prompts/`, и хаб этого неймспейса. Теги страниц: `agent-prompt` и имя категории.
 9. **`.gitignore`**: `inbox/` и `raw/` (добавь недостающие строки, существующие не трогай).
 10. **`.obsidian/app.json`**: `newLinkFormat: relative` по согласию пользователя. Если файл есть, меняй только эту настройку.
-11. **Рабочий процесс**: убедись, что скил `cane-wiki` доступен. В Claude Code дополнительно установи `.claude/agents/cane-wiki.md`: возьми файл из `~/.claude/agents/cane-wiki.md` или `agents/cane-wiki/cane-wiki.md` в checkout этого репозитория. В Codex используй скил `cane-wiki` напрямую; файл агента Claude не создавай.
+11. **Агент**: в Claude Code установи `.claude/agents/cane-wiki.md` из `~/.claude/agents/cane-wiki.md` или `agents/cane-wiki/cane-wiki.md` в checkout. В Codex убедись, что доступен `~/.codex/agents/cane-wiki.toml` либо проектный `.codex/agents/cane-wiki.toml`; если нет, предложи `bash scripts/install-cane-wiki-codex.sh` из checkout. Агент вызывает `cane-wiki-init` для vault без `llm-wiki.yml`, при явной просьбе перенастроить его или при нехватке Obsidian skills.
 12. **Git**: предложи `git init`, если каталог не репозиторий.
 
 ## Шаг R: проверка и перенастройка существующей вики

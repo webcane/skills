@@ -58,6 +58,14 @@ On a published release, CI packages and uploads only the tagged skill and
 promotes its `[Unreleased]` CHANGELOG section — so you don't need to attach the
 `.skill` file or bump the changelog by hand.
 
+For cane-wiki, the Claude agent owns the wiki workflow and
+`scripts/build-codex-agent.py` generates its Codex TOML version. The
+`cane-wiki-init` uses the Agent Skills format for setup and dependencies.
+Package skill variants with `scripts/package-skill-claude-code.sh` or
+`scripts/package-skill-codex.sh`. Use `scripts/install-cane-wiki-claude.sh` or
+`scripts/install-cane-wiki-codex.sh` for local installation; the Codex installer
+also installs the three external Obsidian skill dependencies.
+
 ## 3. Update Later
 
 ```bash

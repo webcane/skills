@@ -36,7 +36,7 @@ jobs:
   # On a published release: the tag is <skill-name>/v<version>. Package and
   # upload ONLY that skill, then promote its [Unreleased] CHANGELOG section.
   release-skill:
-    if: github.event_name == 'release'
+    if: github.event_name == 'release' && !startsWith(github.event.release.tag_name, 'agents/')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -62,12 +62,19 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
       - name: Package the released skill
         run: bash scripts/package-skill.sh "${{ steps.parse.outputs.skill }}" "${{ steps.parse.outputs.version }}"
+      - name: Package cane-wiki platform variants
+        if: steps.parse.outputs.skill == 'cane-wiki-init'
+        run: |
+          bash scripts/package-skill-claude-code.sh "${{ steps.parse.outputs.skill }}" "${{ steps.parse.outputs.version }}"
+          bash scripts/package-skill-codex.sh "${{ steps.parse.outputs.skill }}" "${{ steps.parse.outputs.version }}"
       - name: Upload to release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             dist/${{ steps.parse.outputs.skill_id }}.skill
             dist/${{ steps.parse.outputs.skill_id }}-${{ steps.parse.outputs.version }}.skill
+            dist/${{ steps.parse.outputs.skill_id }}-claude-code-${{ steps.parse.outputs.version }}.zip
+            dist/${{ steps.parse.outputs.skill_id }}-codex-${{ steps.parse.outputs.version }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Promote skill CHANGELOG
@@ -82,3 +89,48 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add "$CL"
           git diff --cached --quiet || { git commit -m "chore: promote ${SKILL} CHANGELOG for v${VERSION}" && git push origin master; }
+
+  release-agent:
+    if: github.event_name == 'release' && startsWith(github.event.release.tag_name, 'agents/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      - name: Parse agent and version from tag
+        id: parse
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          case "$TAG" in
+            agents/*/v*) ;;
+            *) echo "::error::Tag '$TAG' must be agents/<name>/v<version>"; exit 1 ;;
+          esac
+          AGENT="${TAG#agents/}"; AGENT="${AGENT%/*}"
+          VERSION="${TAG##*/}"; VERSION="${VERSION#v}"
+          case "$AGENT" in
+            ''|*/*|*[!a-zA-Z0-9_-]*) echo "::error::Invalid agent name"; exit 1 ;;
+          esac
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::Invalid agent version"; exit 1; }
+          [ -f "agents/$AGENT/$AGENT.md" ] || { echo "::error::Agent file missing"; exit 1; }
+          [ "$(tr -d '[:space:]' < "agents/$AGENT/VERSION")" = "$VERSION" ] || { echo "::error::Agent version does not match tag"; exit 1; }
+          echo "agent=$AGENT" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+      - name: Package the released agent
+        run: |
+          mkdir -p dist
+          cp "agents/${{ steps.parse.outputs.agent }}/${{ steps.parse.outputs.agent }}.md" "dist/${{ steps.parse.outputs.agent }}-${{ steps.parse.outputs.version }}.md"
+          if [ "${{ steps.parse.outputs.agent }}" = "cane-wiki" ]; then
+            python3 scripts/build-codex-agent.py --check
+            cp agents/cane-wiki/cane-wiki.codex.toml "dist/cane-wiki-${{ steps.parse.outputs.version }}.toml"
+          fi
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/${{ steps.parse.outputs.agent }}-${{ steps.parse.outputs.version }}.md
+            dist/${{ steps.parse.outputs.agent }}-${{ steps.parse.outputs.version }}.toml
+          overwrite_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
