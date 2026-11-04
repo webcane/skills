@@ -84,7 +84,7 @@ npx skills add https://github.com/kepano/obsidian-skills --skill obsidian-markdo
 8. **Промпты**: каталог `prompts.namespace` с промптами для выбранных категорий, у которых они есть в `references/prompts/`, и хаб этого неймспейса. Теги страниц: `agent-prompt` и имя категории.
 9. **`.gitignore`**: `inbox/` и `raw/` (добавь недостающие строки, существующие не трогай).
 10. **`.obsidian/app.json`**: `newLinkFormat: relative` по согласию пользователя. Если файл есть, меняй только эту настройку.
-11. **Агенты**: в Claude Code установи `.claude/agents/cane-wiki.md` и `.claude/agents/cane-wiki-critic.md` из пользовательской установки или checkout. В Codex убедись, что доступны `~/.codex/agents/cane-wiki.toml` и `~/.codex/agents/cane-wiki-critic.toml` либо их проектные аналоги; если нет, предложи `bash scripts/install-cane-wiki-codex.sh` из checkout. `cane-wiki` вызывает `cane-wiki-init` для vault без `llm-wiki.yml`, при явной просьбе перенастроить его или при нехватке Obsidian skills.
+11. **Агенты**: в Claude Code, если оба агента уже доступны через плагин `cane-wiki`, не копируй их в vault. Иначе установи `.claude/agents/cane-wiki.md` и `.claude/agents/cane-wiki-critic.md` из пользовательской установки или checkout. В Codex убедись, что доступны `~/.codex/agents/cane-wiki.toml` и `~/.codex/agents/cane-wiki-critic.toml` либо их проектные аналоги; если нет, предложи `bash scripts/install-cane-wiki-agents-codex.sh` из checkout. `cane-wiki` вызывает `cane-wiki-init` для vault без `llm-wiki.yml`, при явной просьбе перенастроить его или при нехватке Obsidian skills.
 12. **Git**: предложи `git init`, если каталог не репозиторий.
 
 ## Шаг R: проверка и перенастройка существующей вики

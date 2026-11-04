@@ -75,15 +75,39 @@ agent finds no `llm-wiki.yml` or the user requests reconfiguration. It also
 installs missing Obsidian skill dependencies without changing the vault. Its neutral `{{ASK_USER}}` and
 `{{MULTI_SELECT}}` markers are resolved in platform packages.
 
-Install for Claude Code from this checkout:
+Install the Claude Code plugin from this repository's marketplace. It bundles
+both agents and `cane-wiki-init`:
+
+```bash
+claude plugin marketplace add webcane/skills
+claude plugin install cane-wiki@webcane-skills
+```
+
+Install the Codex plugin, then install the custom agents from a checkout.
+Codex plugins provide skills but do not register custom agent TOML files:
+
+```bash
+codex plugin marketplace add webcane/skills
+codex plugin add cane-wiki@webcane-skills
+git clone https://github.com/webcane/skills.git
+bash skills/scripts/install-cane-wiki-agents-codex.sh
+```
+
+Start a new session after installation. The plugin's `cane-wiki-init` skill
+sets up the vault; the agents handle wiki work. The three external Obsidian
+skills are installed when first needed. If automatic installation cannot run,
+use `npx` for the relevant host:
+
+```bash
+npx skills add https://github.com/kepano/obsidian-skills --skill obsidian-markdown --skill obsidian-cli --skill defuddle -g -a claude-code -y
+npx skills add https://github.com/kepano/obsidian-skills --skill obsidian-markdown --skill obsidian-cli --skill defuddle -g -a codex -y
+```
+
+`npx skills add` installs skills, not the `cane-wiki` agents. The existing
+all-in-one installers remain available from a checkout:
 
 ```bash
 bash scripts/install-cane-wiki-claude.sh
-```
-
-Install for Codex from this checkout:
-
-```bash
 bash scripts/install-cane-wiki-codex.sh
 ```
 
@@ -98,6 +122,11 @@ installer uses `~/.claude/skills` and `~/.claude/agents` by default.
 On first use, the agent checks for the three external skills and tries to install any
 missing ones. If network or filesystem access prevents that, it gives the user
 the matching `npx skills add` command to run manually.
+
+The plugin directories under `plugins/` are built from the canonical agent and
+skill sources. After changing either source, run
+`python3 scripts/build-cane-wiki-plugins.py` and commit the updated bundles;
+`python3 scripts/build-cane-wiki-plugins.py --check` detects stale copies.
 
 For platform packages, use `scripts/package-skill-claude-code.sh`,
 `scripts/package-skill-codex.sh`, or `scripts/package-skill-claudeai.sh` with

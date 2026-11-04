@@ -1,0 +1,12 @@
+{
+  "name": "webcane-skills",
+  "description": "Webcane agents and skills",
+  "owner": { "name": "webcane" },
+  "plugins": [
+    {
+      "name": "cane-wiki",
+      "source": "./plugins/claude/cane-wiki",
+      "description": "Obsidian wiki agents and vault setup skill"
+    }
+  ]
+}

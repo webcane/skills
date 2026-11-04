@@ -1,0 +1,86 @@
+# Пресеты категорий для cane-wiki-init.
+# Значения копируются в раздел `categories` файла llm-wiki.yml.
+#   description    для опроса пользователя
+#   namespace_hint предлагаемый неймспейс верхнего уровня (можно изменить)
+#   template       файл из references/templates/ (если есть)
+#   prompt         промпт разбора из references/prompts/ (если есть)
+#   perishable     true — категория может устаревать, предлагается stale_after_days
+
+presets:
+  knowledge:
+    description: Концепция, технология, знание. Одна идея — один файл.
+    namespace_hint: CS
+    template: knowledge.md
+    prompt: Knowledge-Ingest
+    required: [type, domain, created, updated, confidence, tags]
+    lines: [80, 400]
+    depth: [example, pitfalls, comparison_table]
+    update: revise
+  book:
+    description: Конспект книги.
+    namespace_hint: Books
+    template: book.md
+    required: [type, author, year, status, created, updated, tags]
+    lines: [40, 150]
+    update: revise
+  entity:
+    description: Персона, сервис, инструмент, технология, компания.
+    namespace_hint: People
+    template: entity.md
+    required: [type, entity-type, status, created, updated]
+    lines: [20, 80]
+    update: revise
+  project:
+    description: Проект или сервис с текущим состоянием.
+    namespace_hint: Projects
+    template: project.md
+    required: [type, status, created, started]
+    update: revise
+  decision:
+    description: ADR. История решений и есть содержание, поэтому только добавление.
+    namespace_hint: Projects
+    template: decision.md
+    required: [type, decision-status, created]
+    update: append
+  application:
+    description: Сопроводительное письмо или отклик (персональные данные).
+    namespace_hint: Interview
+    template: application.md
+    prompt: Application-Ingest
+    required: [type, company, position, created, status]
+    update: revise
+  recipe:
+    description: Готовое решение, рецепт, инструкция.
+    namespace_hint: Recipes
+    template: recipe.md
+    required: [type, serves, time, created, tags]
+    lines: [20, 60]
+    update: revise
+  daily:
+    description: Ежедневная заметка. Только добавление.
+    namespace_hint: Daily Notes
+    template: daily.md
+    required: [type, date]
+    update: append
+  reference:
+    description: Справочный материал.
+    namespace_hint: Reference
+    required: [type, domain, created]
+    update: revise
+  news:
+    description: Новости, дайджесты, версии инструментов (скоропортящееся).
+    namespace_hint: Tech
+    required: [type, domain, created, updated, tags]
+    update: revise
+    perishable: true
+    stale_after_days: 30
+
+# Категории, которые создаются всегда
+always:
+  hub:
+    required: [type, namespace, created, updated]
+    lines: [30, 80]
+    update: revise
+  prompt:
+    required: [type, created, updated, tags]
+    update: revise

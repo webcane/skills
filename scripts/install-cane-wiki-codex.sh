@@ -32,15 +32,4 @@ for name in cane-wiki-init obsidian-markdown obsidian-cli defuddle; do
   echo "✓ Installed $name to $target"
 done
 
-mkdir -p "$AGENT_DIR"
-for name in cane-wiki cane-wiki-critic; do
-  agent_target="$AGENT_DIR/$name.toml"
-  agent_source="$REPO_ROOT/agents/$name/$name.codex.toml"
-  if [ -f "$agent_target" ] && ! cmp -s "$agent_source" "$agent_target"; then
-    backup="$agent_target.bak.$(date +%Y%m%d%H%M%S)"
-    mv "$agent_target" "$backup"
-    echo "Backed up Codex agent to $backup"
-  fi
-  cp "$agent_source" "$agent_target"
-  echo "✓ Installed Codex agent to $agent_target"
-done
+AGENT_INSTALL_DIR="$AGENT_DIR" bash "$REPO_ROOT/scripts/install-cane-wiki-agents-codex.sh"

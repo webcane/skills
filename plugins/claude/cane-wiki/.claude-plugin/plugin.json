@@ -1,0 +1,10 @@
+{
+  "name": "cane-wiki",
+  "version": "0.2.0",
+  "description": "Obsidian wiki agents and vault setup skill",
+  "author": {
+    "name": "webcane"
+  },
+  "repository": "https://github.com/webcane/skills",
+  "license": "MIT"
+}

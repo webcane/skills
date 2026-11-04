@@ -1,0 +1,12 @@
+{
+  "name": "webcane-skills",
+  "interface": { "displayName": "Webcane Skills" },
+  "plugins": [
+    {
+      "name": "cane-wiki",
+      "source": { "source": "local", "path": "./plugins/codex/cane-wiki" },
+      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+      "category": "Productivity"
+    }
+  ]
+}
