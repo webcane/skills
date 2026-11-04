@@ -1,15 +1,14 @@
 #!/bin/bash
 # Sync canonical mm-wiki assets into member skill dirs.
-# Usage: ./scripts/sync-mm-wiki.sh [--check]
+# Usage: ./archive/scripts/sync-mm-wiki.sh [--check]
 #
 # Two canonical pools feed the member skills:
-#   skills/mm-wiki/shared/*   → copied into EVERY member's references/
+#   archive/skills/mm-wiki/shared/*   → copied into EVERY member's references/
 #                                (conventions/docs, e.g. wiki-conventions.md)
-#   skills/mm-wiki/scripts/*  → copied only into the scanner members' scripts/
+#   archive/skills/mm-wiki/scripts/*  → copied only into the scanner members' scripts/
 #                                (mm-wiki-lint, mm-wiki-prune, mm-wiki-status)
 #                                — a single scanner, not copied to everyone
-# Each member skill ships a self-contained copy so the packaging pipeline
-# (which packs skills/<name>/ as-is) keeps working unchanged.
+# Each archived member retains its self-contained copy for future reference.
 #
 # Per-skill custom files (e.g. mm-wiki-ingest/references/wiki-conventions.extra.md)
 # are hand-maintained and NEVER overwritten — only files that exist in the
@@ -21,8 +20,8 @@
 
 set -e
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-MM="$REPO_ROOT/skills/mm-wiki"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+MM="$REPO_ROOT/archive/skills/mm-wiki"
 CHECK=0
 [ "${1:-}" = "--check" ] && CHECK=1
 
@@ -49,7 +48,7 @@ sync_one() { # src dest — copy if different; --check reports drift
 }
 
 # 1) Every nested member skill (a dir containing a SKILL.md) receives every
-#    shared file. The family home itself (skills/mm-wiki) has no SKILL.md and
+#    shared file. The family home itself has no SKILL.md and
 #    is skipped.
 MEMBERS=()
 while IFS= read -r skill_md; do
@@ -74,7 +73,7 @@ done
 
 if [ "$CHECK" = "1" ]; then
   if [ "$DRIFT" = "1" ]; then
-    echo "→ run: bash scripts/sync-mm-wiki.sh to restore canonical content"
+    echo "→ run: bash archive/scripts/sync-mm-wiki.sh to restore canonical content"
     exit 1
   fi
   echo "✓ all mm-wiki shared assets in sync"

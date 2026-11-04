@@ -68,8 +68,9 @@ truncated to fit, with a warning.
 ## cane-wiki for Claude Code and Codex
 
 The [cane-wiki agent](agents/cane-wiki/cane-wiki.md) owns the query, ingest,
-update, lint, and prune workflow. `scripts/build-codex-agent.py` renders a
-Codex custom agent from that source. `cane-wiki-init` prepares a vault when the
+update, lint, and prune workflow. The [cane-wiki-critic agent](agents/cane-wiki-critic/cane-wiki-critic.md)
+reviews explanatory quality, writes daily reports, and delegates edits and factual checks to cane-wiki.
+`scripts/build-codex-agent.py` renders Codex custom agents from both Markdown sources. `cane-wiki-init` prepares a vault when the
 agent finds no `llm-wiki.yml` or the user requests reconfiguration. It also
 installs missing Obsidian skill dependencies without changing the vault. Its neutral `{{ASK_USER}}` and
 `{{MULTI_SELECT}}` markers are resolved in platform packages.
@@ -86,7 +87,7 @@ Install for Codex from this checkout:
 bash scripts/install-cane-wiki-codex.sh
 ```
 
-The Codex installer places the custom agent in `~/.codex/agents` and
+The Codex installer places both custom agents in `~/.codex/agents` and
 `cane-wiki-init` plus its three required external skills in `${CODEX_HOME:-~/.codex}/skills`.
 It fetches external skills from
 [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills); set
@@ -102,10 +103,9 @@ For platform packages, use `scripts/package-skill-claude-code.sh`,
 `scripts/package-skill-codex.sh`, or `scripts/package-skill-claudeai.sh` with
 `cane-wiki-init`. The existing `package-skill.sh` keeps the
 neutral Agent Skills source. Its release attaches Claude Code and Codex
-variants. To publish both agent formats, update
-`agents/cane-wiki/VERSION` and its changelog, commit, then run
-`bash scripts/release-agent.sh cane-wiki`. A released Codex agent can be
-installed with `bash scripts/install-agent-codex.sh cane-wiki 0.1.0`.
+variants. To publish an agent in both formats, update its `VERSION` and changelog,
+commit, then run `bash scripts/release-agent.sh <agent-name>`. A released Codex agent
+can be installed with `bash scripts/install-agent-codex.sh <agent-name> <version>`.
 
 The three external skills used by the agent are `obsidian-markdown`, `obsidian-cli`, and
 `defuddle`. `obsidian-bases`, `json-canvas`, and `knap` are optional for related
@@ -121,6 +121,7 @@ workflow uses Obsidian CLI when available and falls back to file search.
 │   └── README.md
 ├── skills/cane-wiki-init/            # Obsidian vault initialization skill
 ├── agents/cane-wiki/                 # Claude source and generated Codex agent
+├── agents/cane-wiki-critic/          # Editorial critic for both platforms
 ├── scripts/
 │   ├── package-skill.sh              # skill dir → .skill file
 │   ├── package-skill-claudeai.sh     # skill dir → Claude.ai-compatible .zip
@@ -143,19 +144,10 @@ workflow uses Obsidian CLI when available and falls back to file search.
 | [thesis-to-text](skills/thesis-to-text/) | Interactive wizard that turns raw theses/notes into a finished, audience-ready text |
 | [python-quiz](skills/python-quiz/) | Интерактивный квиз по Python по .md файлам в директории: выбор, открытые вопросы, задача на код, таймер и оценка в % |
 | [python-algo-coach](skills/python-algo-coach/) | Тренер по алгоритмам на Python (LeetCode Easy/Medium): 41 задача, 14 паттернов, прогон решений через тестовый харнесс |
-| [mm-gtd](skills/mm-gtd/) | Router for a Covey/GTD planning system in a Logseq graph: ingest (capture → inbox/), planning (weekly ritual + day-end), query (what-today, summaries) |
 | [pes](skills/pes/) | Personal Management Lifecycle (Strategic/Tactical/Operational) agent over Apple Reminders + Calendar via MCP — WIP limits, Expected-Outcome gates, Results-vs-Activity tracking |
-| [mm-wiki-ingest](skills/mm-wiki/mm-wiki-ingest/) | Distill source material into a Logseq wiki with hub-index routing and cross-references |
-| [mm-wiki-query](skills/mm-wiki/mm-wiki-query/) | Read-only two-stage (hub-index then targeted-read) search and synthesis over a Logseq wiki |
-| [mm-wiki-prune](skills/mm-wiki/mm-wiki-prune/) | LRU-Demote: evict cold pages from live hub indexes into an archive section |
-| [mm-wiki-lint](skills/mm-wiki/mm-wiki-lint/) | Structural health check for a Logseq wiki (orphans, broken links, index drift, credential leaks) |
-| [mm-wiki-status](skills/mm-wiki/mm-wiki-status/) | Metrics, health, and hot/cold access-profile dashboard for a Logseq wiki |
-| [mm-wiki-import](skills/mm-wiki/mm-wiki-import/) | Bulk-import existing markdown notes (incl. Slab exports) into a Logseq wiki |
-| [mm-wiki-reading-list](skills/mm-wiki/mm-wiki-reading-list/) | Pull books from a macOS Reminders list via MCP, generate conspects from the wiki's own prompts, file them through mm-wiki-ingest |
 
-The mm-wiki skills are grouped under [skills/mm-wiki/](skills/mm-wiki/) — their
-[shared assets](skills/mm-wiki/MANIFEST.md) (conventions, scanner) are kept there
-and synced into each skill by `scripts/sync-mm-wiki.sh`.
+The former `mm-gtd` and `mm-wiki-*` skills are preserved in
+[archive/skills/](archive/skills/) and are not part of the active skill catalog.
 
 ## Installation URLs
 

@@ -39,10 +39,10 @@ Four steps — package, package for Claude.ai, install locally, then release:
 bash scripts/package-skill.sh <skill-name>
 ```
 
-`<skill-name>` is the path relative to `skills/` — flat for most skills
-(`content-writer-linkedin`), nested for family members
-(`mm-wiki/mm-wiki-ingest`). Artifacts and install dirs always use the flat
-basename (`dist/mm-wiki-ingest.skill`, `~/.claude/skills/mm-wiki-ingest`).
+`<skill-name>` is the path relative to the active `skills/` directory
+(`content-writer-linkedin`, for example). Archived skills under
+`archive/skills/` are not included. Artifacts and install dirs use the skill's
+flat basename.
 
 # 2. Package as .zip for Claude.ai upload
 bash scripts/package-skill-claudeai.sh <skill-name>

@@ -13,12 +13,10 @@ skills/<skill-name>/    # Skill source files (git-tracked) — flat by default
   SKILL.md              # Required: skill definition with YAML frontmatter (holds metadata.version)
   CHANGELOG.md          # Per-skill changelog (this skill's history only)
   README.md             # Optional: user-facing documentation
-skills/mm-wiki/         # Logical family home for the mm-wiki-* skills
-  shared/               # Canonical conventions/docs — copied to every member's references/
-  scripts/              # Canonical family scripts (e.g. wiki_scan.py) — copied to scanner members' scripts/
-  mm-wiki-<skill>/      # Member skill dirs (packaged/installed as flat mm-wiki-<skill>)
-                        #   references/* and scripts/* synced; per-skill extras (e.g. ingest's
-                        #   wiki-conventions.extra.md) are hand-maintained
+archive/skills/         # Retired skill sources; excluded from active discovery
+  mm-gtd/
+  mm-wiki/              # Retired family and shared assets
+archive/scripts/        # Retired family maintenance scripts
 agents/<agent-name>/    # Agent source, VERSION, and CHANGELOG.md
   <agent-name>.md        # Claude Code subagent definition
 dist/                   # Generated output (gitignored)
@@ -27,31 +25,12 @@ CHANGELOG.md            # Repo-tooling changelog only (scripts/CI/layout)
 .github/workflows/      # CI: auto-packages skills on push to main
 ```
 
-### Skill family directories
+### Archived skills
 
-A group of closely-related skills (e.g. the `mm-wiki-*` Logseq family) may be
-grouped under a logical home directory `skills/<family>/`. Inside it, `shared/`
-holds canonical assets that the member skills consume, and each member lives in
-`skills/<family>/<family>-<name>/`.
-
-- On the command line, a nested skill is addressed by its full path relative to
-  `skills/` — e.g. `bash scripts/package-skill.sh mm-wiki/mm-wiki-ingest`.
-- Artifact and install names are always the **flat basename** — e.g.
-  `dist/mm-wiki-ingest.skill`, `~/.claude/skills/mm-wiki-ingest`, tag
-  `mm-wiki/mm-wiki-ingest/v1.2.0`.
-- Shared assets are single-sourced in `skills/<family>/shared/` and
-  `skills/<family>/scripts/`: the family sync script `scripts/sync-mm-wiki.sh`
-  copies **every file in `shared/*`** into each member skill's `references/`,
-  and **every file in `scripts/*`** into the scanner members' `scripts/` (lint /
-  prune / status). Run with `--check` to verify no drift. **Never hand-edit the
-  synced copies** inside a member skill — they are generated. Per-skill custom
-  files (e.g. `mm-wiki-ingest/references/wiki-conventions.extra.md`) are
-  hand-maintained and never overwritten by the sync.
-- The packaging scripts (`package-skill.sh`, `package-skill-claudeai.sh`,
-  `install-local.sh`, `release-skill.sh`) and CI already resolve nested skills:
-  they locate skills by `SKILL.md` (recursive) and derive flat artifact names
-  with `basename`. Non-skill dirs inside `skills/` (family homes with no
-  `SKILL.md`) are ignored.
+`mm-gtd` and the `mm-wiki-*` family are retained under `archive/skills/` for
+reference. The family maintenance script is in `archive/scripts/`. Packaging,
+installation, release selection, and CI discovery operate on the active
+`skills/` directory, so archived sources are excluded.
 
 ## Versioning Model
 
@@ -160,8 +139,9 @@ After updating and committing the agent and its version, run
 `bash scripts/release-agent.sh cane-wiki` to create a tag and GitHub Release.
 Agent tags have the form `agents/<name>/v<version>`; CI routes them to the agent
 release job rather than the skill release job. The `cane-wiki` agent owns the
-wiki workflow. `scripts/build-codex-agent.py` generates the Codex custom agent
-TOML from it; run that script after editing the source, then check with
+wiki workflow; `cane-wiki-critic` reviews explanatory quality and delegates
+changes to it. `scripts/build-codex-agent.py` generates Codex custom agent
+TOMLs from both Markdown sources; run it after editing either source, then check with
 `--check`. `cane-wiki-init` handles vault setup and missing external skill
 dependencies. It is versioned independently from the agent.
 Use `scripts/package-skill-claude-code.sh` or `scripts/package-skill-codex.sh`

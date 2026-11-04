@@ -6,7 +6,11 @@ and each skill is versioned and released independently.
 
 ## [Unreleased]
 
+### Archived
+- Moved `mm-gtd` and the `mm-wiki-*` family out of the active `skills/` catalog into `archive/skills/`, retaining their source and family sync script for reference.
+
 ### Added
+- `cane-wiki-critic` editorial agent, generated Codex TOML, shared installation and release support, and configurable vault reports.
 - Agent-owned `cane-wiki` workflow rendered as a Codex custom agent; platform-specific packages and installers for the cane-wiki family.
 - `cane-wiki-init` skill and independently versioned `cane-wiki` agent, with local/remote agent installers and a separate agent release script.
 - Agent release routing in CI and installation guidance for external Obsidian skills.
