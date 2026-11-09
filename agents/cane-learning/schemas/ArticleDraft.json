@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "heading": {
+            "type": "string"
+          },
+          "markdown": {
+            "type": "string"
+          },
+          "knowledge_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cell_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "heading",
+          "markdown",
+          "knowledge_ids",
+          "cell_ids"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "review_card": {
+      "type": "string"
+    },
+    "deeper": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "title",
+    "sections",
+    "review_card",
+    "deeper"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "revise"
+      ]
+    },
+    "coverage": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "cell_id": {
+            "type": "string"
+          },
+          "section_id": {
+            "type": "string"
+          },
+          "quote": {
+            "type": "string"
+          },
+          "task_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "cell_id",
+          "section_id",
+          "quote",
+          "task_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "owner": {
+            "type": "string",
+            "enum": [
+              "analyst",
+              "designer",
+              "writer"
+            ]
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "blocking",
+              "advisory"
+            ]
+          },
+          "target": {
+            "type": "string"
+          },
+          "problem": {
+            "type": "string"
+          },
+          "fix": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner",
+          "severity",
+          "target",
+          "problem",
+          "fix"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "verdict",
+    "coverage",
+    "findings"
+  ],
+  "additionalProperties": false
+}

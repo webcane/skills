@@ -1,0 +1,137 @@
+{
+  "thesis": "HashMap хранит отображения по равенству ключей и использует хеш для выбора места поиска, поэтому свойства ключа, определяющие равенство и хеш, должны быть устойчивы.",
+  "prerequisites": [
+    "Интерфейс Map, классы, record и обобщения Java"
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Map API",
+      "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html",
+      "version": "Java SE 21"
+    },
+    {
+      "id": "S2",
+      "title": "Object API",
+      "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html",
+      "version": "Java SE 21"
+    },
+    {
+      "id": "S3",
+      "title": "HashMap API",
+      "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/HashMap.html",
+      "version": "Java SE 21"
+    },
+    {
+      "id": "S4",
+      "title": "HashMap.java",
+      "url": "https://github.com/openjdk/jdk/blob/jdk-21%2B35/src/java.base/share/classes/java/util/HashMap.java",
+      "version": "OpenJDK 21, jdk-21+35"
+    }
+  ],
+  "facets": [
+    {
+      "id": "F1",
+      "name": "Контракт ключа",
+      "priority": "P0",
+      "scope_reason": "Определяет замену и поиск отображения"
+    },
+    {
+      "id": "F2",
+      "name": "Хеширование и коллизии",
+      "priority": "P0",
+      "scope_reason": "Объясняет, как различаются ключи с одним хешем"
+    },
+    {
+      "id": "F3",
+      "name": "Граница изменяемости",
+      "priority": "P0",
+      "scope_reason": "Объясняет предел применимости контракта и задаёт практику проектирования ключа"
+    }
+  ],
+  "knowledge": [
+    {
+      "id": "K1",
+      "facet_id": "F1",
+      "statement": "Равные по equals ключи обозначают одно отображение. Равные объекты обязаны иметь равный hashCode.",
+      "kind": "library_contract",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "id": "K2",
+      "facet_id": "F2",
+      "statement": "OpenJDK 21 вычисляет индекс корзины из хеша и различает кандидатов по хешу и ключу.",
+      "kind": "implementation_detail",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "id": "K3",
+      "facet_id": "F3",
+      "statement": "Поведение Map не специфицировано, если находящийся в ней ключ изменился так, что это влияет на сравнение через equals.",
+      "kind": "not_guaranteed",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "mechanisms": [
+    {
+      "id": "M1",
+      "knowledge_ids": [
+        "K1",
+        "K2"
+      ],
+      "condition": "Ключи равны по equals и hashCode согласован с equals",
+      "mechanism": "Поиск находит прежнее отображение, put заменяет его значение",
+      "consequence": "size сохраняется, get по равному ключу возвращает новое значение",
+      "boundary": "Нарушение контракта hashCode делает ключ непригодным"
+    },
+    {
+      "id": "M2",
+      "knowledge_ids": [
+        "K2"
+      ],
+      "condition": "Неравные ключи попадают в одну корзину",
+      "mechanism": "OpenJDK различает кандидатов, используя сохранённый хеш и сравнение ключей",
+      "consequence": "Оба отображения могут сосуществовать",
+      "boundary": "Организация корзин относится к реализации"
+    },
+    {
+      "id": "M3",
+      "knowledge_ids": [
+        "K2",
+        "K3"
+      ],
+      "condition": "Меняется поле, определяющее равенство и хеш хранимого ключа",
+      "mechanism": "Новый поиск использует актуальные свойства ключа, запись была размещена по прежним",
+      "consequence": "Поиск может потерять доступ к записи",
+      "boundary": "Контракт Map не определяет результат"
+    }
+  ],
+  "cases": [
+    {
+      "scenario": "Два экземпляра одного record с равными компонентами",
+      "result": "Второй put заменяет значение",
+      "mechanism_id": "M1"
+    },
+    {
+      "scenario": "Строки Aa и BB",
+      "result": "Хеш одинаковый, отображения различны",
+      "mechanism_id": "M2"
+    },
+    {
+      "scenario": "Переименование объекта, у которого имя участвует в equals",
+      "result": "Гарантия поиска отсутствует",
+      "mechanism_id": "M3"
+    }
+  ],
+  "deeper": [
+    "Ёмкость и коэффициент заполнения",
+    "Устройство корзин OpenJDK 21"
+  ]
+}

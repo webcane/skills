@@ -141,8 +141,8 @@ Agent tags have the form `agents/<name>/v<version>`; CI routes them to the agent
 release job rather than the skill release job. The `cane-wiki` agent owns the
 wiki workflow; `cane-wiki-critic` reviews explanatory quality and delegates
 changes to it. `scripts/build-codex-agent.py` generates Codex custom agent
-TOMLs from both Markdown sources; run it after editing either source, then check with
-`--check`. `cane-wiki-init` handles vault setup and missing external skill
+TOMLs from the registered Markdown sources. Run it after editing an agent, then check with
+`--check`. The `cane-learning` agent uses the learning pipeline bundled in its source directory. `cane-wiki-init` handles vault setup and missing external skill
 dependencies. It is versioned independently from the agent.
 Use `scripts/package-skill-claude-code.sh` or `scripts/package-skill-codex.sh`
 for platform packages, and `scripts/install-cane-wiki-claude.sh` or

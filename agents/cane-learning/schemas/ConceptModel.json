@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "thesis": {
+      "type": "string"
+    },
+    "prerequisites": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "url",
+          "version"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "facets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "P0",
+              "P1",
+              "P2"
+            ]
+          },
+          "scope_reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "priority",
+          "scope_reason"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "knowledge": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "facet_id": {
+            "type": "string"
+          },
+          "statement": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "language_spec",
+              "library_contract",
+              "implementation_detail",
+              "typical",
+              "not_guaranteed"
+            ]
+          },
+          "source_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "facet_id",
+          "statement",
+          "kind",
+          "source_ids"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "mechanisms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "knowledge_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "condition": {
+            "type": "string"
+          },
+          "mechanism": {
+            "type": "string"
+          },
+          "consequence": {
+            "type": "string"
+          },
+          "boundary": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "knowledge_ids",
+          "condition",
+          "mechanism",
+          "consequence",
+          "boundary"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "scenario": {
+            "type": "string"
+          },
+          "result": {
+            "type": "string"
+          },
+          "mechanism_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "scenario",
+          "result",
+          "mechanism_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "deeper": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "thesis",
+    "prerequisites",
+    "sources",
+    "facets",
+    "knowledge",
+    "mechanisms",
+    "cases",
+    "deeper"
+  ],
+  "additionalProperties": false
+}

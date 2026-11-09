@@ -162,6 +162,12 @@ workflow uses Obsidian CLI when available and falls back to file search.
 └── .gitignore
 ```
 
+## cane-learning for Claude Code and Codex
+
+The [cane-learning agent](agents/cane-learning/) creates reviewed technical learning
+articles with examples and exercises. Its directory includes the runner, stage
+instructions, schemas, and a reproducible HashMap example.
+
 ## Skills
 
 | Skill | Description |

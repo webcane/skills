@@ -9,7 +9,7 @@ import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
-AGENTS = ("cane-wiki", "cane-wiki-critic")
+AGENTS = ("cane-wiki", "cane-wiki-critic", "cane-learning")
 
 
 def render(name: str) -> str:
@@ -33,7 +33,8 @@ if __name__ == "__main__":
     check = "--check" in args
     names = [arg for arg in args if arg != "--check"] or list(AGENTS)
     if args.count("--check") > 1 or any(name not in AGENTS for name in names):
-        sys.exit(f"Usage: {sys.argv[0]} [--check] [cane-wiki|cane-wiki-critic ...]")
+        supported = "|".join(AGENTS)
+        sys.exit(f"Usage: {sys.argv[0]} [--check] [{supported} ...]")
     for name in names:
         target = ROOT / "agents" / name / f"{name}.codex.toml"
         try:

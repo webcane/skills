@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "cells": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "facet_id": {
+            "type": "string"
+          },
+          "competency": {
+            "type": "string",
+            "enum": [
+              "conceptual",
+              "structural",
+              "declarative",
+              "procedural",
+              "mechanistic",
+              "predictive",
+              "diagnostic",
+              "design"
+            ]
+          },
+          "importance": {
+            "type": "string",
+            "enum": [
+              "required",
+              "supporting"
+            ]
+          },
+          "outcome": {
+            "type": "string"
+          },
+          "knowledge_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "explanation": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "facet_id",
+          "competency",
+          "importance",
+          "outcome",
+          "knowledge_ids",
+          "explanation"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "prompt": {
+            "type": "string"
+          },
+          "prerequisites": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "cell_id": {
+                  "type": "string"
+                },
+                "criterion": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "cell_id",
+                "criterion"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "id",
+          "prompt",
+          "prerequisites",
+          "checks"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "published_task_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "cells",
+    "tasks",
+    "published_task_ids"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,21 @@
+[metadata]
+name = "cane-learning"
+author = "Cane"
+version = "0.1.0"
+methodology = "Master Prompt v2.0 — Concept Learning Article Writer"
+
+[run]
+max_revisions = 2
+timeout_seconds = 300
+command = ["codex", "exec", "--skip-git-repo-check", "--ephemeral", "-s", "read-only", "--color", "never"]
+
+[depth]
+focused = "Все P0, только необходимые P1. Основной механизм и одна существенная граница. Три упражнения."
+standard = "Все P0 и P1, нужные для учебной цели. Покажи практические компромиссы и перенос. Три–четыре упражнения."
+deep = "Все P0 и релевантные P1, связанные причинные цепочки и контрпримеры. Включай P2, если они проясняют P0/P1. Четыре–пять упражнений."
+
+[contracts]
+analyst = "ConceptModel"
+designer = "LearningSpec"
+writer = "ArticleDraft"
+reviewer = "QualityReport"
