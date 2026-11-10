@@ -41,22 +41,11 @@
         ],
         "additionalProperties": false
       }
-    },
-    "review_card": {
-      "type": "string"
-    },
-    "deeper": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
     }
   },
   "required": [
     "title",
-    "sections",
-    "review_card",
-    "deeper"
+    "sections"
   ],
   "additionalProperties": false
 }

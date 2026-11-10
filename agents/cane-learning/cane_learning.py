@@ -54,7 +54,7 @@ def refs(ids, valid, label, *, required=True):
             f"{label}: пустая, повторная или неизвестная ссылка {ids}")
 
 
-def validate_links(role, data, state, depth):
+def validate_links(role, data, state, depth, projection='article'):
     if role == "analyst":
         facets, knowledge, sources, mechanisms = (
             index(data[key]) for key in ("facets", "knowledge", "sources", "mechanisms")
@@ -82,8 +82,7 @@ def validate_links(role, data, state, depth):
                 {cells[key]["facet_id"] for key in mandatory}, "P0 без обязательной клетки")
         for key, cell in cells.items():
             refs([cell["facet_id"]], facets, key)
-            same_facet = {k for k, item in knowledge.items() if item["facet_id"] == cell["facet_id"]}
-            refs(cell["knowledge_ids"], same_facet, key)
+            refs(cell["knowledge_ids"], knowledge, key)
         tested = set()
         for key, task in tasks.items():
             check_ids = [check["cell_id"] for check in task["checks"]]
@@ -91,9 +90,10 @@ def validate_links(role, data, state, depth):
             tested.update(check_ids)
         require(mandatory <= tested, "Обязательные клетки без задания")
         published = data["published_task_ids"]
-        refs(published, tasks, "Опубликованные задания")
-        minimum, maximum = TASK_COUNTS[depth]
-        require(minimum <= len(published) <= maximum, f"Для {depth} нужно {minimum}–{maximum} заданий")
+        refs(published, tasks, "Опубликованные задания", required=projection == "article")
+        if projection == "article":
+            minimum, maximum = TASK_COUNTS[depth]
+            require(minimum <= len(published) <= maximum, f"Для {depth} нужно {minimum}–{maximum} заданий")
         return
 
     learning = state["designer"]
@@ -148,11 +148,10 @@ def render_article(draft, learning):
     tasks = index(learning["tasks"])
     parts = [f"# {draft['title']}"]
     parts.extend(f"## {section['heading']}\n\n{section['markdown']}" for section in draft["sections"])
-    parts.extend(["## Итоговая карточка", draft["review_card"], "## Самопроверка"])
+    if learning["published_task_ids"]:
+        parts.append("## Самопроверка")
     for number, key in enumerate(learning["published_task_ids"], 1):
         parts.append(f"### {number}. Задание\n\n{tasks[key]['prompt']}")
-    if draft["deeper"]:
-        parts.extend(["## Глубже", "\n".join(f"- {item}" for item in draft["deeper"])])
     return "\n\n".join(parts) + "\n"
 
 
@@ -191,8 +190,11 @@ def run(args, config, brief):
                         )
                     raw = raw_file.read_text(encoding="utf-8")
                 artifact = json.loads(raw)
+                if role == "writer" and args.replay:
+                    artifact.pop("review_card", None)
+                    artifact.pop("deeper", None)
                 validate_shape(artifact, schema)
-                validate_links(role, artifact, state, depth)
+                validate_links(role, artifact, state, depth, brief["projection"])
             except (ValueError, OSError, subprocess.SubprocessError) as error:
                 raise ValueError(f"{name}/{contract}: {error}") from error
             state[role] = artifact
@@ -223,11 +225,14 @@ def main():
             "goal": "Практическое применение",
             "output_language": "ru",
             "depth": "standard",
+            "projection": "article",
             **tomllib.loads(args.request.read_text(encoding="utf-8")),
         }
         for key in ("topic", "technology", "version"):
             require(isinstance(brief.get(key), str) and brief[key].strip(), f"Нужно поле {key}")
         require(brief["depth"] in TASK_COUNTS, "Неизвестный режим глубины")
+        require(brief["projection"] in config["projections"], "Неизвестная проекция")
+        brief["projection_policy"] = config["projections"][brief["projection"]]
         require(type(config["run"]["max_revisions"]) is int and config["run"]["max_revisions"] >= 0,
                 "max_revisions должен быть целым неотрицательным числом")
         return run(args, config, brief)
