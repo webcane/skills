@@ -1,7 +1,7 @@
 [metadata]
 name = "cane-learning"
 author = "Cane"
-version = "0.1.0"
+version = "0.2.0"
 methodology = "Master Prompt v2.0 — Concept Learning Article Writer"
 
 [run]
