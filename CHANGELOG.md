@@ -10,6 +10,7 @@ and each skill is versioned and released independently.
 - Moved `mm-gtd` and the `mm-wiki-*` family out of the active `skills/` catalog into `archive/skills/`, retaining their source and family sync script for reference.
 
 ### Added
+- `scripts/install-opencode-agent.sh`: install repository agents in a project OpenCode directory, including cane-wiki-init or cane-learning runtime dependencies, with backup-on-force behavior
 - Registered `cane-learning` in the shared agent builder for Claude Code and Codex.
 - `cane-wiki-critic` editorial agent, generated Codex TOML, shared installation and release support, and configurable vault reports.
 - Agent-owned `cane-wiki` workflow rendered as a Codex custom agent; platform-specific packages and installers for the cane-wiki family.

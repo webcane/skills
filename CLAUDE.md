@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Repo Is
 
-A distribution system for Agent Skills with Claude Code, Claude.ai, and Codex packages. Canonical skills live in `skills/`; platform scripts render tool names and packaging differences without editing canonical source. Claude Code agents live separately under `agents/` and are released as versioned Markdown files.
+A distribution system for Agent Skills and agents for Claude Code, Claude.ai, Codex, and OpenCode. Canonical skills live in `skills/`; platform scripts render tool names and packaging differences without editing canonical source. Claude Code agents live separately under `agents/` and are released as versioned Markdown files.
 
 ## Repo Structure
 
@@ -135,6 +135,8 @@ Add it to the Skills table in `README.md`. CI packages it automatically on push.
 Agents live in `agents/<name>/<name>.md` with a separate `VERSION` and
 `CHANGELOG.md`. Install `cane-wiki` locally with `bash scripts/install-agent-local.sh cane-wiki`,
 or install a released version with `bash scripts/install-agent.sh cane-wiki 0.1.0`.
+Install an agent for a project in OpenCode with
+`bash scripts/install-opencode-agent.sh <agent-name> <project-dir>`.
 After updating and committing the agent and its version, run
 `bash scripts/release-agent.sh cane-wiki` to create a tag and GitHub Release.
 Agent tags have the form `agents/<name>/v<version>`; CI routes them to the agent
@@ -187,6 +189,7 @@ Releasing is handled by `release-skill.sh` (promotes `[Unreleased]` locally befo
 | `release-skill.sh` | Tag, push, and create GitHub release | `scripts/release-skill.sh` |
 | `install-skill.sh` | Install a skill from remote repo | `scripts/install-skill.sh` |
 | `install-local.sh` | Install a skill from local source | `scripts/install-local.sh` |
+| `install-opencode-agent.sh` | Install a repository agent in a project's OpenCode directory | `scripts/install-opencode-agent.sh` |
 ## CI/CD
 - `package-skills.yml` (`.github/workflows/package-skills.yml`) — two jobs:
 - `actions/checkout@v5`

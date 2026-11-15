@@ -1,6 +1,6 @@
 # Agent Skills Repository
 
-Distribute Agent Skills and custom agents for Claude Code and Codex from shared sources.
+Distribute Agent Skills and custom agents for Claude Code, Codex, and OpenCode from shared sources.
 
 ## How It Works
 
@@ -64,6 +64,24 @@ This produces `dist/<skillname>-claudeai.zip` (and a versioned copy), with
 skill's frontmatter defines `metadata.description_claudeai` (<= 200 chars),
 that short description is used; otherwise the main `description` is
 truncated to fit, with a warning.
+
+## Install a repository agent in OpenCode
+
+Install an agent into a project's `.opencode/agents/` directory. The script
+converts the repository Markdown frontmatter to OpenCode's format. For
+`cane-wiki`, it also installs the `cane-wiki-init` skill. For `cane-learning`,
+it installs the required runtime files under `agents/cane-learning/`.
+
+```bash
+bash scripts/install-opencode-agent.sh cane-wiki "$HOME/Documents/cane-wiki"
+bash scripts/install-opencode-agent.sh cane-learning "$HOME/Documents/cane-wiki"
+```
+
+An existing agent file is preserved by default. To replace it, use `--force`;
+the script saves a timestamped backup first. An existing complete
+`agents/cane-learning/` runtime or `cane-wiki-init` skill is left untouched.
+If `opencode` is available, the installer checks that it discovers the agent.
+The conversion requires Python 3 and PyYAML.
 
 ## cane-wiki for Claude Code and Codex
 
