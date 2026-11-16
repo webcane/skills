@@ -191,6 +191,7 @@ instructions, schemas, and a reproducible HashMap example.
 | Skill | Description |
 |-------|-------------|
 | [cane-wiki-init](skills/cane-wiki-init/) | Prepare an Obsidian vault for the cane-wiki agent |
+| [cane-wiki-reading-list](skills/cane-wiki-reading-list/) | Create a book conspect from Apple Reminders and offer to import it through cane-wiki |
 | [content-writer-linkedin](skills/content-writer-linkedin/) | Write authentic LinkedIn articles |
 | [hr-answer-coach](skills/hr-answer-coach/) | Interactive wizard that flags HR-interview red flags and rewrites the answer |
 | [idea-to-concept](skills/idea-to-concept/) | Structured reasoning: analyze, clarify, or solve a problem via a rigorous method, surfacing assumptions and resolving contradictions |
