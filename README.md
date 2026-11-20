@@ -12,7 +12,7 @@ skills/          →   package-skill.sh   →   dist/*.skill   →   GitHub Rele
 ## Quick Setup
 
 See **[QUICK_START.md](QUICK_START.md)** for the full release workflow
-(4 commands: package → package-claudeai → install-local → release).
+(package → install-local → release).
 
 Users install a skill with:
 
@@ -27,26 +27,40 @@ skill's `SKILL.md` frontmatter (`metadata.version`); release tags are
 
 For full setup instructions, see [QUICK_START.md](QUICK_START.md).
 
+## self-inquiry
+
+[Self-inquiry](skills/self-inquiry/README.md) provides evidence-based self-inquiry:
+three phases, seven adaptive modules, hypothesis checks, and small behavioral
+experiments. Includes installation instructions for Codex, OpenCode, Claude Code,
+and a separate Claude.ai upload package. It is not a diagnostic or therapy tool.
+
 ## Local Build & Install (Reinstall)
 
-Build a skill from source and install/reinstall it into your local Claude
-skills directory (`~/.claude/skills` by default) without going through
-GitHub releases:
+Build all package variants and install into Codex (`~/.agents/skills`),
+OpenCode (`${XDG_CONFIG_HOME:-~/.config}/opencode/skills`), and Claude Code
+(`~/.claude/skills`) by default:
 
 ```bash
-# Pick a skill interactively from skills/
+# Pick a skill interactively, or supply its name
 bash scripts/install-local.sh
-
-# Or specify it directly
 bash scripts/install-local.sh <skillname>
 
-# Install elsewhere
-INSTALL_DIR=/path/to/skills bash scripts/install-local.sh <skillname>
+# Install only into one harness
+bash scripts/install-local.sh <skillname> --target codex
+bash scripts/install-local.sh <skillname> --target opencode
+bash scripts/install-local.sh <skillname> --target claude-code
+
+# Single custom destination (choose the rendering explicitly)
+INSTALL_DIR=/path/to/skills bash scripts/install-local.sh <skillname> --target codex
 ```
 
-This packages the skill (version read from `SKILL.md` frontmatter) and
-re-extracts it over any existing local copy — safe to re-run after every
-local change to pick up edits.
+`--target all` is the default when `INSTALL_DIR` is unset. `claude` is an alias
+for `claude-code`. Setting `INSTALL_DIR` installs only there: known harness paths
+select the matching format; other paths use the universal package unless
+`--target` is supplied. `INSTALL_DIR` with `--target all` is rejected as ambiguous.
+Codex and Claude Code receive their rendered packages; OpenCode receives the
+universal skill. Reinstallation replaces the selected skill folders, so keep
+personal session data elsewhere. Requires Python 3 with PyYAML, tar, zip, and unzip.
 
 ## Packaging for Claude.ai
 
@@ -56,7 +70,11 @@ Claude.ai's skill upload has different requirements than the `.skill`
 top-level folder named after the skill rather than loose files at the root.
 
 ```bash
-bash scripts/package-skill-claudeai.sh <skillname>          # version read from frontmatter
+# One command builds universal .skill plus Codex, Claude Code, and Claude.ai ZIPs
+bash scripts/package-skill.sh <skillname>
+
+# Optional: rebuild only the Claude.ai ZIP
+bash scripts/package-skill-claudeai.sh <skillname>
 ```
 
 This produces `dist/<skillname>-claudeai.zip` (and a versioned copy), with

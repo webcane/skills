@@ -32,27 +32,27 @@ metadata:
 
 ## 2. Release a New Version
 
-Four steps — package, package for Claude.ai, install locally, then release:
+Three steps — build all packages, optionally install locally, then release:
 
 ```bash
-# 1. Package as .skill (tar.gz) for Claude Code / agentskills.io
+# 1. Build universal .skill and Codex, Claude Code, Claude.ai ZIPs
 bash scripts/package-skill.sh <skill-name>
+
+# 2. Install/reinstall into Codex, OpenCode, and Claude Code
+bash scripts/install-local.sh <skill-name>
+# Or choose only one: --target codex|opencode|claude-code
+
+# 3. Tag, push, and create GitHub release (version read from SKILL.md frontmatter)
+bash scripts/release-skill.sh <skill-name>
 ```
 
 `<skill-name>` is the path relative to the active `skills/` directory
 (`content-writer-linkedin`, for example). Archived skills under
 `archive/skills/` are not included. Artifacts and install dirs use the skill's
-flat basename.
-
-# 2. Package as .zip for Claude.ai upload
-bash scripts/package-skill-claudeai.sh <skill-name>
-
-# 3. Install/reinstall locally (optional — validates the package works)
-bash scripts/install-local.sh <skill-name>
-
-# 4. Tag, push, and create GitHub release (version read from SKILL.md frontmatter)
-bash scripts/release-skill.sh <skill-name>
-```
+flat basename. `INSTALL_DIR` installs only in the specified directory; use
+`--target` to select its format for a custom path. Existing selected skill
+folders are replaced. Packaging requires Python 3 with PyYAML, tar, and zip;
+installation also requires unzip.
 
 On a published release, CI packages and uploads only the tagged skill and
 promotes its `[Unreleased]` CHANGELOG section — so you don't need to attach the
@@ -73,9 +73,8 @@ vim skills/<skill-name>/SKILL.md          # bump metadata.version (e.g. 1.1.0 �
 # add the change under ## [Unreleased] in skills/<skill-name>/CHANGELOG.md
 git add skills/ && git commit -m "<skill-name>: description of change"
 
-# Then repeat the 4 release steps:
+# Then repeat the 3 release steps:
 bash scripts/package-skill.sh <skill-name>
-bash scripts/package-skill-claudeai.sh <skill-name>
 bash scripts/install-local.sh <skill-name>
 bash scripts/release-skill.sh <skill-name>
 ```

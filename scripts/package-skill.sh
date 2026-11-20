@@ -1,5 +1,5 @@
 #!/bin/bash
-# Package a skill directory into a distributable .skill file (tar.gz)
+# Build the universal .skill plus Codex, Claude Code, and Claude.ai archives.
 # Usage: ./scripts/package-skill.sh <skill-name> [version]
 #
 # If [version] is omitted, it is read from the skill's SKILL.md frontmatter
@@ -18,6 +18,9 @@ DIST_DIR="$REPO_ROOT/dist"
 ARTIFACT_NAME="$(basename "$SKILL_NAME")"
 
 [ -z "$SKILL_NAME" ] && echo "Usage: $0 <skill-name> [version]" && exit 1
+case "$SKILL_NAME" in
+  /*|*..*) echo "Error: invalid skill path '$SKILL_NAME'" >&2; exit 1 ;;
+esac
 [ ! -f "$SKILL_DIR/SKILL.md" ] && echo "Error: $SKILL_DIR/SKILL.md not found" && exit 1
 
 # Derive version from frontmatter (metadata.version) when not passed explicitly.
@@ -45,3 +48,8 @@ JSON
 
 echo "✓ dist/${ARTIFACT_NAME}.skill"
 echo "✓ dist/${ARTIFACT_NAME}-${VERSION}.skill (v${VERSION})"
+
+# Platform packagers are leaf commands: none calls this orchestrator.
+bash "$REPO_ROOT/scripts/package-skill-codex.sh" "$SKILL_NAME" "$VERSION"
+bash "$REPO_ROOT/scripts/package-skill-claude-code.sh" "$SKILL_NAME" "$VERSION"
+bash "$REPO_ROOT/scripts/package-skill-claudeai.sh" "$SKILL_NAME" "$VERSION"
