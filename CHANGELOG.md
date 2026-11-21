@@ -10,6 +10,9 @@ and each skill is versioned and released independently.
 - Moved `mm-gtd` and the `mm-wiki-*` family out of the active `skills/` catalog into `archive/skills/`, retaining their source and family sync script for reference.
 
 ### Added
+- `agents/engineering-dialectic/build_opencode.py`: render restricted OpenCode V2 orchestration and participant profiles from shared role prompts, with model override and generated-file checks.
+- `skills/engineering-dialectic/scripts/install_commands.py`: install the optional `/dialectic` entry command into OpenCode, Claude Code, and Codex command directories.
+- `agents/engineering-dialectic/verification.md`: configuration checks that were executed, plus the behavioral scenarios still pending.
 - `scripts/install-opencode-agent.sh`: install repository agents in a project OpenCode directory, with cane-learning runtime support and backup-on-force behavior
 - Registered `cane-learning` in the shared agent builder for Claude Code and Codex.
 - `cane-wiki-critic` editorial agent, generated Codex TOML, shared installation and release support, and configurable vault reports.

@@ -126,6 +126,16 @@ On push to `master` CI repackages all skills as `<name>.skill` artifacts.
 
 ## Adding a New Skill
 
+`engineering-dialectic` keeps its portable protocol and role prompts in
+`skills/engineering-dialectic/`. Its OpenCode V2 profiles are rendered with
+`python3 agents/engineering-dialectic/build_opencode.py`; use `--check` after
+editing canonical prompts. Installation requires both those profiles and the
+skill. Do not use the generic OpenCode installer for this agent: it does not
+preserve the group's restrictive permission rules. See the agent README.
+`skills/engineering-dialectic/scripts/install_commands.py` installs the optional
+`/dialectic` entry command; `agents/engineering-dialectic/verification.md` records
+which checks were actually run.
+
 Create `skills/<new-skill-name>/SKILL.md` with the required frontmatter (include
 `metadata.version`, start at `1.0.0`) and a `skills/<new-skill-name>/CHANGELOG.md`.
 Add it to the Skills table in `README.md`. CI packages it automatically on push.

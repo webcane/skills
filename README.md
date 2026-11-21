@@ -211,6 +211,7 @@ instructions, schemas, and a reproducible HashMap example.
 | [cane-wiki-init](skills/cane-wiki-init/) | Prepare an Obsidian vault for the cane-wiki agent |
 | [cane-wiki-reading-list](skills/cane-wiki-reading-list/) | Create a book conspect from Apple Reminders and offer to import it through cane-wiki |
 | [content-writer-linkedin](skills/content-writer-linkedin/) | Write authentic LinkedIn articles |
+| [engineering-dialectic](skills/engineering-dialectic/) | Independent engineering decisions, evidence discrimination, and targeted expert falsification; [examples](skills/engineering-dialectic/references/use-cases.md), [method comparison](skills/engineering-dialectic/references/method-comparison.md), [OpenCode agent](agents/engineering-dialectic/README.md) |
 | [howtotalk](skills/howtotalk/) | Communication and persuasion coach: routes a situation to 1–3 of 13 frameworks and writes exact scripts, with `analyze`, `select`, and `practice` modes |
 | [hr-answer-coach](skills/hr-answer-coach/) | Interactive wizard that flags HR-interview red flags and rewrites the answer |
 | [idea-to-concept](skills/idea-to-concept/) | Structured reasoning: analyze, clarify, or solve a problem via a rigorous method, surfacing assumptions and resolving contradictions |
