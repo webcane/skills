@@ -1,0 +1,123 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/webcane/skills/skills/pl-dialectics/comparability.schema.json",
+  "title": "pl-dialectics comparability block",
+  "description": "Machine-readable Task H plus axis positions. One file per language.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "study_id",
+    "language",
+    "slug",
+    "era",
+    "axes",
+    "core_contradictions",
+    "qualitative_jumps",
+    "major_syntheses",
+    "new_tensions",
+    "discovered_axes",
+    "verdict",
+    "source_counts",
+    "metrics"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1"
+    },
+    "study_id": {
+      "type": "string",
+      "description": "<slug>-v<schema_version>"
+    },
+    "language": {
+      "type": "string",
+      "minLength": 1
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "era": {
+      "type": "string",
+      "minLength": 1
+    },
+    "axes": {
+      "type": "object",
+      "description": "Exactly AX1..AX19.",
+      "required": [
+        "AX1", "AX2", "AX3", "AX4", "AX5", "AX6", "AX7", "AX8", "AX9", "AX10",
+        "AX11", "AX12", "AX13", "AX14", "AX15", "AX16", "AX17", "AX18", "AX19"
+      ],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^AX([1-9]|1[0-9])$": {
+          "type": "object",
+          "required": ["axis", "position", "justification", "evidence"],
+          "properties": {
+            "axis": { "type": "string" },
+            "position": {
+              "type": "string",
+              "minLength": 1,
+              "description": "THESIS | ANTITHESIS | SYNTHESIS | N/A | THIRD POLE: <name>"
+            },
+            "justification": { "type": "string", "minLength": 1 },
+            "evidence": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "core_contradictions": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^C[0-9]+$" },
+      "minItems": 3,
+      "maxItems": 5
+    },
+    "qualitative_jumps": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^J[0-9]+$" },
+      "minItems": 1
+    },
+    "major_syntheses": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^S[0-9]+$" },
+      "minItems": 1
+    },
+    "new_tensions": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^T[0-9]+$" },
+      "minItems": 1
+    },
+    "discovered_axes": {
+      "type": "string",
+      "description": "Candidate axes or 'None identified.'"
+    },
+    "verdict": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_counts": {
+      "type": "object",
+      "required": ["spec", "essay", "paper", "release", "retro"],
+      "additionalProperties": { "type": "integer", "minimum": 0 },
+      "properties": {
+        "spec": { "type": "integer", "minimum": 0 },
+        "essay": { "type": "integer", "minimum": 0 },
+        "paper": { "type": "integer", "minimum": 0 },
+        "release": { "type": "integer", "minimum": 0 },
+        "retro": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "required": ["citations", "unsourced", "unsourced_ratio", "words"],
+      "additionalProperties": false,
+      "properties": {
+        "citations": { "type": "integer", "minimum": 0 },
+        "unsourced": { "type": "integer", "minimum": 0 },
+        "unsourced_ratio": { "type": "number", "minimum": 0, "maximum": 1 },
+        "words": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}
