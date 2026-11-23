@@ -54,7 +54,7 @@ def refs(ids, valid, label, *, required=True):
             f"{label}: пустая, повторная или неизвестная ссылка {ids}")
 
 
-def validate_links(role, data, state, depth, projection='article'):
+def validate_links(role, data, state, depth, projection='overview'):
     if role == "analyst":
         facets, knowledge, sources, mechanisms = (
             index(data[key]) for key in ("facets", "knowledge", "sources", "mechanisms")
@@ -91,6 +91,8 @@ def validate_links(role, data, state, depth, projection='article'):
         require(mandatory <= tested, "Обязательные клетки без задания")
         published = data["published_task_ids"]
         refs(published, tasks, "Опубликованные задания", required=projection == "article")
+        if projection == "overview":
+            require(not published, "Overview не публикует задания")
         if projection == "article":
             minimum, maximum = TASK_COUNTS[depth]
             require(minimum <= len(published) <= maximum, f"Для {depth} нужно {minimum}–{maximum} заданий")
@@ -225,7 +227,7 @@ def main():
             "goal": "Практическое применение",
             "output_language": "ru",
             "depth": "standard",
-            "projection": "article",
+            "projection": "overview",
             **tomllib.loads(args.request.read_text(encoding="utf-8")),
         }
         for key in ("topic", "technology", "version"):

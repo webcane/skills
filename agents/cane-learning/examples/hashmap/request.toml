@@ -5,3 +5,4 @@ audience = "Разработчик, знакомый с классами, record
 goal = "Предсказать результат поиска, диагностировать ошибку и выбрать устойчивый ключ"
 output_language = "ru"
 depth = "focused"
+projection = "article"

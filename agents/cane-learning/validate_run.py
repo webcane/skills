@@ -16,7 +16,7 @@ def main():
     try:
         config = tomllib.loads((ROOT / 'pipeline.toml').read_text(encoding='utf-8'))
         brief = read_json(args.directory / 'brief.json')
-        projection = brief.get('projection', 'article')
+        projection = brief.get('projection', 'overview')
         if projection not in config['projections']:
             raise ValueError('Неизвестная проекция')
         state = {}
