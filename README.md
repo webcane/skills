@@ -215,6 +215,7 @@ instructions, schemas, and a reproducible HashMap example.
 | [howtotalk](skills/howtotalk/) | Communication and persuasion coach: routes a situation to 1–3 of 13 frameworks and writes exact scripts, with `analyze`, `select`, and `practice` modes |
 | [hr-answer-coach](skills/hr-answer-coach/) | Interactive wizard that flags HR-interview red flags and rewrites the answer |
 | [idea-to-concept](skills/idea-to-concept/) | Structured reasoning: analyze, clarify, or solve a problem via a rigorous method, surfacing assumptions and resolving contradictions |
+| [nyquist-validation](skills/nyquist-validation/) | Audit requirements and system invariants against behavioral tests; fill gaps without changing implementation, with OpenSpec change and delta-spec support |
 | [thesis-to-text](skills/thesis-to-text/) | Interactive wizard that turns raw theses/notes into a finished, audience-ready text |
 | [python-quiz](skills/python-quiz/) | Интерактивный квиз по Python по .md файлам в директории: выбор, открытые вопросы, задача на код, таймер и оценка в % |
 | [python-algo-coach](skills/python-algo-coach/) | Тренер по алгоритмам на Python (LeetCode Easy/Medium): 41 задача, 14 паттернов, прогон решений через тестовый харнесс |

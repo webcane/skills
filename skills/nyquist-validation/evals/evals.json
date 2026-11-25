@@ -1,0 +1,62 @@
+{
+  "skill_name": "nyquist-validation",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Проведи Nyquist-аудит покрытия требований платежного API. Ничего не изменяй. Все текущие тесты зелёные: достаточно ли их?",
+      "expected_output": "Distinguishes status-only tests from durable idempotency; finds missing concurrency evidence and skipped test; audit changes nothing.",
+      "files": [
+        "skills/nyquist-validation/evals/fixtures/misleading-green-audit"
+      ],
+      "assertions": [
+        "No source or test modifications",
+        "Does not accept HTTP-only checks or skipped tests as verified idempotency",
+        "Maps requirement to observable durable effect and exact runnable command",
+        "Reports unresolved concurrency coverage and limits"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Закрой тестами пробелы Nyquist-валидации последовательных повторов платежа по REQ-PAY-1. Сохрани VALIDATION.md. Работай только с последовательными запросами.",
+      "expected_output": "Adds and runs a durable-effect assertion, exposes duplicate records, escalates without changing implementation.",
+      "files": [
+        "skills/nyquist-validation/evals/fixtures/implementation-defect-fill"
+      ],
+      "assertions": [
+        "Creates and executes a behavioral test of persisted operation count",
+        "Reports the duplicate-payment implementation defect and does not weaken the test",
+        "Production payments.py remains unchanged",
+        "VALIDATION.md retains noncompliance with reproducible failing evidence"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Спланируй Nyquist-валидацию этой фичи до реализации. Сохрани VALIDATION.md, не устанавливай зависимости.",
+      "expected_output": "Standalone strategy with requirement IDs, invariants, observables and scaffolding, no false passing claims.",
+      "files": [
+        "skills/nyquist-validation/evals/fixtures/standalone-planning"
+      ],
+      "assertions": [
+        "Works without a specification framework and without installing dependencies",
+        "Defines distinct authorization, atomicity and retry obligations",
+        "Reports PLANNED/pending with coverage_complete false",
+        "Provides proposed commands and clearly marks missing scaffolding"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Закрой пробелы тестами для OpenSpec change owner-only-delete и сохрани отчёт в его VALIDATION.md. Учитывай все requirement/scenario этого изменения. Не меняй реализацию и спецификации.",
+      "expected_output": "Uses modified contract rather than baseline/archive, preserves renamed identity, exposes member deletion defect despite checked tasks, saves noncompliant report without source/spec edits.",
+      "files": [
+        "skills/nyquist-validation/evals/fixtures/openspec-delta"
+      ],
+      "assertions": [
+        "Uses owner-only MODIFIED contract and flags Member denied as failing, despite baseline/archive allowing members",
+        "Tracks Read document to View document rename without counting two requirements",
+        "Creates and executes meaningful tests; checked tasks and existing green tests do not count as complete coverage",
+        "Implementation and all OpenSpec input artifacts remain byte-identical; only tests and requested report change",
+        "Saves change VALIDATION.md with coverage_complete false and reproducible defect evidence"
+      ]
+    }
+  ]
+}
